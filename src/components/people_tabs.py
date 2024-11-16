@@ -1,21 +1,36 @@
-from PyQt5.QtWidgets import QListWidget, QWidget, QTabWidget, QLabel, QVBoxLayout
-from components.product_tabs import create_table_tab
+from PyQt5.QtWidgets import QWidget, QTabWidget, QVBoxLayout, QLabel, QListWidget, QSizePolicy
+from utils.table import CustomTable
 
-def create_list_tab(label):
-    tab = QWidget()
-    layout = QVBoxLayout()
-    layout.addWidget(QLabel(label))
-    layout.addWidget(QListWidget())
-    tab.setLayout(layout)
-    return tab
+class PeopleTabs(QWidget):
+    def __init__(self):
+        super().__init__()
+        self.init_ui()
 
-def init_people_tabs():
-    """Initialize people-related tabs."""
-    people_tab_widget = QTabWidget()
-    supplier_tab = create_table_tab(["Supplier", "Material", "Availability"])
-    rnd_tab = create_list_tab("R&D Projects")
+    def init_ui(self):
+        tab_widget = QTabWidget()
 
-    people_tab_widget.addTab(supplier_tab, "Supplier Tracking")
-    people_tab_widget.addTab(rnd_tab, "R&D Projects")
-    
-    return people_tab_widget
+        # Supplier Tracking Tab
+        supplier_tab = QWidget()
+        supplier_layout = QVBoxLayout()
+        supplier_table = CustomTable(5, 3)  # Example: 5 rows, 3 columns
+        supplier_table.setHorizontalHeaderLabels(["Supplier", "Material", "Availability"])
+        supplier_table.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
+        supplier_layout.addWidget(supplier_table)
+        supplier_tab.setLayout(supplier_layout)
+
+        # R&D Projects Tab
+        rnd_tab = QWidget()
+        rnd_layout = QVBoxLayout()
+        rnd_project_list = QListWidget()
+        rnd_layout.addWidget(QLabel("R&D Projects"))
+        rnd_layout.addWidget(rnd_project_list)
+        rnd_tab.setLayout(rnd_layout)
+
+        # Add tabs to the tab widget
+        tab_widget.addTab(supplier_tab, "Supplier Tracking")
+        tab_widget.addTab(rnd_tab, "R&D Projects")
+
+        # Main layout for PeopleTabs
+        main_layout = QVBoxLayout()
+        main_layout.addWidget(tab_widget)
+        self.setLayout(main_layout)

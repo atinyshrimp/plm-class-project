@@ -1,10 +1,11 @@
+import webbrowser
 from PyQt5 import QtGui
-from PyQt5.QtWidgets import QWidget, QHBoxLayout, QVBoxLayout, QStackedWidget, QMenuBar, QDesktopWidget, QMessageBox
+from PyQt5.QtWidgets import QAction, QWidget, QHBoxLayout, QVBoxLayout, QStackedWidget, QMenuBar, QDesktopWidget, QMessageBox
 from components.navbar import NavBar
-from components.product_tabs import init_product_tabs
-from components.people_tabs import init_people_tabs
-from components.process_tabs import init_process_tabs
-from components.data_tabs import init_data_tabs
+from components.product_tabs import ProductTabs
+from components.people_tabs import PeopleTabs
+from components.process_tabs import ProcessTabs
+from components.data_tabs import DataTabs
 from utils.styling import apply_stylesheet
 
 class PLMApp(QWidget):
@@ -44,15 +45,10 @@ class PLMApp(QWidget):
         self.tab_widget_stack = QStackedWidget(self)
 
         # Initialize and add tab widgets
-        self.product_tabs = init_product_tabs()
-        self.people_tabs = init_people_tabs()
-        self.process_tabs = init_process_tabs()
-        self.data_tabs = init_data_tabs()
-
-        self.tab_widget_stack.addWidget(self.product_tabs)
-        self.tab_widget_stack.addWidget(self.people_tabs)
-        self.tab_widget_stack.addWidget(self.process_tabs)
-        self.tab_widget_stack.addWidget(self.data_tabs)
+        self.tab_widget_stack.addWidget(ProductTabs())
+        self.tab_widget_stack.addWidget(PeopleTabs())
+        self.tab_widget_stack.addWidget(ProcessTabs())
+        self.tab_widget_stack.addWidget(DataTabs())
         self.tab_widget_stack.setCurrentIndex(0)  # Default to the first tab set
 
         # Connect navbar clicks to change the displayed content
@@ -72,6 +68,8 @@ class PLMApp(QWidget):
         # File Menu
         file_menu = menubar.addMenu("File")
         file_menu.addAction("New", self.new_file)
+
+        save_action = QAction
         file_menu.addAction("Save", self.save_file)
         file_menu.addAction("Export", self.export_data)
         file_menu.addAction("Exit", self.close_application)
@@ -88,6 +86,8 @@ class PLMApp(QWidget):
         help_menu = menubar.addMenu("Help")
         help_menu.addAction("About", self.show_about)
         help_menu.addAction("Help", self.show_help_documentation)
+        help_menu.addSeparator()
+        help_menu.addAction("Visit GitHub Repository", lambda: webbrowser.open("https://github.com/atinyshrimp/plm-class-project"))
 
         return menubar
 
