@@ -1,0 +1,90 @@
+QWidget {
+  background-color: background_color; /* Light Cream Background */
+  color: text_color; /* Dark Brown Text */
+  font-family: "Helvetica Neue", Arial, sans-serif;
+  font-size: 14px;
+}
+QTabWidget::pane {
+  border: none; /* Remove border from tab pane */
+}
+QTabBar::tab {
+  background: #ffffff; /* White background for inactive tabs */
+  padding: 10px 20px; /* More padding to avoid text truncation */
+  border: 1px solid background_color; /* Border matching background */
+  border-radius: 6px; /* Rounded tabs */
+  margin: 2px;
+  color: text_color; /* Dark Brown Text */
+  font-weight: bold; /* Bold text */
+  min-width: 150px; /* Ensure text fits */
+}
+QTabBar::tab:selected {
+  background: primary_color !important; /* Honey Brown color for selected tab */
+  color: white;
+  font-weight: bold;
+}
+QTabBar::tab:hover {
+  background: accent_color; /* Gold Yellow on hover */
+  color: white;
+}
+QPushButton {
+  background-color: primary_color; /* Honey Brown button */
+  color: white;
+  padding: 8px;
+  border-radius: 6px;
+  border: none;
+  font-size: 14px;
+}
+QPushButton:hover {
+  background-color: accent_color; /* Gold Yellow on hover */
+}
+QLineEdit,
+QTextEdit {
+  background-color: white;
+  border: 1px solid accent_color; /* Gold Yellow border */
+  padding: 6px;
+  border-radius: 4px;
+  font-size: 14px;
+}
+QListWidget {
+  background-color: primary_color; /* Honey Brown for Sidebar */
+  color: white !important;
+  border: none;
+  font-weight: bold;
+  font-size: 16px;
+  padding: 10px;
+}
+QListWidget::item {
+  padding: 5px;
+}
+QListWidget::item:selected {
+  background-color: accent_color; /* Gold Yellow when selected */
+  border-left: 5px solid white; /* Highlight selected item */
+  color: white;
+}
+QTableWidget {
+  background-color: white;
+  border: 1px solid accent_color;
+  border-radius: 6px;
+  font-size: 14px;
+}
+QTableWidget::item {
+  padding: 10px;
+  color: text_color;
+}
+QTableWidget::item:selected {
+  background-color: selected_color; /* Darker Teal for selected rows */
+  color: white;
+}
+QTableWidget::item:hover {
+  background-color: hover_color; /* Hover color for rows */
+  color: white;
+}
+QProgressBar {
+  border: 1px solid accent_color;
+  border-radius: 5px;
+  text-align: center;
+}
+QProgressBar::chunk {
+  background-color: primary_color; /* Progress bar color */
+  width: 20px;
+}
