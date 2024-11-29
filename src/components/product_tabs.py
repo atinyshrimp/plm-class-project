@@ -50,7 +50,7 @@ class ProductTabs(QWidget):
         # Product Table (on the left, larger size)
         self.product_table = CustomTable()
         self.product_table.setColumnCount(5)
-        self.product_table.setHorizontalHeaderLabels(["ID", "Nom", "Quantité", "Version", "Date de Production"])
+        self.product_table.setHorizontalHeaderLabels(["ID", "Nom", "Quantity", "Version", "Production Date"])
         self.product_table.itemSelectionChanged.connect(self._display_product_details)
         self.product_table.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
         self.product_table.setMinimumWidth(500)  # Set a larger minimum width for the table
@@ -109,13 +109,13 @@ class ProductTabs(QWidget):
         # Add the top row to the overall layout
         group_layout.addLayout(top_row_layout)
 
-        # Remaining Fields: Quantité, Contenant ID, Version, Date, Ingrédients
+        # Remaining Fields: Quantity, Contenant ID, Version, Date, Ingredients
         remaining_fields_layout = QFormLayout()
-        remaining_fields_layout.addRow("<b>Quantité:</b>", self.quantity_field)
-        remaining_fields_layout.addRow("<b>Contenant ID:</b>", self.container_field)
+        remaining_fields_layout.addRow("<b>Quantity:</b>", self.quantity_field)
+        remaining_fields_layout.addRow("<b>Container ID:</b>", self.container_field)
         remaining_fields_layout.addRow("<b>Version:</b>", self.version_field)
-        remaining_fields_layout.addRow("<b>Date de Production:</b>", self.date_field)
-        remaining_fields_layout.addRow("<b>Ingrédients:</b>", self.ingredients_field)
+        remaining_fields_layout.addRow("<b>Production Date:</b>", self.date_field)
+        remaining_fields_layout.addRow("<b>Ingredients:</b>", self.ingredients_field)
 
         # Add the remaining fields to the overall layout
         group_layout.addLayout(remaining_fields_layout)
@@ -179,7 +179,7 @@ class ProductTabs(QWidget):
         self.name_field.setText(product[1])
         self.description_field.setText(product[6])  # Description
         self.quantity_field.setText(str(product[2]))
-        self.container_field.setText(product[5])  # Contenant ID
+        self.container_field.setText(product[5])  # Container ID
         self.version_field.setText(product[3])
         self.date_field.setText(product[4])  # Date
         self.ingredients_field.setText(product[7])  # Ingredients
