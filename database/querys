@@ -1,0 +1,113 @@
+"""_______________________________________________________________________
+Fiches produit 
+
+  Pour chaque id afficher (Product_info): 
+    Nom 
+    Description_étiquettes 
+    Quantité 
+    Photo_étiquettes 
+    Id_contenant 
+    Photo 
+    Version 
+    Date_mise_en prod 
+    Ingrédients: join (composition_produit & ingredients) 
+"""
+SELECT 
+    pi.*,
+    cp.quantité AS composition_quantité,
+    ing.nom AS ingredient_nom
+FROM 
+    Product_info pi
+LEFT JOIN 
+    Composition_produit cp ON pi.id = cp.id_produit
+LEFT JOIN 
+    Ingredients ing ON cp.id_ingredient = ing.id
+WHERE 
+    pi.id = var(id_produit_chois);
+
+"""_______________________________________________________________________
+Détails des coûts 
+  
+  Pour chaque id_produit afficher (Details_Couts): 
+    cout_production 
+    cout_matières premières 
+    Prix de vente 
+    cout_marketing 
+    Somme des cout (Sum) 
+"""
+SELECT 
+    id_produit,
+    cout_prod AS cout_production,
+    cout_matieres_premieres AS cout_matieres_premieres,
+    prix_de_vente AS prix_de_vente,
+    cout_marketing AS cout_marketing,
+    (cout_prod + cout_matieres_premieres + cout_marketing) AS somme_des_couts
+FROM 
+    Details_Couts
+WHERE id_produit = var(id_produit_chois);
+
+
+"""_______________________________________________________________________
+Stock disponible et localisation 
+  
+  Afficher, filtrer et grouper : 
+    
+    La quantité par lot 
+    La date de peremption des lots  
+    L’entrepot de stockage 
+    La localisation de l’entrepot 
+    La date d’arrivée 
+    Id_produit  
+    Id_lot 
+"""
+  
+"""_______________________________________________________________________
+  Suivi de prod 
+  
+  Afficher, filtrer et grouper : 
+    Id_lot 
+    Process_name 
+    Date 
+    Id_produit 
+    Id_marchandise 
+    Ingredients 
+    usine 
+"""
+
+"""_______________________________________________________________________
+Suivi de marchandises (dispo fournisseurs) 
+  
+  Afficher, filtrer et grouper : 
+    Id_marchandises 
+    Date_contractualisation 
+    Date_livraison 
+    Ingredient 
+    quantité 
+    Usine de livraison 
+    fournisseur 
+"""
+
+"""_______________________________________________________________________
+Suivi distribution 
+  
+  Afficher, filtrer et grouper : 
+    Date_livraison 
+    Date de contractualisation 
+    Lot 
+    Quantité lot 
+    Entrepot de depart 
+    Distributeur, localisation 
+    Id_produit 
+"""
+  
+"""_______________________________________________________________________
+Historique des lots de produits (changement dans leurs attributs) 
+  
+  Pour chaque id_lot: 
+    Id_produit 
+    Quantité 
+    Date_de_prod 
+    Date_peremption 
+    Statut 
+    retour 
+"""
