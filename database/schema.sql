@@ -35,7 +35,7 @@ CREATE TABLE IF NOT EXISTS `Fournisseurs/Distributeurs` (
 	`nom` TEXT NOT NULL,
 	`localisation` TEXT NOT NULL,
 	`contact` TEXT NOT NULL,
-	`type` BLOB NOT NULL
+	`type` BOOLEAN NOT NULL
 );
 CREATE TABLE IF NOT EXISTS `Marchandises` (
 	`id` integer primary key NOT NULL UNIQUE,
@@ -46,14 +46,14 @@ CREATE TABLE IF NOT EXISTS `Marchandises` (
 	`id_usine_livraison` INTEGER NOT NULL,
 	`id_fournisseur` INTEGER NOT NULL,
 FOREIGN KEY(`id_ingredient`) REFERENCES `Ingredients`(`id`),
-FOREIGN KEY(`id_usine_livraison`) REFERENCES `Usines/entrepots`(`id`),
+FOREIGN KEY(`id_usine_livraison`) REFERENCES `Usines_entrepots`(`id`),
 FOREIGN KEY(`id_fournisseur`) REFERENCES `Fournisseurs/Distributeurs`(`id`)
 );
-CREATE TABLE IF NOT EXISTS `Usines/entrepots` (
+CREATE TABLE IF NOT EXISTS `Usines_entrepots` (
 	`id` integer primary key NOT NULL UNIQUE,
 	`localisation` TEXT NOT NULL,
 	`contact` TEXT NOT NULL,
-	`type` BLOB NOT NULL
+	`type` BOOLEAN NOT NULL
 );
 CREATE TABLE IF NOT EXISTS `Process` (
 	`id_usine` INTEGER NOT NULL,
@@ -85,8 +85,8 @@ CREATE TABLE IF NOT EXISTS `Lots` (
 	`date_de_peremption` REAL,
 	`id_produit` INTEGER NOT NULL,
 	`quantite` INTEGER NOT NULL,
-	`statut` BLOB NOT NULL,
-	`retour` BLOB,
+	`statut` BOOLEAN NOT NULL,
+	`retour` BOOLEAN,
 FOREIGN KEY(`id_produit`) REFERENCES `Product_info`(`id`)
 );
 CREATE TABLE IF NOT EXISTS `Historique_process` (
