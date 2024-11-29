@@ -155,26 +155,72 @@ ADD FOREIGN KEY(`id_distributeur`) REFERENCES `Fournisseurs_Distributeurs`(`id`)
 
 
 
-INSERT INTO Product_info (id, nom, description_étiquettes, quantité, photo_étiquettes, id_contenant, photo, version, date_mise_en_prod) VALUES (1, 'Product 1', 'Description for product 1', 45.97, 'photo_1_label.png', 5, 'photo_1.png', 8, '2024-11-29T17:26:57.980471');
-INSERT INTO Product_info (id, nom, description_étiquettes, quantité, photo_étiquettes, id_contenant, photo, version, date_mise_en_prod) VALUES (2, 'Product 2', 'Description for product 2', 87.00, 'photo_2_label.png', 4, 'photo_2.png', 7, '2024-11-29T17:26:57.980490');
-INSERT INTO Product_info (id, nom, description_étiquettes, quantité, photo_étiquettes, id_contenant, photo, version, date_mise_en_prod) VALUES (3, 'Product 3', 'Description for product 3', 24.39, 'photo_3_label.png', 5, 'photo_3.png', 3, '2024-11-29T17:26:57.980501');
-INSERT INTO Product_info (id, nom, description_étiquettes, quantité, photo_étiquettes, id_contenant, photo, version, date_mise_en_prod) VALUES (4, 'Product 4', 'Description for product 4', 17.44, 'photo_4_label.png', 1, 'photo_4.png', 10, '2024-11-29T17:26:57.980516');
-INSERT INTO Product_info (id, nom, description_étiquettes, quantité, photo_étiquettes, id_contenant, photo, version, date_mise_en_prod) VALUES (5, 'Product 5', 'Description for product 5', 55.60, 'photo_5_label.png', 1, 'photo_5.png', 9, '2024-11-29T17:26:57.980525');
-INSERT INTO Details_Couts (id, cout_prod, cout_matieres_premieres, prix_de_vente, id_produit, cout_marketing) VALUES (1, 32.60, 16.32, 81.85, 1, 1744);
-INSERT INTO Details_Couts (id, cout_prod, cout_matieres_premieres, prix_de_vente, id_produit, cout_marketing) VALUES (2, 16.96, 11.30, 53.22, 2, 3928);
-INSERT INTO Details_Couts (id, cout_prod, cout_matieres_premieres, prix_de_vente, id_produit, cout_marketing) VALUES (3, 17.34, 6.29, 88.30, 3, 4620);
-INSERT INTO Details_Couts (id, cout_prod, cout_matieres_premieres, prix_de_vente, id_produit, cout_marketing) VALUES (4, 15.17, 12.43, 79.95, 4, 4402);
-INSERT INTO Details_Couts (id, cout_prod, cout_matieres_premieres, prix_de_vente, id_produit, cout_marketing) VALUES (5, 42.60, 19.62, 68.00, 5, 1164);
-INSERT INTO Ingredients (id, nom) VALUES (1, 'Ingredient 1');
-INSERT INTO Ingredients (id, nom) VALUES (2, 'Ingredient 2');
-INSERT INTO Ingredients (id, nom) VALUES (3, 'Ingredient 3');
-INSERT INTO Ingredients (id, nom) VALUES (4, 'Ingredient 4');
-INSERT INTO Ingredients (id, nom) VALUES (5, 'Ingredient 5');
-INSERT INTO Composition_produit (id, id_produit, quantité, id_ingredient) VALUES (1, 5, 6.44, 3);
-INSERT INTO Composition_produit (id, id_produit, quantité, id_ingredient) VALUES (2, 2, 1.81, 3);
-INSERT INTO Composition_produit (id, id_produit, quantité, id_ingredient) VALUES (3, 3, 8.51, 3);
-INSERT INTO Composition_produit (id, id_produit, quantité, id_ingredient) VALUES (4, 3, 7.18, 1);
-INSERT INTO Composition_produit (id, id_produit, quantité, id_ingredient) VALUES (5, 1, 2.26, 1);
+-- Insertion des données dans Product_info
+INSERT INTO Product_info (id, nom, description_étiquettes, quantité, photo_étiquettes, id_contenant, photo, version, date_mise_en_prod) VALUES
+(1, 'Shampooing Naturel', 'Shampooing à base de plantes', 500, 'shampooing_label.png', 1, 'shampooing.png', 1, '2023-05-10'),
+(2, 'Savon Bio', 'Savon fait à la main', 300, 'savon_label.png', 2, 'savon.png', 1, '2023-07-15');
+
+-- Insertion des données dans Details_Couts
+INSERT INTO Details_Couts (id, cout_prod, cout_matieres_premieres, prix_de_vente, id_produit, cout_marketing) VALUES
+(1, 2.50, 1.20, 5.00, 1, 0.50),
+(2, 1.50, 0.80, 3.00, 2, 0.30);
+
+-- Insertion des données dans Ingredients
+INSERT INTO Ingredients (id, nom) VALUES
+(1, 'Huile essentielle'),
+(2, 'Aloe Vera'),
+(3, 'Beurre de karité');
+
+-- Insertion des données dans Composition_produit
+INSERT INTO Composition_produit (id, id_produit, quantité, id_ingredient) VALUES
+(1, 1, 100, 1),
+(2, 1, 200, 2),
+(3, 2, 150, 3);
+
+-- Insertion des données dans Fournisseurs_Distributeurs
+INSERT INTO Fournisseurs_Distributeurs (id, nom, localisation, contact, type) VALUES
+(1, 'Fournisseur Naturel', 'Paris', 'contact@naturel.com', 1),
+(2, 'Distributeur Bio', 'Lyon', 'contact@bio.com', 2);
+
+-- Insertion des données dans Usines_entrepots
+INSERT INTO Usines_entrepots (id, localisation, contact, type) VALUES
+(1, 'Usine Marseille', 'contact@usine.com', 1),
+(2, 'Entrepôt Lille', 'contact@entrepot.com', 2);
+
+-- Insertion des données dans Marchandises
+INSERT INTO Marchandises (id, date_contractualisation, date_livraison, id_ingredient, quantité_kg, id_usine_livraison, id_fournisseur) VALUES
+(1, '2023-04-01', '2023-04-15', 1, 50, 1, 1),
+(2, '2023-06-10', '2023-06-20', 2, 30, 1, 1);
+
+-- Insertion des données dans Process_type
+INSERT INTO Process_type (id, name) VALUES
+(1, 'Mélange'),
+(2, 'Conditionnement');
+
+-- Insertion des données dans Process
+INSERT INTO Process (id, id_usine, id_process_type, date, id_marchandise, id_ingredient) VALUES
+(1, 1, 1, '2023-05-01', 1, 1),
+(2, 1, 2, '2023-05-02', 2, 2);
+
+-- Insertion des données dans Lots
+INSERT INTO Lots (id, date_de_prod, date_de_peremption, id_produit, quantité, statut, retour) VALUES
+(1, '2023-05-10', '2024-05-10', 1, 100, 1, 0),
+(2, '2023-07-15', '2024-07-15', 2, 50, 1, 0);
+
+-- Insertion des données dans Stock
+INSERT INTO Stock (id, id_entrepot, id_lot, date_arrivee) VALUES
+(1, 2, 1, '2023-05-20'),
+(2, 2, 2, '2023-07-18');
+
+-- Insertion des données dans Historique_process
+INSERT INTO Historique_process (id_lot, id_process) VALUES
+(1, 1),
+(2, 2);
+
+-- Insertion des données dans Distributions
+INSERT INTO Distributions (id, id_entrepot, id_lot, id_distributeur, date_contractualisation, date_livraison) VALUES
+(1, 2, 1, 2, '2023-05-22', '2023-05-25'),
+(2, 2, 2, 2, '2023-07-20', '2023-07-25');
 
 -- QUERY database
 SELECT * FROM Product_info;
