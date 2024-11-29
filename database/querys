@@ -50,7 +50,7 @@ WHERE id_produit = var(id_produit_chois);
 """_______________________________________________________________________
 Stock disponible et localisation 
   
-  Afficher, filtrer et grouper : 
+  Afficher, filtrer: 
     
     La quantité par lot 
     La date de peremption des lots  
@@ -60,11 +60,29 @@ Stock disponible et localisation
     Id_produit  
     Id_lot 
 """
+SELECT 
+    Lots.id AS id_lot,
+    Lots.id_produit,
+    Lots.quantité AS quantite_par_lot,
+    Lots.date_de_peremption,
+    Usines_entrepots.id AS id_entrepot,
+    Usines_entrepots.localisation AS localisation_entrepot,
+    Stock.date_arrivee
+FROM 
+    Lots
+JOIN 
+    Stock ON Stock.id_lot = Lots.id
+JOIN 
+    Usines_entrepots ON Usines_entrepots.id = Stock.id_entrepot
+WHERE 
+    Lots.date_de_peremption > '2024-01-01' -- Exemple de filtre sur la date de péremption
+    AND Stock.date_arrivee > '2024-01-01'  -- Exemple de filtre sur la date d'arrivée
+    AND Usines_entrepots.localisation = 'Paris' -- Exemple de filtre sur la localisation
   
 """_______________________________________________________________________
   Suivi de prod 
   
-  Afficher, filtrer et grouper : 
+  Afficher, filtrer : 
     Id_lot 
     Process_name 
     Date 
