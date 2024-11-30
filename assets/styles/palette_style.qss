@@ -75,10 +75,6 @@ QTableWidget::item:selected {
   background-color: selected_color; /* Darker Teal for selected rows */
   color: white;
 }
-QTableWidget::item:hover {
-  background-color: hover_color; /* Hover color for rows */
-  color: white;
-}
 QProgressBar {
   border: 1px solid accent_color;
   border-radius: 5px;

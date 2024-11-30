@@ -1,13 +1,25 @@
 from PyQt5.QtWidgets import (
-    QWidget, QVBoxLayout, QHBoxLayout, QTabWidget, QTableWidgetItem, QFormLayout,
+    QWidget, QVBoxLayout, QHBoxLayout, QTabWidget, QTableWidgetItem, QGridLayout,
     QLineEdit, QTextEdit, QLabel, QSizePolicy
 )
+from PyQt5.QtGui import QPixmap
 from utils.table import CustomTable
 from widgets.product_photo_widget import ProductPhotoWidget
 
 class ProductTabs(QWidget):
     def __init__(self):
         super().__init__()
+        
+         # Initialize all fields before calling init_ui
+        self.id_field = QLineEdit()
+        self.name_field = QLineEdit()
+        self.description_field = QTextEdit()
+        self.quantity_field = QLineEdit()
+        self.container_field = QLineEdit()
+        self.version_field = QLineEdit()
+        self.date_field = QLineEdit()
+        self.ingredients_field = QTextEdit()
+        
         self.init_ui()
 
     def init_ui(self):
@@ -50,104 +62,143 @@ class ProductTabs(QWidget):
         # Product Table (on the left, larger size)
         self.product_table = CustomTable()
         self.product_table.setColumnCount(5)
-        self.product_table.setHorizontalHeaderLabels(["ID", "Nom", "Quantity", "Version", "Production Date"])
+        self.product_table.setHorizontalHeaderLabels(["ID", "Name", "Quantity", "Version", "Production Date"])
         self.product_table.itemSelectionChanged.connect(self._display_product_details)
         self.product_table.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
         self.product_table.setMinimumWidth(500)  # Set a larger minimum width for the table
+        
+        # Monitor selection changes
+        selection_model = self.product_table.selectionModel()
+        selection_model.selectionChanged.connect(self._on_selection_changed)
+
         product_sheet_tab_layout.addWidget(self.product_table, stretch=3)  # Assign more space to the table
 
         # Product Details Form (on the right)
         details_widget = QWidget()
         details_layout = QVBoxLayout()  # Use a vertical layout for a modern stacked design
 
-        # Group box for details
-        group_box = QWidget()
-        group_layout = QFormLayout()
-        
-
-        # Photo Widget
-        self.photo_widget = ProductPhotoWidget()
-
-        # Create text fields for product details
-        self.id_field = QLineEdit()
-        self.name_field = QLineEdit()
-        self.description_field = QTextEdit()
-        self.description_field.setMaximumHeight(50)
-        self.quantity_field = QLineEdit()
-        self.container_field = QLineEdit()
-        self.version_field = QLineEdit()
-        self.date_field = QLineEdit()
-        self.ingredients_field = QTextEdit()
-
-        # Make fields read-only
-        for widget in [
-            self.id_field, self.name_field, self.description_field, self.quantity_field,
-            self.container_field, self.version_field, self.date_field, self.ingredients_field
-        ]:
-            widget.setReadOnly(True)
-
-        # Create the overall layout
-        group_layout = QVBoxLayout()
-
-        # Top Row: Image and Basic Info (ID, Name, Description)
-        top_row_layout = QHBoxLayout()
-
-        # Left: Picture
-        self.photo_widget = ProductPhotoWidget()
-        top_row_layout.addWidget(self.photo_widget, stretch=1)
-
-        # Right: Basic Info (ID, Name, Description)
-        basic_info_layout = QFormLayout()
-        basic_info_layout.addRow("", self.id_field)
-        basic_info_layout.addRow("", self.name_field)
-        basic_info_layout.addRow("", self.description_field)
-
-        basic_info_widget = QWidget()
-        basic_info_widget.setLayout(basic_info_layout)
-        top_row_layout.addWidget(basic_info_widget, stretch=2)
-
-        # Add the top row to the overall layout
-        group_layout.addLayout(top_row_layout)
-
-        # Remaining Fields: Quantity, Contenant ID, Version, Date, Ingredients
-        remaining_fields_layout = QFormLayout()
-        remaining_fields_layout.addRow("<b>Quantity:</b>", self.quantity_field)
-        remaining_fields_layout.addRow("<b>Container ID:</b>", self.container_field)
-        remaining_fields_layout.addRow("<b>Version:</b>", self.version_field)
-        remaining_fields_layout.addRow("<b>Production Date:</b>", self.date_field)
-        remaining_fields_layout.addRow("<b>Ingredients:</b>", self.ingredients_field)
-
-        # Add the remaining fields to the overall layout
-        group_layout.addLayout(remaining_fields_layout)
-
-        # Style the group box
-        group_box.setLayout(group_layout)
-        group_box.setStyleSheet("""
+        # Group box for details with a more modern look
+        details_group_box = QWidget()
+        details_group_box.setStyleSheet("""
             QWidget {
-                border: 1px solid #d3d3d3;
-                border-radius: 5px;
-                padding: 10px;
-                background-color: #f9f9f9;
+                background-color: white;
+                border-radius: 12px;
             }
+        """)
+        details_group_layout = QVBoxLayout()
+
+        # Photo Section
+        photo_section = QHBoxLayout()
+        self.photo_widget = ProductPhotoWidget()
+        photo_section.addStretch(1)
+        photo_section.addWidget(self.photo_widget)
+        photo_section.addStretch(1)
+        details_group_layout.addLayout(photo_section)
+
+        # Details Grid
+        details_grid = QGridLayout()
+        details_grid.setSpacing(5)
+        details_grid.setColumnStretch(1, 2)
+
+        # Create a list of field labels and corresponding attributes
+        field_info = [
+            ("ID", self.id_field),
+            ("Name", self.name_field),
+            ("Quantity", self.quantity_field),
+            ("Container", self.container_field),
+            ("Version", self.version_field),
+            ("Production Date", self.date_field)
+        ]
+
+        # Create fields with modern styling
+        for row, (label, field) in enumerate(field_info):
+            label_widget = QLabel(f"<b>{label}:</b>")
+            label_widget.setStyleSheet("""
+                QLabel {
+                    color: #333;
+                    font-size: 14px;
+                    padding: 0;
+                }
+            """)
+            
+            field.setReadOnly(True)
+            field.setStyleSheet("""
+                QLineEdit {
+                    background-color: #f8f9fa;
+                    border: 1px solid #ced4da;
+                    border-radius: 4px;
+                    padding: 6px;
+                    font-size: 14px;
+                }
+                QLineEdit:focus {
+                    border-color: #80bdff;
+                }
+            """)
+            
+            details_grid.addWidget(label_widget, row, 0)
+            details_grid.addWidget(field, row, 1)
+
+        # Description Section
+        description_label = QLabel("<b>Description:</b>")
+        description_label.setStyleSheet("""
             QLabel {
-                font-size: 12px;
+                color: #333;
+                font-size: 14px;
+                padding: 0;
             }
-            QLineEdit, QTextEdit {
-                background-color: #ffffff;
-                border: 1px solid #d3d3d3;
-                border-radius: 3px;
-                padding: 5px;
+        """)
+        self.description_field.setReadOnly(True)
+        self.description_field.setStyleSheet("""
+            QTextEdit {
+                background-color: #f8f9fa;
+                border: 1px solid #ced4da;
+                border-radius: 4px;
+                padding: 6px;
+                font-size: 14px;
             }
         """)
 
-        details_layout.addWidget(group_box)
+        # Ingredients Section
+        ingredients_label = QLabel("<b>Ingredients:</b>")
+        ingredients_label.setStyleSheet("""
+            QLabel {
+                color: #333;
+                font-size: 14px;
+            }
+        """)
+        self.ingredients_field.setReadOnly(True)
+        self.ingredients_field.setStyleSheet("""
+            QTextEdit {
+                background-color: #f8f9fa;
+                border: 1px solid #ced4da;
+                border-radius: 4px;
+                padding: 6px;
+                font-size: 14px;
+            }
+        """)
+
+        # Add sections to the layout
+        details_group_layout.addLayout(details_grid)
+        details_group_layout.addWidget(description_label)
+        details_group_layout.addWidget(self.description_field)
+        details_group_layout.addWidget(ingredients_label)
+        details_group_layout.addWidget(self.ingredients_field)
+
+        # Set layout for the group box
+        details_group_box.setLayout(details_group_layout)
+
+        # Add the group box to the details layout
+        details_layout.addWidget(details_group_box)
         details_widget.setLayout(details_layout)
-        product_sheet_tab_layout.addWidget(details_widget, stretch=2)  # Allocate less space than the table
+
+        # Add details widget to the main layout
+        product_sheet_tab_layout.addWidget(details_widget, stretch=2)
 
         # Populate the table with dummy data
         self._load_dummy_data()
 
         # Set the layout to the specific tab
+        product_sheet_tab_layout.setContentsMargins(20, 20, 20, 20)  # Add some padding
         product_sheet_tab.setLayout(product_sheet_tab_layout)
 
     def _load_dummy_data(self):
@@ -171,6 +222,7 @@ class ProductTabs(QWidget):
         """Display detailed information about the selected product."""
         selected_row = self.product_table.currentRow()
         if selected_row == -1:
+            self.__clear_details_view()
             return
 
         product = self.dummy_data[selected_row]
@@ -183,3 +235,22 @@ class ProductTabs(QWidget):
         self.version_field.setText(product[3])
         self.date_field.setText(product[4])  # Date
         self.ingredients_field.setText(product[7])  # Ingredients
+        
+    def __clear_details_view(self):
+        self.photo_widget.photo_label.setPixmap(QPixmap())
+        self.photo_widget.photo_label.setText("No Image Found")
+        
+        self.id_field.setText("")
+        self.name_field.setText("")
+        self.description_field.setText("")  # Description
+        self.quantity_field.setText("")
+        self.container_field.setText("")  # Container ID
+        self.version_field.setText("")
+        self.date_field.setText("")  # Date
+        self.ingredients_field.setText("")  # Ingredients
+
+    def _on_selection_changed(self, selected, deselected):
+        """Handle selection changes and clear the detailed view if nothing is selected."""
+        if not self.product_table.selectionModel().hasSelection():  # No rows selected
+            self.__clear_details_view()
+
