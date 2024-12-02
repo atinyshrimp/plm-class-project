@@ -57,8 +57,14 @@ class ProductTabs(QWidget):
 
     def _init_product_sheets(self, product_sheet_tab):
         # Create the main horizontal layout for the table and details view
+        overall_tab_layout = QVBoxLayout()
+        self.search_field = QLineEdit()
+        self.search_field.setPlaceholderText("Search by name, ID, or container...")
+        self.search_field.textChanged.connect(self.__filter_products)
+        overall_tab_layout.addWidget(self.search_field)
+        
         product_sheet_tab_layout = QHBoxLayout()
-
+        
         # Product Table (on the left, larger size)
         self.product_table = CustomTable()
         self.product_table.setColumnCount(5)
@@ -198,8 +204,9 @@ class ProductTabs(QWidget):
         self._load_dummy_data()
 
         # Set the layout to the specific tab
-        product_sheet_tab_layout.setContentsMargins(20, 20, 20, 20)  # Add some padding
-        product_sheet_tab.setLayout(product_sheet_tab_layout)
+        product_sheet_tab_layout.setContentsMargins(10, 10, 10, 10)  # Add some padding
+        overall_tab_layout.addLayout(product_sheet_tab_layout)
+        product_sheet_tab.setLayout(overall_tab_layout)
 
     def _load_dummy_data(self):
         dummy_data = [
@@ -248,6 +255,17 @@ class ProductTabs(QWidget):
         self.version_field.setText("")
         self.date_field.setText("")  # Date
         self.ingredients_field.setText("")  # Ingredients
+
+    def __filter_products(self):
+        """Filter based on `Name` field
+        """
+        filter_text = self.search_field.text().lower()
+        for row in range(self.product_table.rowCount()):
+            item = self.product_table.item(row, 1) # Name
+            if item and filter_text in item.text().lower():
+                self.product_table.setRowHidden(row, False)
+            else:
+                self.product_table.setRowHidden(row, True)
 
     def _on_selection_changed(self, selected, deselected):
         """Handle selection changes and clear the detailed view if nothing is selected."""
