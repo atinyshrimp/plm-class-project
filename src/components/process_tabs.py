@@ -1,4 +1,4 @@
-from PyQt5.QtWidgets import QWidget, QTabWidget, QVBoxLayout, QComboBox, QLabel, QProgressBar, QSizePolicy
+from PyQt5.QtWidgets import QWidget, QTabWidget, QVBoxLayout, QSizePolicy, QLineEdit
 from utils.table import CustomTable
 
 class ProcessTabs(QWidget):
@@ -10,31 +10,52 @@ class ProcessTabs(QWidget):
         tab_widget = QTabWidget()
 
         # Production Tracking Tab
-        production_tab = QWidget()
-        production_layout = QVBoxLayout()
-        production_stage_combo = QComboBox()
-        production_stage_combo.addItems(["Raw Materials", "In Production", "Packaging", "Completed"])
-        production_progress = QProgressBar()
-        production_progress.setValue(50)
-        production_layout.addWidget(QLabel("Production Stage:"))
-        production_layout.addWidget(production_stage_combo)
-        production_layout.addWidget(production_progress)
-        production_tab.setLayout(production_layout)
+        tab_widget.addTab(self.create_production_tracking_tab(), "Production Tracking")
 
-        # Process History Tab
-        process_history_tab = QWidget()
-        process_history_layout = QVBoxLayout()
-        process_table = CustomTable(5, 3)  # Example: 5 rows, 3 columns
-        process_table.setHorizontalHeaderLabels(["Process ID", "Date", "Stage"])
-        process_table.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
-        process_history_layout.addWidget(process_table)
-        process_history_tab.setLayout(process_history_layout)
+        # Supplier Availability Tab
+        tab_widget.addTab(self.create_supplier_tab(), "Supplier Availability")
 
-        # Add tabs to the tab widget
-        tab_widget.addTab(production_tab, "Production Tracking")
-        tab_widget.addTab(process_history_tab, "Process History")
-
-        # Main layout for ProcessTabs
+        # Main Layout
         main_layout = QVBoxLayout()
         main_layout.addWidget(tab_widget)
         self.setLayout(main_layout)
+
+    def create_production_tracking_tab(self):
+        """Create the Production Tracking tab."""
+        tab = QWidget()
+        layout = QVBoxLayout()
+
+        search_field = QLineEdit()
+        search_field.setPlaceholderText("Search by Lot ID or Process Name...")
+        layout.addWidget(search_field)
+
+        table = CustomTable(8, 7)
+        table.setHorizontalHeaderLabels([
+            "Lot ID", "Process Name", "Date", "Product ID",
+            "Goods ID", "Ingredients", "Factory"
+        ])
+        table.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
+        layout.addWidget(table)
+
+        tab.setLayout(layout)
+        return tab
+
+    def create_supplier_tab(self):
+        """Create the Supplier Availability tab."""
+        tab = QWidget()
+        layout = QVBoxLayout()
+
+        search_field = QLineEdit()
+        search_field.setPlaceholderText("Search by Supplier or Goods ID...")
+        layout.addWidget(search_field)
+
+        table = CustomTable(8, 7)
+        table.setHorizontalHeaderLabels([
+            "Goods ID", "Contract Date", "Delivery Date",
+            "Ingredient", "Quantity", "Delivery Factory", "Supplier"
+        ])
+        table.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
+        layout.addWidget(table)
+
+        tab.setLayout(layout)
+        return tab
