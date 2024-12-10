@@ -31,6 +31,29 @@ class BatchHistoryTab(QWidget):
 
         # Grouping Dropdown
         self.grouping_dropdown = QComboBox()
+        self.grouping_dropdown.setStyleSheet("""
+            QComboBox {
+                border: 1px solid #F4C542;
+                border-radius: 5px;
+                padding: 5px 10px;
+                background-color: #ffffff;
+                color: #333;
+                font-size: 14px;
+            }
+            QComboBox::drop-down {
+                border: none;
+                background: #f8f9fa;
+            }
+            QComboBox QAbstractItemView {
+                border: 1px solid #ced4da;
+                background-color: #ffffff;
+                color: #333;
+                selection-background-color: #ffe6cc;
+                selection-color: #000;
+                padding: 5px;
+            }
+        """)
+
         self.grouping_dropdown.addItems(["No Grouping", "Group by Product ID", "Group by Status"])
         self.grouping_dropdown.currentIndexChanged.connect(self.group_batch_history)
         control_layout.addWidget(self.grouping_dropdown)
