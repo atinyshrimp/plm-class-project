@@ -11,6 +11,8 @@ class ProductTabs(QWidget):
     def __init__(self):
         super().__init__()
         
+        self.is_editing = False
+        
          # Initialize all fields before calling init_ui
         self.id_field = QLineEdit()
         self.name_field = QLineEdit()
@@ -110,6 +112,11 @@ class ProductTabs(QWidget):
         # Product Details Form (on the right)
         details_widget = QWidget()
         details_layout = QVBoxLayout()  # Use a vertical layout for a modern stacked design
+
+        self.toggle_edit_button = QPushButton("Edit Product")
+        # self.toggle_edit_button.setAlignment(Qt.AlignRight)
+        self.toggle_edit_button.clicked.connect(self._toggle_edit_mode)
+        details_layout.addWidget(self.toggle_edit_button)
 
         # Group box for details with a more modern look
         details_group_box = QWidget()
@@ -237,6 +244,70 @@ class ProductTabs(QWidget):
         self._load_dummy_data()
         self._update_table()
 
+    def _toggle_edit_mode(self):
+        """Enable or disable edit mode."""
+        selected_row = self.product_table.currentRow()
+        if selected_row == -1:
+            return
+
+        
+        if (not self.is_editing):
+            self.is_editing = True
+            
+            self.name_field.setReadOnly(False)
+            self.quantity_field.setReadOnly(False)
+            self.version_field.setReadOnly(False)
+            self.date_field.setReadOnly(False)
+            self.container_field.setReadOnly(False)
+            self.description_field.setReadOnly(False)
+            self.ingredients_field.setReadOnly(False)
+            
+            self.toggle_edit_button.setText("Save Edits")
+            self.toggle_edit_button.clicked.connect(self._save_product_details)
+            
+        else:
+            
+            self.name_field.setReadOnly(True)
+            self.quantity_field.setReadOnly(True)
+            self.version_field.setReadOnly(True)
+            self.date_field.setReadOnly(True)
+            self.container_field.setReadOnly(True)
+            self.description_field.setReadOnly(True)
+            self.ingredients_field.setReadOnly(True)
+            
+            self.is_editing = False
+
+            self.toggle_edit_button.setText("Edit Product")
+            self.toggle_edit_button.clicked.connect(self._toggle_edit_mode)
+        
+    def _save_product_details(self):
+        """Save updated product details and disable editing."""
+        selected_row = self.product_table.currentRow()
+        if selected_row == -1:
+            return
+
+        global_row_index = (self.current_page - 1) * self.page_size + selected_row
+
+        if global_row_index < len(self.filtered_data):
+            # Update the product details in the dataset
+            self.filtered_data[global_row_index] = (
+                self.filtered_data[global_row_index][0],  # ID (unchanged)
+                self.name_field.text(),
+                int(self.quantity_field.text()),
+                self.version_field.text(),
+                self.date_field.text(),
+                self.container_field.text(),
+                self.description_field.toPlainText(),
+                self.ingredients_field.toPlainText(),
+                self.filtered_data[global_row_index][8],  # Photo URL (unchanged)
+            )
+
+        # Refresh the table
+        self._update_table()
+
+        # Switch back to view mode
+        self._toggle_edit_mode()
+
     def _load_dummy_data(self):
         self.dummy_data = [
             (1, "Honey Jar", 50, "1.0", "2023-10-01", "JAR001", "Pure organic honey", "Honey (90%), Beeswax (10%)", "https://m.media-amazon.com/images/I/81XTYU+nntL.jpg"),
@@ -287,12 +358,21 @@ class ProductTabs(QWidget):
 
     def _display_product_details(self):
         """Display detailed information about the selected product."""
-        selected_row = self.product_table.currentRow()
-        if selected_row == -1:
+        selected_row = self.product_table.currentRow()  # Get the row index in the paginated table
+        if selected_row == -1:  # No selection
             self.__clear_details_view()
             return
 
-        product = self.dummy_data[selected_row]
+        # Calculate the correct index in the filtered data
+        global_row_index = (self.current_page - 1) * self.page_size + selected_row
+
+        # Ensure the index is within bounds
+        if global_row_index >= len(self.filtered_data):
+            self.__clear_details_view()
+            return
+
+        # Retrieve the product data
+        product = self.filtered_data[global_row_index]
         self.photo_widget.set_photo(str(product[8]))  # Set the photo
         self.id_field.setText(str(product[0]))
         self.name_field.setText(product[1])
@@ -302,7 +382,7 @@ class ProductTabs(QWidget):
         self.version_field.setText(product[3])
         self.date_field.setText(product[4])  # Date
         self.ingredients_field.setText(product[7])  # Ingredients
-        
+    
     def __clear_details_view(self):
         self.photo_widget.photo_label.setPixmap(QPixmap())
         self.photo_widget.photo_label.setText("No Image Found")
@@ -336,7 +416,6 @@ class ProductTabs(QWidget):
         self.total_pages = (len(self.filtered_data) + self.page_size - 1) // self.page_size
         self.current_page = 1
         self._update_table()
-
 
     def _on_selection_changed(self, selected, deselected):
         """Handle selection changes and clear the detailed view if nothing is selected."""

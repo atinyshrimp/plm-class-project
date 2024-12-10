@@ -28,7 +28,7 @@ class ProductPhotoWidget(QWidget):
         # Cancel any ongoing network request
         if self.current_reply:
             self.current_reply.abort()
-            self.current_reply.deleteLater()
+            # self.current_reply.deleteLater()
 
         if photo_path.startswith("http://") or photo_path.startswith("https://"):
             # Handle online images
@@ -62,5 +62,5 @@ class ProductPhotoWidget(QWidget):
             else:
                 self.photo_label.setText("Error Loading Image")
             
-            reply.deleteLater()
+            # reply.deleteLater()
             self.current_reply = None
