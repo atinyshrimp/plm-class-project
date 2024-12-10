@@ -1,5 +1,5 @@
 from PyQt5.QtWidgets import (
-    QWidget, QVBoxLayout, QHBoxLayout, QLineEdit, QTableWidgetItem, QFileDialog, QPushButton, QComboBox, QLabel
+    QWidget, QVBoxLayout, QHBoxLayout, QLineEdit, QTableWidgetItem, QFileDialog, QPushButton, QComboBox, QLabel, QAbstractItemView, QMenu, QAction, QMessageBox
 )
 from PyQt5.QtGui import QColor
 from PyQt5.QtCore import Qt
@@ -49,6 +49,8 @@ class BatchHistoryTab(QWidget):
             "Expiry Date", "Status", "Return"
         ])
         self.batch_table.setSizePolicy(self.batch_table.sizePolicy().Expanding, self.batch_table.sizePolicy().Expanding)
+        self.batch_table.setContextMenuPolicy(Qt.CustomContextMenu)
+        self.batch_table.customContextMenuRequested.connect(self.show_context_menu)
         main_layout.addWidget(self.batch_table)
 
         # Pagination Controls
@@ -142,6 +144,63 @@ class BatchHistoryTab(QWidget):
         if self.current_page < self.total_pages:
             self.current_page += 1
             self.update_batch_table()
+            
+    def show_context_menu(self, position):
+        """Display context menu for batch actions."""
+        menu = QMenu(self)
+
+        report_action = QAction("View Report", self)
+        report_action.triggered.connect(self.show_batch_report)
+        menu.addAction(report_action)
+
+        mark_inactive_action = QAction("Mark as Inactive", self)
+        mark_inactive_action.triggered.connect(self.mark_batch_as_inactive)
+        menu.addAction(mark_inactive_action)
+
+        mark_shipped_action = QAction("Mark as Shipped", self)
+        mark_shipped_action.triggered.connect(self.mark_batch_as_shipped)
+        menu.addAction(mark_shipped_action)
+
+        menu.exec_(self.batch_table.viewport().mapToGlobal(position))
+        
+    def show_batch_report(self):
+        """Display detailed batch information in a popup."""
+        selected_row = self.batch_table.currentRow()
+        if selected_row == -1:
+            return
+        global_row_index = (self.current_page - 1) * self.page_size + selected_row
+        batch = self.filtered_batch_data[global_row_index]
+
+        report_text = f"""
+        Lot ID: {batch[0]}
+        Product ID: {batch[1]}
+        Quantity: {batch[2]}
+        Production Date: {batch[3]}
+        Expiry Date: {batch[4]}
+        Status: {batch[5]}
+        Return: {batch[6]}
+        """
+        QMessageBox.information(self, "Batch Report", report_text)
+
+    def mark_batch_as_inactive(self):
+        """Mark the selected batch as inactive."""
+        selected_row = self.batch_table.currentRow()
+        if selected_row == -1:
+            return
+        global_row_index = (self.current_page - 1) * self.page_size + selected_row
+        batch = self.filtered_batch_data[global_row_index]
+        self.filtered_batch_data[global_row_index] = batch[:5] + ("Inactive", batch[6])
+        self.update_batch_table()
+
+    def mark_batch_as_shipped(self):
+        """Mark the selected batch as shipped."""
+        selected_row = self.batch_table.currentRow()
+        if selected_row == -1:
+            return
+        global_row_index = (self.current_page - 1) * self.page_size + selected_row
+        batch = self.filtered_batch_data[global_row_index]
+        self.filtered_batch_data[global_row_index] = batch[:5] + ("Shipped", batch[6])
+        self.update_batch_table()
 
     def export_batch_history(self):
         """Export batch history to a CSV file."""
