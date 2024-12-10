@@ -8,5 +8,8 @@ class CustomTable(QTableWidget):
         widget.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
         widget.horizontalHeader().setSectionResizeMode(QHeaderView.Stretch)
         widget.verticalHeader().setVisible(False)
+        widget.setShowGrid(False)
+        widget.setEditTriggers(QTableWidget.NoEditTriggers)
+
         if headers:
             widget.setHorizontalHeaderLabels(headers)
