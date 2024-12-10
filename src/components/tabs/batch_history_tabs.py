@@ -1,5 +1,5 @@
 from PyQt5.QtWidgets import (
-    QWidget, QVBoxLayout, QHBoxLayout, QLineEdit, QTableWidgetItem, QFileDialog, QPushButton, QComboBox
+    QWidget, QVBoxLayout, QHBoxLayout, QLineEdit, QTableWidgetItem, QFileDialog, QPushButton, QComboBox, QLabel
 )
 from PyQt5.QtGui import QColor
 from PyQt5.QtCore import Qt
@@ -9,6 +9,11 @@ import csv
 class BatchHistoryTab(QWidget):
     def __init__(self):
         super().__init__()
+        self.page_size = 5  # Number of rows per page
+        self.current_page = 1
+        self.total_pages = 1
+        self.batch_data = []  # Full dataset
+        self.filtered_batch_data = []  # Filtered dataset
         self.init_ui()
 
     def init_ui(self):
@@ -46,6 +51,20 @@ class BatchHistoryTab(QWidget):
         self.batch_table.setSizePolicy(self.batch_table.sizePolicy().Expanding, self.batch_table.sizePolicy().Expanding)
         main_layout.addWidget(self.batch_table)
 
+        # Pagination Controls
+        pagination_layout = QHBoxLayout()
+        self.previous_button = QPushButton("Previous")
+        self.previous_button.clicked.connect(self.go_to_previous_page)
+        self.next_button = QPushButton("Next")
+        self.next_button.clicked.connect(self.go_to_next_page)
+        self.page_label = QLabel("Page 1 of 1")
+        pagination_layout.addWidget(self.previous_button)
+        pagination_layout.addWidget(self.page_label, alignment=Qt.AlignCenter)
+        pagination_layout.addWidget(self.next_button)
+        main_layout.addLayout(pagination_layout)
+
+        self.setLayout(main_layout)
+
         # Dummy Data
         self.batch_data = [
             ("L001", "P001", 100, "2023-01-15", "2023-06-15", "Active", "None"),
@@ -56,9 +75,8 @@ class BatchHistoryTab(QWidget):
             ("L006", "P001", 60, "2023-06-10", "2023-11-10", "Expired", "Returned"),
         ]
         self.filtered_batch_data = self.batch_data[:]  # Start with unfiltered data
+        self.total_pages = (len(self.batch_data) + self.page_size - 1) // self.page_size
         self.update_batch_table()
-
-        self.setLayout(main_layout)
 
     def filter_batch_history(self):
         """Filter batch history based on the search input."""
@@ -112,6 +130,18 @@ class BatchHistoryTab(QWidget):
             "Returned": QColor("#ffff99"),  # Yellow
         }
         return colors.get(status, QColor("#ffffff"))  # Default: White
+
+    def go_to_previous_page(self):
+        """Navigate to the previous page."""
+        if self.current_page > 1:
+            self.current_page -= 1
+            self.update_batch_table()
+
+    def go_to_next_page(self):
+        """Navigate to the next page."""
+        if self.current_page < self.total_pages:
+            self.current_page += 1
+            self.update_batch_table()
 
     def export_batch_history(self):
         """Export batch history to a CSV file."""
