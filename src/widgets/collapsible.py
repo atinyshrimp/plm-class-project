@@ -1,6 +1,9 @@
 from PyQt5.QtWidgets import QWidget, QVBoxLayout, QPushButton, QFrame, QListWidget, QHBoxLayout
+from PyQt5.QtCore import pyqtSignal
 
 class CollapsibleSection(QWidget):
+    toggled = pyqtSignal(bool) # Signal to indicate expanded/collapsed state
+    
     def __init__(self, title, content_widget):
         super().__init__()
         self.init_ui(title, content_widget)
@@ -26,4 +29,6 @@ class CollapsibleSection(QWidget):
 
     def toggle_content(self):
         """Show or hide the content based on the toggle button."""
-        self.content_frame.setVisible(self.toggle_button.isChecked())
+        is_expanded = self.toggle_button.isChecked()
+        self.content_frame.setVisible(is_expanded)
+        self.toggled.emit(is_expanded)  # Emit the toggled signal

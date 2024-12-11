@@ -153,6 +153,11 @@ class DistributionTrackingTab(QWidget):
 
         # Add collapsible section for upcoming deliveries
         upcoming_section = CollapsibleSection("Upcoming Deliveries", upcoming_content_widget)
+        
+        # Connect the toggled signal to refresh the deliveries when expanded
+        upcoming_section.toggled.connect(lambda expanded: self.show_upcoming_deliveries() if expanded else None)
+        
+        # Add the section to the main layout
         main_layout.addWidget(upcoming_section)
 
         self.setLayout(main_layout)
