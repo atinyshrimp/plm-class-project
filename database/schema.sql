@@ -1,5 +1,6 @@
 -- INIT database
--- 1. Création des tables sans clés étrangères
+-- 1. Création des tables avec clés étrangères incluses
+
 CREATE TABLE IF NOT EXISTS `Product_info` (
 	`id` INTEGER PRIMARY KEY NOT NULL UNIQUE,
 	`nom` TEXT NOT NULL,
@@ -18,7 +19,8 @@ CREATE TABLE IF NOT EXISTS `Details_Couts` (
 	`cout_matieres_premieres` REAL NOT NULL,
 	`prix_de_vente` REAL NOT NULL,
 	`id_produit` INTEGER NOT NULL,
-	`cout_marketing` INTEGER NOT NULL
+	`cout_marketing` INTEGER NOT NULL,
+	FOREIGN KEY(`id_produit`) REFERENCES `Product_info`(`id`)
 );
 
 CREATE TABLE IF NOT EXISTS `Ingredients` (
@@ -30,7 +32,9 @@ CREATE TABLE IF NOT EXISTS `Composition_produit` (
 	`id` INTEGER PRIMARY KEY NOT NULL UNIQUE,
 	`id_produit` INTEGER NOT NULL,
 	`quantité` REAL NOT NULL,
-	`id_ingredient` INTEGER NOT NULL
+	`id_ingredient` INTEGER NOT NULL,
+	FOREIGN KEY(`id_produit`) REFERENCES `Product_info`(`id`),
+	FOREIGN KEY(`id_ingredient`) REFERENCES `Ingredients`(`id`)
 );
 
 CREATE TABLE IF NOT EXISTS `Fournisseurs_Distributeurs` (
@@ -55,7 +59,10 @@ CREATE TABLE IF NOT EXISTS `Marchandises` (
 	`id_ingredient` INTEGER NOT NULL,
 	`quantité_kg` REAL NOT NULL,
 	`id_usine_livraison` INTEGER NOT NULL,
-	`id_fournisseur` INTEGER NOT NULL
+	`id_fournisseur` INTEGER NOT NULL,
+	FOREIGN KEY(`id_ingredient`) REFERENCES `Ingredients`(`id`),
+	FOREIGN KEY(`id_usine_livraison`) REFERENCES `Usines_entrepots`(`id`),
+	FOREIGN KEY(`id_fournisseur`) REFERENCES `Fournisseurs_Distributeurs`(`id`)
 );
 
 CREATE TABLE IF NOT EXISTS `Process_type` (
@@ -64,19 +71,25 @@ CREATE TABLE IF NOT EXISTS `Process_type` (
 );
 
 CREATE TABLE IF NOT EXISTS `Process` (
+	`id` INTEGER PRIMARY KEY NOT NULL UNIQUE,
 	`id_usine` INTEGER NOT NULL,
 	`id_process_type` INTEGER NOT NULL,
 	`date` DATE NOT NULL,
-	`id` INTEGER NOT NULL PRIMARY KEY,
 	`id_marchandise` INTEGER,
-	`id_ingredient` INTEGER NOT NULL
+	`id_ingredient` INTEGER NOT NULL,
+	FOREIGN KEY(`id_usine`) REFERENCES `Usines_entrepots`(`id`),
+	FOREIGN KEY(`id_process_type`) REFERENCES `Process_type`(`id`),
+	FOREIGN KEY(`id_marchandise`) REFERENCES `Marchandises`(`id`),
+	FOREIGN KEY(`id_ingredient`) REFERENCES `Ingredients`(`id`)
 );
 
 CREATE TABLE IF NOT EXISTS `Stock` (
 	`id` INTEGER PRIMARY KEY NOT NULL UNIQUE,
 	`id_entrepot` INTEGER NOT NULL,
 	`id_lot` INTEGER NOT NULL,
-	`date_arrivee` DATE NOT NULL
+	`date_arrivee` DATE NOT NULL,
+	FOREIGN KEY(`id_entrepot`) REFERENCES `Usines_entrepots`(`id`),
+	FOREIGN KEY(`id_lot`) REFERENCES `Lots`(`id`)
 );
 
 CREATE TABLE IF NOT EXISTS `Lots` (
@@ -86,12 +99,15 @@ CREATE TABLE IF NOT EXISTS `Lots` (
 	`id_produit` INTEGER NOT NULL,
 	`quantité` INTEGER NOT NULL,
 	`statut` INTEGER NOT NULL,
-	`retour` INTEGER
+	`retour` INTEGER,
+	FOREIGN KEY(`id_produit`) REFERENCES `Product_info`(`id`)
 );
 
 CREATE TABLE IF NOT EXISTS `Historique_process` (
 	`id_lot` INTEGER NOT NULL,
-	`id_process` INTEGER NOT NULL
+	`id_process` INTEGER NOT NULL,
+	FOREIGN KEY(`id_lot`) REFERENCES `Lots`(`id`),
+	FOREIGN KEY(`id_process`) REFERENCES `Process`(`id`)
 );
 
 CREATE TABLE IF NOT EXISTS `Distributions` (
@@ -100,57 +116,11 @@ CREATE TABLE IF NOT EXISTS `Distributions` (
 	`id_lot` INTEGER NOT NULL,
 	`id_distributeur` INTEGER NOT NULL,
 	`date_contractualisation` DATE NOT NULL,
-	`date_livraison` DATE NOT NULL
+	`date_livraison` DATE NOT NULL,
+	FOREIGN KEY(`id_entrepot`) REFERENCES `Usines_entrepots`(`id`),
+	FOREIGN KEY(`id_lot`) REFERENCES `Lots`(`id`),
+	FOREIGN KEY(`id_distributeur`) REFERENCES `Fournisseurs_Distributeurs`(`id`)
 );
-
--- 2. Ajout des clés étrangères (FOREIGN KEY) après la création des tables
-
--- Foreign Key pour `Details_Couts`
-ALTER TABLE `Details_Couts`
-ADD FOREIGN KEY(`id_produit`) REFERENCES `Product_info`(`id`);
-
--- Foreign Key pour `Composition_produit`
-ALTER TABLE `Composition_produit`
-ADD FOREIGN KEY(`id_produit`) REFERENCES `Product_info`(`id`),
-ADD FOREIGN KEY(`id_ingredient`) REFERENCES `Ingredients`(`id`);
-
--- Foreign Key pour `Marchandises`
-ALTER TABLE `Marchandises`
-ADD FOREIGN KEY(`id_ingredient`) REFERENCES `Ingredients`(`id`),
-ADD FOREIGN KEY(`id_usine_livraison`) REFERENCES `Usines_entrepots`(`id`),
-ADD FOREIGN KEY(`id_fournisseur`) REFERENCES `Fournisseurs_Distributeurs`(`id`);
-
--- Foreign Key pour `Process`
-ALTER TABLE `Process`
-ADD FOREIGN KEY(`id_usine`) REFERENCES `Usines_entrepots`(`id`),
-ADD FOREIGN KEY(`id_process_type`) REFERENCES `Process_type`(`id`),
-ADD FOREIGN KEY(`id_marchandise`) REFERENCES `Marchandises`(`id`),
-ADD FOREIGN KEY(`id_ingredient`) REFERENCES `Ingredients`(`id`);
-
--- Foreign Key pour `Stock`
-ALTER TABLE `Stock`
-ADD FOREIGN KEY(`id_entrepot`) REFERENCES `Usines_entrepots`(`id`),
-ADD FOREIGN KEY(`id_lot`) REFERENCES `Lots`(`id`);
-
--- Foreign Key pour `Lots`
-ALTER TABLE `Lots`
-ADD FOREIGN KEY(`id_produit`) REFERENCES `Product_info`(`id`);
-
--- Foreign Key pour `Historique_process`
-ALTER TABLE `Historique_process`
-ADD FOREIGN KEY(`id_lot`) REFERENCES `Lots`(`id`),
-ADD FOREIGN KEY(`id_process`) REFERENCES `Process`(`id`);
-
--- Foreign Key pour `Distributions`
-ALTER TABLE `Distributions`
-ADD FOREIGN KEY(`id_entrepot`) REFERENCES `Usines_entrepots`(`id`),
-ADD FOREIGN KEY(`id_lot`) REFERENCES `Lots`(`id`),
-ADD FOREIGN KEY(`id_distributeur`) REFERENCES `Fournisseurs_Distributeurs`(`id`);
-
-
-
--- INSERT DATA
--- (Data remains unchanged)
 
 
 
