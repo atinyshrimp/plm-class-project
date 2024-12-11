@@ -91,6 +91,71 @@ WHERE
     Ingredients 
     usine 
 """
+vision ligne par ligne:
+  SELECT 
+      L.id AS Id_lot,
+      PT.name AS Process_name,
+      P.date AS Date,
+      PI.id AS Id_produit,
+      M.id AS Id_marchandise,
+      UE.localisation AS Usine
+  FROM 
+      Historique_process HP
+  JOIN 
+      Lots L ON HP.id_lot = L.id
+  JOIN 
+      Process P ON HP.id_process = P.id
+  JOIN 
+      Process_type PT ON P.id_process_type = PT.id
+  LEFT JOIN 
+      Marchandises M ON P.id_marchandise = M.id
+  JOIN 
+      Ingredients I ON P.id_ingredient = I.id
+  JOIN 
+      Usines_entrepots UE ON P.id_usine = UE.id
+  JOIN 
+      Product_info PI ON L.id_produit = PI.id
+  WHERE
+      P.date BETWEEN '2024-01-01' AND '2024-12-31'  -- Exemple de filtre par date
+    AND  PI.id = 101                             -- Exemple de filtre par id_produit
+    AND  UE.localisation = 'Usine A'             -- Exemple de filtre par localisation d'usine
+  ORDER BY 
+      P.date;
+
+Vision concaténée par process :
+  SELECT 
+        L.id AS Id_lot,
+        PT.name AS Process_name,
+        P.date AS Date,
+        PI.id AS Id_produit,
+        GROUP_CONCAT(M.id, ', ') AS Id_marchandises,  -- Concatène les id des marchandises
+        GROUP_CONCAT(I.nom, ', ') AS Ingredients,     -- Concatène les noms d'ingrédients
+        UE.localisation AS Usine
+  FROM 
+        Historique_process HP
+  JOIN 
+        Lots L ON HP.id_lot = L.id
+  JOIN 
+        Process P ON HP.id_process = P.id
+  JOIN 
+        Process_type PT ON P.id_process_type = PT.id
+  LEFT JOIN 
+        Marchandises M ON P.id_marchandise = M.id
+  JOIN 
+        Ingredients I ON P.id_ingredient = I.id
+  JOIN 
+        Usines_entrepots UE ON P.id_usine = UE.id
+  JOIN 
+        Product_info PI ON L.id_produit = PI.id
+  WHERE
+        P.date BETWEEN '2024-01-01' AND '2024-12-31'  -- Exemple de filtre par date
+    AND  PI.id = 101                             -- Exemple de filtre par id_produit
+    AND  UE.localisation = 'Usine A'             -- Exemple de filtre par localisation d'usine
+  GROUP BY 
+        L.id, PT.name, P.date, PI.id, UE.localisation
+  ORDER BY 
+        P.date;
+
 
 """_______________________________________________________________________
 Suivi de marchandises (dispo fournisseurs) 
@@ -104,6 +169,27 @@ Suivi de marchandises (dispo fournisseurs)
     Usine de livraison 
     fournisseur 
 """
+  SELECT
+      m.id AS id_marchandises,
+      m.date_contractualisation,
+      m.date_livraison,
+      i.nom AS ingredient,
+      m.quantité_kg AS quantité,
+      u.localisation AS usine_de_livraison,
+      f.nom AS fournisseur
+  FROM
+      Marchandises m
+  JOIN
+      Ingredients i ON m.id_ingredient = i.id
+  JOIN
+      Usines_entrepots u ON m.id_usine_livraison = u.id
+  JOIN
+      Fournisseurs_Distributeurs f ON m.id_fournisseur = f.id
+  WHERE 
+      m.date_livraison BETWEEN '2024-01-01' AND '2024-12-31'
+  ORDER BY
+      m.date_livraison;
+
 
 """_______________________________________________________________________
 Suivi distribution 
@@ -117,6 +203,30 @@ Suivi distribution
     Distributeur, localisation 
     Id_produit 
 """
+  SELECT
+      d.date_livraison,
+      d.date_contractualisation,
+      l.id AS lot,
+      l.quantité AS quantité_lot,
+      ue.localisation AS entrepot_de_depart,
+      fd.nom AS distributeur,
+      fd.localisation AS localisation_distributeur,
+      pi.id AS id_produit
+  FROM
+      Distributions d
+  JOIN
+      Lots l ON d.id_lot = l.id
+  JOIN
+      Usines_entrepots ue ON d.id_entrepot = ue.id
+  JOIN
+      Fournisseurs_Distributeurs fd ON d.id_distributeur = fd.id
+  JOIN
+      Product_info pi ON l.id_produit = pi.id
+  WHERE
+      l.id = 2 --exemple de filtre
+      AND d.date_livraison BETWEEN '2023-05-24' AND '2024-05-26' --exemple de filtre
+  ORDER BY
+      d.date_livraison;
   
 """_______________________________________________________________________
 Historique des lots de produits (changement dans leurs attributs) 
@@ -129,3 +239,18 @@ Historique des lots de produits (changement dans leurs attributs)
     Statut 
     retour 
 """
+SELECT
+    L.id AS Id_lot,
+    PI.id AS Id_produit,
+    L.quantité AS Quantité,
+    L.date_de_prod AS Date_de_prod,
+    L.date_de_peremption AS Date_peremption,
+    L.statut AS Statut,
+    L.retour AS Retour
+FROM
+    Lots L
+JOIN
+    Product_info PI ON L.id_produit = PI.id
+ORDER BY
+    L.id;
+
