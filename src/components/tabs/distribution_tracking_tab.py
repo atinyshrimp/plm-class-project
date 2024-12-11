@@ -1,7 +1,7 @@
 import csv
 from PyQt5.QtWidgets import (
-    QWidget, QVBoxLayout, QHBoxLayout, QLineEdit, QTableWidgetItem, QLabel,
-    QPushButton, QComboBox, QFileDialog
+    QWidget, QVBoxLayout, QHBoxLayout, QLineEdit, QTableWidgetItem, QLabel, QMenu, QAction,
+    QPushButton, QComboBox, QFileDialog, QMessageBox
 )
 from PyQt5.QtCore import Qt
 from utils.table import CustomTable
@@ -73,6 +73,8 @@ class DistributionTrackingTab(QWidget):
         ])
         self.distribution_table.setSizePolicy(self.distribution_table.sizePolicy().Expanding,
                                               self.distribution_table.sizePolicy().Expanding)
+        self.distribution_table.setContextMenuPolicy(Qt.CustomContextMenu)
+        self.distribution_table.customContextMenuRequested.connect(self.show_context_menu)
         main_layout.addWidget(self.distribution_table)
 
         # Pagination Controls
@@ -171,3 +173,33 @@ class DistributionTrackingTab(QWidget):
                 "Departure Warehouse", "Distributor", "Distributor Location", "Product ID"
             ])
             writer.writerows(self.filtered_distribution_data)
+
+    def show_context_menu(self, position):
+        """Display context menu for distribution actions."""
+        menu = QMenu(self)
+
+        view_details_action = QAction("View Distribution Details", self)
+        view_details_action.triggered.connect(self.show_distribution_details)
+        menu.addAction(view_details_action)
+
+        menu.exec_(self.distribution_table.viewport().mapToGlobal(position))
+
+    def show_distribution_details(self):
+        """Display details of a selected distribution in a popup."""
+        selected_row = self.distribution_table.currentRow()
+        if selected_row == -1:
+            return
+        global_row_index = (self.current_page - 1) * self.page_size + selected_row
+        distribution = self.filtered_distribution_data[global_row_index]
+
+        details_text = f"""
+        Delivery Date: {distribution[0]}
+        Contract Date: {distribution[1]}
+        Lot: {distribution[2]}
+        Lot Quantity: {distribution[3]}
+        Departure Warehouse: {distribution[4]}
+        Distributor: {distribution[5]}
+        Distributor Location: {distribution[6]}
+        Product ID: {distribution[7]}
+        """
+        QMessageBox.information(self, "Distribution Details", details_text)
