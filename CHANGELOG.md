@@ -2,15 +2,25 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.5.0] - 2024-12-11
+
+### 🚀 Features
+
+- *(ui)* Style the cost details tab in "Product"
+
+### ⚙️ Miscellaneous Tasks
+
+- Add git-cliff for changelog generation
+
 ## [0.4.0] - 2024-12-11
 
 ### 🚀 Features
 
-- Add style for supplier tracking
-- Add context menu
-- Filter by delivery date and warehouse
-- Add upcoming deliveries notification
 - Show upcoming deliveries upon first opening
+- Add upcoming deliveries notification
+- Filter by delivery date and warehouse
+- Add context menu
+- Add style for supplier tracking
 
 ### 🚜 Refactor
 
@@ -24,9 +34,9 @@ All notable changes to this project will be documented in this file.
 
 ### 🚀 Features
 
-- Add database connection and query execution
-- *(ui)* Style the product sheet (#1)
 - *(ui)* Style the batch history sheet
+- *(ui)* Style the product sheet (#1)
+- Add database connection and query execution
 
 ### 🚜 Refactor
 
