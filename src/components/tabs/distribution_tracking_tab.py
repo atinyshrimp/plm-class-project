@@ -1,21 +1,23 @@
 import csv
 from PyQt5.QtWidgets import (
     QWidget, QVBoxLayout, QHBoxLayout, QLineEdit, QTableWidgetItem, QLabel, QMenu, QAction,
-    QPushButton, QComboBox, QFileDialog, QMessageBox, QDateEdit
+    QPushButton, QComboBox, QFileDialog, QMessageBox, QDateEdit, QListWidget, QToolBox
 )
 from PyQt5.QtCore import Qt
 from utils.table import CustomTable
-from datetime import datetime
+from datetime import datetime, timedelta
+from widgets.collapsible import CollapsibleSection
 
 
 class DistributionTrackingTab(QWidget):
     def __init__(self):
         super().__init__()
-        self.page_size = 5  # Number of rows per page
+        self.page_size = 10  # Number of rows per page
         self.current_page = 1
         self.total_pages = 1
         self.distribution_data = []  # Full dataset
         self.filtered_distribution_data = []  # Filtered dataset
+        self.days_until_delivery = 7
         self.init_ui()
 
     def init_ui(self):
@@ -72,6 +74,7 @@ class DistributionTrackingTab(QWidget):
         self.start_date_field.setCalendarPopup(True)
         self.end_date_field = QDateEdit()
         self.end_date_field.setCalendarPopup(True)
+        self.end_date_field.setDate(datetime.now().date())
         self.filter_button = QPushButton("Apply Filter")
         self.filter_button.clicked.connect(self.filter_by_date_and_warehouse)
 
@@ -136,6 +139,22 @@ class DistributionTrackingTab(QWidget):
         pagination_layout.addWidget(self.next_button)
         main_layout.addLayout(pagination_layout)
 
+        # Upcoming Deliveries List and Button
+        self.upcoming_deliveries_list = QListWidget()
+        self.refresh_upcoming_deliveries_button = QPushButton("Refresh")
+        self.refresh_upcoming_deliveries_button.clicked.connect(self.show_upcoming_deliveries)
+
+        # Create content widget for upcoming deliveries
+        upcoming_content_widget = QWidget()
+        upcoming_content_layout = QVBoxLayout()
+        upcoming_content_layout.addWidget(self.upcoming_deliveries_list)
+        upcoming_content_layout.addWidget(self.refresh_upcoming_deliveries_button)
+        upcoming_content_widget.setLayout(upcoming_content_layout)
+
+        # Add collapsible section for upcoming deliveries
+        upcoming_section = CollapsibleSection("Upcoming Deliveries", upcoming_content_widget)
+        main_layout.addWidget(upcoming_section)
+
         self.setLayout(main_layout)
 
         # Dummy Data
@@ -145,6 +164,7 @@ class DistributionTrackingTab(QWidget):
             ("2023-03-25", "2023-03-20", "L003", 75, "Warehouse A", "Distributor A", "Location C", "P001"),
             ("2023-04-10", "2023-04-05", "L004", 120, "Warehouse C", "Distributor C", "Location D", "P003"),
             ("2023-05-30", "2023-05-25", "L005", 60, "Warehouse B", "Distributor B", "Location B", "P002"),
+            ("2024-12-15", "2024-05-30", "L006", 80, "Warehouse C", "Distributor C", "Location D", "P004"),
         ]
         self.filtered_distribution_data = self.distribution_data[:]  # Start with unfiltered data
         self.total_pages = (len(self.distribution_data) + self.page_size - 1) // self.page_size
@@ -265,3 +285,19 @@ class DistributionTrackingTab(QWidget):
         Product ID: {distribution[7]}
         """
         QMessageBox.information(self, "Distribution Details", details_text)
+        
+    def show_upcoming_deliveries(self):
+        """Display a list of deliveries scheduled within the next X days."""
+        today = datetime.today().date()
+
+        upcoming = [
+            row for row in self.distribution_data
+            if today <= datetime.strptime(row[0], "%Y-%m-%d").date() <= today + timedelta(days=self.days_until_delivery)
+        ]
+
+        # Clear the list widget and add upcoming deliveries
+        self.upcoming_deliveries_list.clear()
+        for row in upcoming:
+            self.upcoming_deliveries_list.addItem(f"Lot {row[2]}: {row[0]} ({row[5]})")
+            
+        # print(self.upcoming_deliveries_list.item(0)[5])
