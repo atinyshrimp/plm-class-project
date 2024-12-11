@@ -1,10 +1,11 @@
 import csv
 from PyQt5.QtWidgets import (
     QWidget, QVBoxLayout, QHBoxLayout, QLineEdit, QTableWidgetItem, QLabel, QMenu, QAction,
-    QPushButton, QComboBox, QFileDialog, QMessageBox
+    QPushButton, QComboBox, QFileDialog, QMessageBox, QDateEdit
 )
 from PyQt5.QtCore import Qt
 from utils.table import CustomTable
+from datetime import datetime
 
 
 class DistributionTrackingTab(QWidget):
@@ -65,6 +66,52 @@ class DistributionTrackingTab(QWidget):
 
         main_layout.addLayout(control_layout)
 
+        # Add date range filters
+        filter_by_date_label = QLabel("Filter by Date Range:")
+        self.start_date_field = QDateEdit()
+        self.start_date_field.setCalendarPopup(True)
+        self.end_date_field = QDateEdit()
+        self.end_date_field.setCalendarPopup(True)
+        self.filter_button = QPushButton("Apply Filter")
+        self.filter_button.clicked.connect(self.filter_by_date_and_warehouse)
+
+        # Add warehouse filter
+        self.warehouse_dropdown = QComboBox()
+        self.warehouse_dropdown.setStyleSheet("""
+            QComboBox {
+                border: 1px solid #F4C542;
+                border-radius: 5px;
+                padding: 5px 10px;
+                background-color: #ffffff;
+                color: #333;
+                font-size: 14px;
+            }
+            QComboBox::drop-down {
+                border: none;
+                background: #f8f9fa;
+            }
+            QComboBox QAbstractItemView {
+                border: 1px solid #ced4da;
+                background-color: #ffffff;
+                color: #333;
+                selection-background-color: #ffe6cc;
+                selection-color: #000;
+                padding: 5px;
+            }
+        """)
+        self.warehouse_dropdown.addItem("All Warehouses")
+        self.warehouse_dropdown.addItems(["Warehouse A", "Warehouse B", "Warehouse C"])
+
+        # Arrange the filter layout
+        filter_layout = QHBoxLayout()
+        filter_layout.addWidget(filter_by_date_label)
+        filter_layout.addWidget(self.start_date_field)
+        filter_layout.addWidget(self.end_date_field)
+        filter_layout.addWidget(self.warehouse_dropdown)
+        filter_layout.addWidget(self.filter_button)
+        main_layout.addLayout(filter_layout)
+
+
         # Distribution Table
         self.distribution_table = CustomTable(10, 8)  # Initial size: 10 rows, 8 columns
         self.distribution_table.setHorizontalHeaderLabels([
@@ -101,6 +148,21 @@ class DistributionTrackingTab(QWidget):
         ]
         self.filtered_distribution_data = self.distribution_data[:]  # Start with unfiltered data
         self.total_pages = (len(self.distribution_data) + self.page_size - 1) // self.page_size
+        self.update_distribution_table()
+
+    def filter_by_date_and_warehouse(self):
+        """Filter distributions by date range and warehouse."""
+        start_date = self.start_date_field.date().toPyDate()
+        end_date = self.end_date_field.date().toPyDate()
+        selected_warehouse = self.warehouse_dropdown.currentText()
+
+        self.filtered_distribution_data = [
+            row for row in self.distribution_data
+            if start_date <= datetime.strptime(row[0], "%Y-%m-%d").date() <= end_date
+            and (selected_warehouse == "All Warehouses" or row[4] == selected_warehouse)
+        ]
+        self.total_pages = (len(self.filtered_distribution_data) + self.page_size - 1) // self.page_size
+        self.current_page = 1
         self.update_distribution_table()
 
     def filter_distribution_data(self):
