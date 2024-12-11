@@ -237,3 +237,7 @@ class BatchHistoryTab(QWidget):
             writer.writerow(["Lot ID", "Product ID", "Quantity", "Production Date",
                              "Expiry Date", "Status", "Return"])  # Header
             writer.writerows(self.filtered_batch_data)  # Rows
+
+    def filter_by_product(self, product_id):
+        """Filter batch history by the given product ID."""
+        self.search_field.setText(product_id)  # Assuming there's a search field

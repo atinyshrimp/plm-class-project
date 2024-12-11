@@ -6,6 +6,7 @@ from PyQt5.QtGui import QPixmap
 from PyQt5.QtCore import Qt
 from utils.table import CustomTable
 from widgets.product_photo_widget import ProductPhotoWidget
+from .tabs.cost_details_tab import ProductCostDetailsTab
 
 class ProductTabs(QWidget):
     def __init__(self):
@@ -33,20 +34,15 @@ class ProductTabs(QWidget):
         self.init_ui()
 
     def init_ui(self):
-        tab_widget = QTabWidget()
+        self.tab_widget = QTabWidget()
 
         # Product Sheets Tab
         product_sheet_tab = QWidget()
         self._init_product_sheets(product_sheet_tab)
 
         # Batch History Tab
-        batch_history_tab = QWidget()
-        batch_history_layout = QVBoxLayout()
-        batch_table = CustomTable(5, 3)
-        batch_table.setHorizontalHeaderLabels(["Batch Number", "Date", "Status"])
-        batch_table.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
-        batch_history_layout.addWidget(batch_table)
-        batch_history_tab.setLayout(batch_history_layout)
+        cost_details_tab = ProductCostDetailsTab()
+        # batch_history_tab.setLayout(batch_history_layout)
 
         # Market Studies Tab
         market_study_tab = QWidget()
@@ -56,20 +52,31 @@ class ProductTabs(QWidget):
         market_study_tab.setLayout(market_study_layout)
 
         # Add tabs to the tab widget
-        tab_widget.addTab(product_sheet_tab, "Product Sheets")
-        tab_widget.addTab(batch_history_tab, "Batch History")
-        tab_widget.addTab(market_study_tab, "Market Studies")
+        self.tab_widget.addTab(product_sheet_tab, "Product Sheets")
+        self.tab_widget.addTab(cost_details_tab, "Cost Details")
+        self.tab_widget.addTab(market_study_tab, "Market Studies")
 
         # Main layout for ProductTabs
         main_layout = QVBoxLayout()
-        main_layout.addWidget(tab_widget)
+        main_layout.addWidget(self.tab_widget)
         self.setLayout(main_layout)
+
+    def focus_on_product_sheet(self, product_id):
+        """Highlight and display details for the given product."""
+        self.search_field.setText(product_id)
+        for row in range(self.product_table.rowCount()):
+            item = self.product_table.item(row, 0)  # Assuming Product ID is in the first column
+            if item and item.text() == product_id:
+                self.product_table.selectRow(row)
+                self._display_product_details()  # Call the existing method to show details
+                break
+
 
     def _init_product_sheets(self, product_sheet_tab):
         # Create the main horizontal layout for the table and details view
         overall_tab_layout = QVBoxLayout()
         self.search_field = QLineEdit()
-        self.search_field.setPlaceholderText("Search by name, ID, or container...")
+        self.search_field.setPlaceholderText("Search by name or ID...")
         self.search_field.textChanged.connect(self.__filter_products)
         
         self.search_field.setContentsMargins(10, 0, 20, 0)
@@ -310,18 +317,18 @@ class ProductTabs(QWidget):
 
     def _load_dummy_data(self):
         self.dummy_data = [
-            (1, "Honey Jar", 50, "1.0", "2023-10-01", "JAR001", "Pure organic honey", "Honey (90%), Beeswax (10%)", "https://m.media-amazon.com/images/I/81XTYU+nntL.jpg"),
-            (2, "Berry Jam", 100, "1.1", "2023-09-15", "JAR002", "Mixed berry jam", "Strawberries (70%), Sugar (30%)", "https://assets.tmecosys.com/image/upload/t_web767x639/img/recipe/ras/Assets/4B7C3510-7041-4B5D-8000-1D10B1BA4678/Derivates/6749ac4e-586d-4055-9df2-5a96832897f6.jpg"),
-            (3, "Lemon Marmalade", 75, "2.0", "2023-08-20", "JAR003", "Zesty lemon marmalade", "Lemons (60%), Sugar (40%)", "https://images.immediate.co.uk/production/volatile/sites/30/2020/08/recipe-image-legacy-id-871488_11-35ddf4e.jpg?quality=90&resize=440,400"),
-            (4, "Almond Butter", 120, "1.0", "2023-09-10", "JAR004", "Smooth almond butter", "Almonds (100%)", "https://www.inspiredtaste.net/wp-content/uploads/2020/06/Homemade-Almond-Butter-Recipe-1200.jpg"),
-            (5, "Herbal Honey", 60, "1.2", "2023-11-01", "JAR005", "Infused with natural herbs", "Honey (85%), Herbs (15%)", "https://www.herbco.com/images/page/herbalhoney/images/RECIPE-honey-spread2.jpg"),
-            (6, "Chocolate Spread", 110, "2.0", "2023-06-15", "JAR006", "", "", "https://assets.tmecosys.com/image/upload/t_web767x639/img/recipe/ras/Assets/8EABE1FD-5729-4A87-828E-B8C57603E5EA/Derivates/A57910CF-D62E-4713-9E77-1C281412D3DF.jpg"),
-            (7, "Strawberry Jam", 90, "1.3", "2023-07-01", "JAR002", "", "", "https://itsnotcomplicatedrecipes.com/wp-content/uploads/2022/01/Strawberry-Jam-Feature.jpg"),
-            (8, "Blueberry Jam", 80, "1.0", "2023-05-20", "JAR002", "", "", "https://www.wildernesswife.com/wp-content/uploads/2023/09/blueberry_jam1.jpg"),
-            (9, "Peanut Butter", 150, "1.2", "2023-04-10", "JAR004", "", "", "https://pinchofyum.com/wp-content/uploads/Homemade-Peanut-Butter-Square.png"),
-            (10, "Citrus Marmalade", 70, "2.1", "2023-03-01", "JAR003", "", "", "https://www.bigbearfarms.in/cdn/shop/products/ThreeCitrusMarmalade-1.png?v=1663151497"),
-            (11, "Caramel Sauce", 40, "1.0", "2023-02-01", "JAR001", "", "", "https://handletheheat.com/wp-content/uploads/2022/06/caramel-sauce-SQUARE-1.png"),
-            (12, "Organic Honey", 55, "1.0", "2023-01-15", "JAR005", "", "", "https://cdn.shopify.com/s/files/1/0262/6374/8713/files/organic-honey_1000x.png?v=1726646497"),
+            ("P001", "Honey Jar", 50, "1.0", "2023-10-01", "JAR001", "Pure organic honey", "Honey (90%), Beeswax (10%)", "https://m.media-amazon.com/images/I/81XTYU+nntL.jpg"),
+            ("P002", "Berry Jam", 100, "1.1", "2023-09-15", "JAR002", "Mixed berry jam", "Strawberries (70%), Sugar (30%)", "https://assets.tmecosys.com/image/upload/t_web767x639/img/recipe/ras/Assets/4B7C3510-7041-4B5D-8000-1D10B1BA4678/Derivates/6749ac4e-586d-4055-9df2-5a96832897f6.jpg"),
+            ("P003", "Lemon Marmalade", 75, "2.0", "2023-08-20", "JAR003", "Zesty lemon marmalade", "Lemons (60%), Sugar (40%)", "https://images.immediate.co.uk/production/volatile/sites/30/2020/08/recipe-image-legacy-id-871488_11-35ddf4e.jpg?quality=90&resize=440,400"),
+            ("P004", "Almond Butter", 120, "1.0", "2023-09-10", "JAR004", "Smooth almond butter", "Almonds (100%)", "https://www.inspiredtaste.net/wp-content/uploads/2020/06/Homemade-Almond-Butter-Recipe-1200.jpg"),
+            ("P005", "Herbal Honey", 60, "1.2", "2023-11-01", "JAR005", "Infused with natural herbs", "Honey (85%), Herbs (15%)", "https://www.herbco.com/images/page/herbalhoney/images/RECIPE-honey-spread2.jpg"),
+            ("P006", "Chocolate Spread", 110, "2.0", "2023-06-15", "JAR006", "", "", "https://assets.tmecosys.com/image/upload/t_web767x639/img/recipe/ras/Assets/8EABE1FD-5729-4A87-828E-B8C57603E5EA/Derivates/A57910CF-D62E-4713-9E77-1C281412D3DF.jpg"),
+            ("P007", "Strawberry Jam", 90, "1.3", "2023-07-01", "JAR002", "", "", "https://itsnotcomplicatedrecipes.com/wp-content/uploads/2022/01/Strawberry-Jam-Feature.jpg"),
+            ("P008", "Blueberry Jam", 80, "1.0", "2023-05-20", "JAR002", "", "", "https://www.wildernesswife.com/wp-content/uploads/2023/09/blueberry_jam1.jpg"),
+            ("P009", "Peanut Butter", 150, "1.2", "2023-04-10", "JAR004", "", "", "https://pinchofyum.com/wp-content/uploads/Homemade-Peanut-Butter-Square.png"),
+            ("P010", "Citrus Marmalade", 70, "2.1", "2023-03-01", "JAR003", "", "", "https://www.bigbearfarms.in/cdn/shop/products/ThreeCitrusMarmalade-1.png?v=1663151497"),
+            ("P011", "Caramel Sauce", 40, "1.0", "2023-02-01", "JAR001", "", "", "https://handletheheat.com/wp-content/uploads/2022/06/caramel-sauce-SQUARE-1.png"),
+            ("P012", "Organic Honey", 55, "1.0", "2023-01-15", "JAR005", "", "", "https://cdn.shopify.com/s/files/1/0262/6374/8713/files/organic-honey_1000x.png?v=1726646497"),
         ]
 
         self.filtered_data = self.dummy_data[:] # Initialize filtered data with all products
@@ -397,10 +404,10 @@ class ProductTabs(QWidget):
         self.ingredients_field.setText("")  # Ingredients
 
     def __filter_products(self):
-        """Filter based on `Name` field
+        """Filter based on `ID` & `Name` fields
         """
         filter_text = self.search_field.text().lower()
-        self.filtered_data = [product for product in self.dummy_data if filter_text in product[1].lower()]  # Filter by Name (column 1)
+        self.filtered_data = [product for product in self.dummy_data if (filter_text in product[0].lower() or filter_text in product[1].lower())]  # Filter by Name (column 1)
     
         # Reset pagination for filtered data
         self.total_pages = (len(self.filtered_data) + self.page_size - 1) // self.page_size
