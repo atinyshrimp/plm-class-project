@@ -2,14 +2,16 @@
 
 All notable changes to this project will be documented in this file.
 
-## [0.5.0] - 2024-12-11
+## [0.6.0] - 2024-12-12
 
 ### 🚀 Features
 
+- *(ui)* Style products' stock and location tab
 - *(ui)* Style the cost details tab in "Product"
 
 ### ⚙️ Miscellaneous Tasks
 
+- Update CHANGELOG.md
 - Add git-cliff for changelog generation
 
 ## [0.4.0] - 2024-12-11
