@@ -7,6 +7,7 @@ from PyQt5.QtCore import Qt
 from utils.table import CustomTable
 from widgets.product_photo_widget import ProductPhotoWidget
 from .tabs.cost_details_tab import ProductCostDetailsTab
+from .tabs.stock_and_location_tab import StockLocationTab
 
 class ProductTabs(QWidget):
     def __init__(self):
@@ -29,7 +30,7 @@ class ProductTabs(QWidget):
         self.current_page = 1  # Current page
         self.total_pages = 1  # Total pages
         self.dummy_data = []  # Store product data
-        self.filtered_data = [] # 
+        self.filtered_data = [] # Store data with filters applied
         
         self.init_ui()
 
@@ -40,21 +41,16 @@ class ProductTabs(QWidget):
         product_sheet_tab = QWidget()
         self._init_product_sheets(product_sheet_tab)
 
-        # Batch History Tab
+        # Cost Details Tab
         cost_details_tab = ProductCostDetailsTab()
-        # batch_history_tab.setLayout(batch_history_layout)
 
-        # Market Studies Tab
-        market_study_tab = QWidget()
-        market_study_layout = QVBoxLayout()
-        market_study_layout.addWidget(QLabel("Market Study Results:"))
-        market_study_layout.addWidget(QTextEdit())
-        market_study_tab.setLayout(market_study_layout)
+        # Stock & Location Tab
+        stock_location_tab = StockLocationTab()
 
         # Add tabs to the tab widget
         self.tab_widget.addTab(product_sheet_tab, "Product Sheets")
         self.tab_widget.addTab(cost_details_tab, "Cost Details")
-        self.tab_widget.addTab(market_study_tab, "Market Studies")
+        self.tab_widget.addTab(stock_location_tab, "Stock & Location")
 
         # Main layout for ProductTabs
         main_layout = QVBoxLayout()
@@ -121,7 +117,6 @@ class ProductTabs(QWidget):
         details_layout = QVBoxLayout()  # Use a vertical layout for a modern stacked design
 
         self.toggle_edit_button = QPushButton("Edit Product")
-        # self.toggle_edit_button.setAlignment(Qt.AlignRight)
         self.toggle_edit_button.clicked.connect(self._toggle_edit_mode)
         details_layout.addWidget(self.toggle_edit_button)
 
