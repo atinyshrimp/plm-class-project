@@ -2,6 +2,17 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.8.0] - 2024-12-13
+
+### 🚀 Features
+
+- *(process)* Add ui for supplier availability (#3)
+
+### ⚙️ Miscellaneous Tasks
+
+- Bump to version 0.8.0
+- Update CHANGELOG.md
+
 ## [0.7.0] - 2024-12-13
 
 ### 🚀 Features
