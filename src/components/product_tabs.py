@@ -42,14 +42,14 @@ class ProductTabs(QWidget):
         self._init_product_sheets(product_sheet_tab)
 
         # Cost Details Tab
-        cost_details_tab = ProductCostDetailsTab()
+        self.cost_details_tab = ProductCostDetailsTab()
 
         # Stock & Location Tab
         stock_location_tab = StockLocationTab()
 
         # Add tabs to the tab widget
         self.tab_widget.addTab(product_sheet_tab, "Product Sheets")
-        self.tab_widget.addTab(cost_details_tab, "Cost Details")
+        self.tab_widget.addTab(self.cost_details_tab, "Cost Details")
         self.tab_widget.addTab(stock_location_tab, "Stock & Location")
 
         # Main layout for ProductTabs
