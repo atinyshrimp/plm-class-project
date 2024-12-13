@@ -1,6 +1,6 @@
 from PyQt5.QtWidgets import QWidget, QTabWidget, QVBoxLayout, QSizePolicy, QLineEdit
 from utils.table import CustomTable
-from .tabs.batch_history_tabs import BatchHistoryTab
+from .tabs.batch_history_tab import BatchHistoryTab
 
 class DataTabs(QWidget):
     def __init__(self):
