@@ -2,6 +2,22 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.7.0] - 2024-12-13
+
+### 🚀 Features
+
+- *(process)* Navigate prod tracking with batch
+- *(ui)* Style the production tracking sheet (#2)
+
+### 🚜 Refactor
+
+- *(tab)* Rename batch history file
+
+### ⚙️ Miscellaneous Tasks
+
+- Bump to version 0.7.0
+- Update CHANGELOG.md
+
 ## [0.6.0] - 2024-12-12
 
 ### 🚀 Features
