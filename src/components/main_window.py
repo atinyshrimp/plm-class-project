@@ -121,6 +121,12 @@ class PLMApp(QWidget):
         if hasattr(self.data_tabs.batch_history_tab, "filter_by_product"):
             self.data_tabs.batch_history_tab.filter_by_product(product_id)
 
+    def navigate_to_batch_history(self, lot_id):
+        """Navigate to Batch History tab for the selected lot."""
+        parent_widget = self.parentWidget()
+        if hasattr(parent_widget, "switch_to_batch_tab"):
+            parent_widget.switch_to_batch_tab(lot_id)
+
     # Menu actions
     def new_file(self):
         print("New File")

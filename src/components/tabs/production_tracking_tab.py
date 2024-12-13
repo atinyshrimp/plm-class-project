@@ -224,11 +224,14 @@ class ProductionTrackingTab(QWidget):
         batch_details_action = QAction("Open Batch Details", self)
         batch_details_action.triggered.connect(lambda: self.show_batch_details(batch_data))
 
+        batch_history_action = QAction(f"View Batch History ({batch_data[0]})", self)
+        batch_history_action.triggered.connect(lambda: self.navigate_to_batch_history(batch_data[0]))
 
-        cost_details_action = QAction("View Cost Details", self)
+        cost_details_action = QAction(f"View Cost Details ({batch_data[1]})", self)
         cost_details_action.triggered.connect(lambda: self.navigate_to_cost_details(batch_data[1]))
 
         menu.addAction(batch_details_action)
+        menu.addAction(batch_history_action)
         menu.addAction(cost_details_action)
         menu.exec_(self.production_table.viewport().mapToGlobal(position))
 
@@ -236,6 +239,12 @@ class ProductionTrackingTab(QWidget):
         """Open the Batch Details dialog."""
         dialog = BatchDetailsDialog(batch_data, self)
         dialog.exec_()
+
+    def navigate_to_batch_history(self, lot_id):
+        """Navigate to Batch History tab for the selected lot."""
+        parent_widget = self.parentWidget().parentWidget().parentWidget().parentWidget().parentWidget()
+        if hasattr(parent_widget, "switch_to_batch_tab"):
+            parent_widget.switch_to_batch_tab(lot_id)
 
     def navigate_to_cost_details(self, product_id):
         """Navigate to Cost Details tab for the selected product."""
