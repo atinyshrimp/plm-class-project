@@ -1,5 +1,6 @@
 from PyQt5.QtWidgets import QWidget, QTabWidget, QVBoxLayout, QComboBox, QLabel, QProgressBar, QSizePolicy
 from utils.table import CustomTable
+from .tabs.production_tracking_tab import ProductionTrackingTab
 
 class ProcessTabs(QWidget):
     def __init__(self):
@@ -10,16 +11,7 @@ class ProcessTabs(QWidget):
         tab_widget = QTabWidget()
 
         # Production Tracking Tab
-        production_tab = QWidget()
-        production_layout = QVBoxLayout()
-        production_stage_combo = QComboBox()
-        production_stage_combo.addItems(["Raw Materials", "In Production", "Packaging", "Completed"])
-        production_progress = QProgressBar()
-        production_progress.setValue(50)
-        production_layout.addWidget(QLabel("Production Stage:"))
-        production_layout.addWidget(production_stage_combo)
-        production_layout.addWidget(production_progress)
-        production_tab.setLayout(production_layout)
+        production_tab = ProductionTrackingTab()
 
         # Process History Tab
         process_history_tab = QWidget()
