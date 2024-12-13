@@ -7,6 +7,7 @@ from PyQt5.QtCore import Qt, QDate
 from PyQt5.QtGui import QColor
 from utils.table import CustomTable
 from dialogs.supplier_contact_window import SupplierContactDialog
+from dialogs.supplier_analytics_window import SupplierAnalyticsWindow
 import csv
 
 
@@ -23,12 +24,26 @@ class SupplierAvailabilityTab(QWidget):
     def init_ui(self):
         main_layout = QVBoxLayout()
 
+        # Buttons Layout
+        buttons_layout = QHBoxLayout()
+
+        # Supplier Analytics Button
+        analytics_button = QPushButton("View Supplier Analytics")
+        analytics_button.setSizePolicy(QSizePolicy.Fixed, QSizePolicy.Fixed)
+        analytics_button.adjustSize()
+        analytics_button.clicked.connect(self.show_supplier_analytics)
+        buttons_layout.addWidget(analytics_button)
+
+
         # Export Button
         export_button = QPushButton("Export to CSV")
         export_button.setSizePolicy(QSizePolicy.Fixed, QSizePolicy.Fixed)
         export_button.adjustSize()
         export_button.clicked.connect(self.export_data)
-        main_layout.addWidget(export_button, alignment=Qt.AlignRight)
+        buttons_layout.addWidget(export_button)
+
+        buttons_layout.setAlignment(Qt.AlignRight)
+        main_layout.addLayout(buttons_layout)
 
         # Filter Controls
         filter_layout = QHBoxLayout()
@@ -117,6 +132,11 @@ class SupplierAvailabilityTab(QWidget):
         """Open the Supplier Contact dialog."""
         dialog = SupplierContactDialog(supplier_name, self)
         dialog.exec_()
+
+    def show_supplier_analytics(self):
+        """Open the Supplier Analytics window."""
+        analytics_window = SupplierAnalyticsWindow(self.supplier_data, self)
+        analytics_window.exec_()
 
     def load_dummy_data(self):
         """Load dummy supplier data for testing."""

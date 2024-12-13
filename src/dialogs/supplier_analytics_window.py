@@ -4,39 +4,40 @@ from matplotlib.figure import Figure
 from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg as FigureCanvas
 from io import BytesIO
 
-class StockTrendsWindow(QDialog):
-    def __init__(self, parent=None):
+
+
+class SupplierAnalyticsWindow(QDialog):
+    def __init__(self, supplier_data, parent=None):
         super().__init__(parent)
-        self.setWindowTitle("Stock Trends by Location")
+        self.setWindowTitle("Supplier Analytics")
         self.resize(800, 600)
+        self.supplier_data = supplier_data
         self.init_ui()
 
     def init_ui(self):
-        layout = QVBoxLayout(self)
+        layout = QVBoxLayout()
 
-        # Create the matplotlib figure
         self.fig = Figure()
         ax = self.fig.add_subplot(111)
 
-        # Dummy trend data
-        trends = {
-            "Paris": [50, 45, 40, 38, 30],
-            "Lyon": [80, 75, 72, 70, 68],
-            "Marseille": [100, 95, 90, 85, 80],
-        }
+        # Aggregate data for chart
+        supplier_counts = {}
+        for row in self.supplier_data:
+            supplier = row[5]
+            supplier_counts[supplier] = supplier_counts.get(supplier, 0) + 1
 
-        # Plot each location's stock trends
-        for location, values in trends.items():
-            ax.plot(range(len(values)), values, marker="o", label=location)
+        # Plot supplier activity
+        suppliers = list(supplier_counts.keys())
+        counts = list(supplier_counts.values())
+        ax.bar(suppliers, counts, color="skyblue")
 
-        ax.set_title("Stock Trends by Location")
-        ax.set_xlabel("Time Period")
-        ax.set_ylabel("Stock Quantity")
-        ax.legend()
+        ax.set_title("Deliveries by Supplier")
+        ax.set_xlabel("Supplier")
+        ax.set_ylabel("Number of Deliveries")
 
-        # Add the matplotlib canvas to the dialog layout
         canvas = FigureCanvas(self.fig)
         layout.addWidget(canvas)
+        self.setLayout(layout)
 
         # Export buttons
         button_layout = QHBoxLayout()
