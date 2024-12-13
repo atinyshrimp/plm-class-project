@@ -1,6 +1,7 @@
 from PyQt5.QtWidgets import (
     QWidget, QVBoxLayout, QHBoxLayout, QTableWidgetItem, QLabel, QLineEdit,
-    QDateEdit, QComboBox, QPushButton, QFileDialog, QMessageBox, QSizePolicy
+    QDateEdit, QComboBox, QPushButton, QFileDialog, QMessageBox, QSizePolicy,
+    QMenu, QAction
 )
 from PyQt5.QtCore import Qt, QDate
 from utils.table import CustomTable
@@ -103,6 +104,8 @@ class ProductionTrackingTab(QWidget):
             "Lot ID", "Product ID", "Process Name", "Date",
             "Factory", "Ingredients", "Merchandise ID"
         ])
+        self.setup_context_menu()
+
         main_layout.addWidget(self.production_table)
 
         # Pagination Controls
@@ -202,3 +205,28 @@ class ProductionTrackingTab(QWidget):
                 ])
                 writer.writerows(self.filtered_production_data)
             QMessageBox.information(self, "Export Successful", f"Data exported to {file_path}")
+
+    def setup_context_menu(self):
+        self.production_table.setContextMenuPolicy(Qt.CustomContextMenu)
+        self.production_table.customContextMenuRequested.connect(self.show_context_menu)
+
+    def show_context_menu(self, position):
+        """Show context menu for the selected production."""
+        selected_row = self.production_table.currentRow()
+        if selected_row == -1:
+            return
+
+        batch_data = self.filtered_production_data[selected_row]
+
+        menu = QMenu(self)
+        cost_details_action = QAction("View Cost Details", self)
+        cost_details_action.triggered.connect(lambda: self.navigate_to_cost_details(batch_data[1]))
+
+        menu.addAction(cost_details_action)
+        menu.exec_(self.production_table.viewport().mapToGlobal(position))
+
+    def navigate_to_cost_details(self, product_id):
+        """Navigate to Cost Details tab for the selected product."""
+        parent_widget = self.parentWidget().parentWidget().parentWidget().parentWidget().parentWidget()
+        if hasattr(parent_widget, "switch_to_cost_tab"):
+            parent_widget.switch_to_cost_tab(product_id)
