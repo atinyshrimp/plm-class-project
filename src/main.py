@@ -3,7 +3,7 @@ from components.main_window import PLMApp
 import sys
 import ctypes
 
-VERSION = "0.6.0"
+VERSION = "0.7.0"
 
 if __name__ == "__main__":
     # Ensure the icon appears correctly in the Windows taskbar
