@@ -1,9 +1,11 @@
 from PyQt5.QtWidgets import (
     QWidget, QVBoxLayout, QHBoxLayout, QLabel, QDateEdit, QLineEdit,
-    QPushButton, QTableWidgetItem, QFileDialog, QMessageBox, QSizePolicy
+    QPushButton, QTableWidgetItem, QFileDialog, QMessageBox, QSizePolicy,
+    QMenu, QAction
 )
 from PyQt5.QtCore import Qt, QDate
 from utils.table import CustomTable
+from dialogs.supplier_contact_window import SupplierContactDialog
 import csv
 
 
@@ -72,6 +74,8 @@ class SupplierAvailabilityTab(QWidget):
             "Merchandise ID", "Delivery Date", "Ingredient",
             "Quantity", "Factory Location", "Supplier Name"
         ])
+        self.supplier_table.setContextMenuPolicy(Qt.CustomContextMenu)
+        self.supplier_table.customContextMenuRequested.connect(self.show_context_menu)
         main_layout.addWidget(self.supplier_table)
 
         # Pagination Controls
@@ -91,6 +95,27 @@ class SupplierAvailabilityTab(QWidget):
         # Load Dummy Data
         self.load_dummy_data()
         self.update_supplier_table()
+
+    def show_context_menu(self, position):
+        """Show context menu for the selected production."""
+        selected_row = self.supplier_table.currentRow()
+        if selected_row == -1:
+            return
+
+        supplier_data = self.filtered_supplier_data[selected_row]
+
+        menu = QMenu(self)
+
+        supplier_contact_action = QAction("Contact Supplier", self)
+        supplier_contact_action.triggered.connect(lambda: self.show_supplier_contact(supplier_data[5]))
+
+        menu.addAction(supplier_contact_action)
+        menu.exec_(self.supplier_table.viewport().mapToGlobal(position))
+
+    def show_supplier_contact(self, supplier_name):
+        """Open the Supplier Contact dialog."""
+        dialog = SupplierContactDialog(supplier_name, self)
+        dialog.exec_()
 
     def load_dummy_data(self):
         """Load dummy supplier data for testing."""
