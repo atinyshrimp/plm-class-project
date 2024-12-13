@@ -4,6 +4,7 @@ from PyQt5.QtWidgets import (
     QMenu, QAction
 )
 from PyQt5.QtCore import Qt, QDate
+from PyQt5.QtGui import QColor
 from utils.table import CustomTable
 from dialogs.supplier_contact_window import SupplierContactDialog
 import csv
@@ -138,7 +139,6 @@ class SupplierAvailabilityTab(QWidget):
         # Set date pickers to the most recent date plus one day
         self.end_date_picker.setDate(QDate.fromString(earliest_date, "yyyy-MM-dd").addDays(1))
 
-
     def update_supplier_table(self):
         """Update the supplier table for the current page."""
         start = (self.current_page - 1) * self.page_size
@@ -148,12 +148,33 @@ class SupplierAvailabilityTab(QWidget):
         self.supplier_table.setRowCount(len(page_data))
         for row_index, row_data in enumerate(page_data):
             for col_index, col_data in enumerate(row_data):
-                self.supplier_table.setItem(row_index, col_index, QTableWidgetItem(str(col_data)))
+                item = QTableWidgetItem(str(col_data))
+                
+                # Highlight critical deliveries
+                if col_index == 1:  # Delivery Date column
+                    delivery_date = QDate.fromString(row_data[1], "yyyy-MM-dd")
+                    if delivery_date <= QDate.currentDate().addDays(7) and delivery_date >= QDate.currentDate():
+                        item.setBackground(QColor("#ffc4c4"))  # Light red
+
+                self.supplier_table.setItem(row_index, col_index, item)
 
         # Update pagination controls
         self.page_label.setText(f"Page {self.current_page} of {self.total_pages}")
         self.previous_button.setEnabled(self.current_page > 1)
         self.next_button.setEnabled(self.current_page < self.total_pages)
+
+    def check_upcoming_deliveries(self):
+        """Check for deliveries within the next 7 days and show a notification."""
+        upcoming_deliveries = [
+            row for row in self.filtered_supplier_data
+            if QDate.fromString(row[1], "yyyy-MM-dd") <= QDate.currentDate().addDays(7) and QDate.fromString(row[1], "yyyy-MM-dd") >= QDate.currentDate()
+        ]
+
+        if upcoming_deliveries:
+            QMessageBox.information(
+                self, "Upcoming Deliveries",
+                f"There are {len(upcoming_deliveries)} deliveries scheduled within the next 7 days."
+            )
 
     def filter_supplier_data(self):
         """Filter supplier data based on date range, supplier name, and ingredient."""
@@ -172,6 +193,7 @@ class SupplierAvailabilityTab(QWidget):
         self.total_pages = (len(self.filtered_supplier_data) + self.page_size - 1) // self.page_size
         self.current_page = 1
         self.update_supplier_table()
+        self.check_upcoming_deliveries()
 
     def go_to_previous_page(self):
         """Navigate to the previous page."""
