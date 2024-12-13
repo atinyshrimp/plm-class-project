@@ -5,6 +5,7 @@ from PyQt5.QtWidgets import (
 )
 from PyQt5.QtCore import Qt, QDate
 from utils.table import CustomTable
+from dialogs.batch_details_window import BatchDetailsDialog
 import csv
 
 class ProductionTrackingTab(QWidget):
@@ -219,11 +220,22 @@ class ProductionTrackingTab(QWidget):
         batch_data = self.filtered_production_data[selected_row]
 
         menu = QMenu(self)
+
+        batch_details_action = QAction("Open Batch Details", self)
+        batch_details_action.triggered.connect(lambda: self.show_batch_details(batch_data))
+
+
         cost_details_action = QAction("View Cost Details", self)
         cost_details_action.triggered.connect(lambda: self.navigate_to_cost_details(batch_data[1]))
 
+        menu.addAction(batch_details_action)
         menu.addAction(cost_details_action)
         menu.exec_(self.production_table.viewport().mapToGlobal(position))
+
+    def show_batch_details(self, batch_data):
+        """Open the Batch Details dialog."""
+        dialog = BatchDetailsDialog(batch_data, self)
+        dialog.exec_()
 
     def navigate_to_cost_details(self, product_id):
         """Navigate to Cost Details tab for the selected product."""
