@@ -45,10 +45,13 @@ class PLMApp(QWidget):
         self.tab_widget_stack = QStackedWidget(self)
 
         # Initialize and add tab widgets
-        self.tab_widget_stack.addWidget(ProductTabs())
+        self.product_tabs = ProductTabs()
+        self.data_tabs = DataTabs()
+        
+        self.tab_widget_stack.addWidget(self.product_tabs)
         self.tab_widget_stack.addWidget(PeopleTabs())
         self.tab_widget_stack.addWidget(ProcessTabs())
-        self.tab_widget_stack.addWidget(DataTabs())
+        self.tab_widget_stack.addWidget(self.data_tabs)
         self.tab_widget_stack.setCurrentIndex(0)  # Default to the first tab set
 
         # Connect navbar clicks to change the displayed content
@@ -94,6 +97,35 @@ class PLMApp(QWidget):
     def display_tabs(self, index):
         """Update the content displayed based on the selected item in the navbar."""
         self.tab_widget_stack.setCurrentIndex(index)
+
+    def switch_to_product_tab(self, product_id):
+        """Switch to the Product Sheets tab and focus on the given product."""
+        self.tab_widget_stack.setCurrentWidget(self.product_tabs)
+        self.navbar.setCurrentRow(0)
+        if hasattr(self.product_tabs, "focus_on_product_sheet"):
+            self.product_tabs.tab_widget.setCurrentIndex(0)
+            self.product_tabs.focus_on_product_sheet(product_id)
+
+    def switch_to_cost_tab(self, product_id):
+        """Switch to the Cost Details tab and focus on the given product."""
+        self.tab_widget_stack.setCurrentWidget(self.product_tabs)
+        self.navbar.setCurrentRow(0)
+        if hasattr(self.product_tabs, "focus_on_product_sheet"):
+            self.product_tabs.tab_widget.setCurrentIndex(1)
+            self.product_tabs.cost_details_tab.search_field.setText(product_id)
+
+    def switch_to_batch_tab(self, product_id):
+        """Switch to the Batch History tab and focus on the given product."""
+        self.tab_widget_stack.setCurrentWidget(self.data_tabs)
+        self.navbar.setCurrentRow(3)
+        if hasattr(self.data_tabs.batch_history_tab, "filter_by_product"):
+            self.data_tabs.batch_history_tab.filter_by_product(product_id)
+
+    def navigate_to_batch_history(self, lot_id):
+        """Navigate to Batch History tab for the selected lot."""
+        parent_widget = self.parentWidget()
+        if hasattr(parent_widget, "switch_to_batch_tab"):
+            parent_widget.switch_to_batch_tab(lot_id)
 
     # Menu actions
     def new_file(self):

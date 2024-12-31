@@ -71,6 +71,14 @@ CREATE TABLE IF NOT EXISTS `Process_type` (
 	`id` integer primary key NOT NULL UNIQUE,
 	`name` TEXT NOT NULL
 );
+CREATE TABLE IF NOT EXISTS `Stock` (
+	`id` integer primary key NOT NULL UNIQUE,
+	`id_entrepot` INTEGER NOT NULL,
+	`id_lot` INTEGER NOT NULL,
+	`date_arrivee` REAL NOT NULL,
+FOREIGN KEY(`id_entrepot`) REFERENCES `Usines/entrepots`(`id`),
+FOREIGN KEY(`id_lot`) REFERENCES `Lots`(`id`)
+);
 CREATE TABLE IF NOT EXISTS `Lots` (
 	`id` integer primary key NOT NULL UNIQUE,
 	`date_de_prod` REAL,
@@ -80,14 +88,6 @@ CREATE TABLE IF NOT EXISTS `Lots` (
 	`statut` BOOLEAN NOT NULL,
 	`retour` BOOLEAN,
 FOREIGN KEY(`id_produit`) REFERENCES `Product_info`(`id`)
-);
-CREATE TABLE IF NOT EXISTS `Stock` (
-	`id` integer primary key NOT NULL UNIQUE,
-	`id_entrepot` INTEGER NOT NULL,
-	`id_lot` INTEGER NOT NULL,
-	`date_arrivee` REAL NOT NULL,
-FOREIGN KEY(`id_entrepot`) REFERENCES `Usines/entrepots`(`id`),
-FOREIGN KEY(`id_lot`) REFERENCES `Lots`(`id`)
 );
 CREATE TABLE IF NOT EXISTS `Historique_process` (
 	`id_lot` INTEGER NOT NULL,
