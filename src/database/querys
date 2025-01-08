@@ -76,7 +76,7 @@ JOIN
     Usines_entrepots ON Usines_entrepots.id = Stock.id_entrepot
 WHERE 
     Lots.date_de_peremption > '2024-01-01' -- Exemple de filtre sur la date de péremption
-    AND Stock.date_arrivee > '2024-01-01'  -- Exemple de filtre sur la date d'arrivée
+    AND Stock.date_arrivee > '2024-01-01'  -- Exemple de filtre sur la date d arrivée
     AND Usines_entrepots.localisation = 'Paris' -- Exemple de filtre sur la localisation
   
 """_______________________________________________________________________
@@ -90,46 +90,48 @@ WHERE
     Id_marchandise 
     Ingredients 
     usine 
-"""
 vision ligne par ligne:
-  SELECT 
-      L.id AS Id_lot,
-      PT.name AS Process_name,
-      P.date AS Date,
-      PI.id AS Id_produit,
-      M.id AS Id_marchandise,
-      UE.localisation AS Usine
-  FROM 
-      Historique_process HP
-  JOIN 
-      Lots L ON HP.id_lot = L.id
-  JOIN 
-      Process P ON HP.id_process = P.id
-  JOIN 
-      Process_type PT ON P.id_process_type = PT.id
-  LEFT JOIN 
-      Marchandises M ON P.id_marchandise = M.id
-  JOIN 
-      Ingredients I ON P.id_ingredient = I.id
-  JOIN 
-      Usines_entrepots UE ON P.id_usine = UE.id
-  JOIN 
-      Product_info PI ON L.id_produit = PI.id
-  WHERE
-      P.date BETWEEN '2024-01-01' AND '2024-12-31'  -- Exemple de filtre par date
-    AND  PI.id = 101                             -- Exemple de filtre par id_produit
-    AND  UE.localisation = 'Usine A'             -- Exemple de filtre par localisation d'usine
-  ORDER BY 
-      P.date;
 
-Vision concaténée par process :
+"""
+
+SELECT 
+    L.id AS Id_lot,
+    PT.name AS Process_name,
+    P.date AS Date,
+    PI.id AS Id_produit,
+    M.id AS Id_marchandise,
+    UE.localisation AS Usine
+FROM 
+    Historique_process HP
+JOIN 
+    Lots L ON HP.id_lot = L.id
+JOIN 
+    Process P ON HP.id_process = P.id
+JOIN 
+    Process_type PT ON P.id_process_type = PT.id
+LEFT JOIN 
+    Marchandises M ON P.id_marchandise = M.id
+JOIN 
+    Ingredients I ON P.id_ingredient = I.id
+JOIN 
+    Usines_entrepots UE ON P.id_usine = UE.id
+JOIN 
+    Product_info PI ON L.id_produit = PI.id
+WHERE
+    P.date BETWEEN '2024-01-01' AND '2024-12-31'  # Exemple de filtre par date
+AND  PI.id = 101                             # Exemple de filtre par id_produit
+AND  UE.localisation = 'Usine A'             # Exemple de filtre par localisation d usine
+ORDER BY 
+    P.date;
+
+# Vision concaténée par process :
   SELECT 
         L.id AS Id_lot,
         PT.name AS Process_name,
         P.date AS Date,
         PI.id AS Id_produit,
-        GROUP_CONCAT(M.id, ', ') AS Id_marchandises,  -- Concatène les id des marchandises
-        GROUP_CONCAT(I.nom, ', ') AS Ingredients,     -- Concatène les noms d'ingrédients
+        GROUP_CONCAT(M.id, ', ') AS Id_marchandises,  # Concatène les id des marchandises
+        GROUP_CONCAT(I.nom, ', ') AS Ingredients,     # Concatène les noms d ingrédients
         UE.localisation AS Usine
   FROM 
         Historique_process HP
@@ -150,7 +152,7 @@ Vision concaténée par process :
   WHERE
         P.date BETWEEN '2024-01-01' AND '2024-12-31'  -- Exemple de filtre par date
     AND  PI.id = 101                             -- Exemple de filtre par id_produit
-    AND  UE.localisation = 'Usine A'             -- Exemple de filtre par localisation d'usine
+    AND  UE.localisation = 'Usine A'             -- Exemple de filtre par localisation d usine
   GROUP BY 
         L.id, PT.name, P.date, PI.id, UE.localisation
   ORDER BY 
@@ -224,7 +226,7 @@ Suivi distribution
       Product_info pi ON l.id_produit = pi.id
   WHERE
       l.id = 2 --exemple de filtre
-      AND d.date_livraison BETWEEN '2023-05-24' AND '2024-05-26' --exemple de filtre
+      AND d.date_livraison BETWEEN '2023-05-24' AND '2024-05-26' # exemple de filtre
   ORDER BY
       d.date_livraison;
   

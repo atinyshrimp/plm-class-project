@@ -4,18 +4,19 @@ from .tabs.production_tracking_tab import ProductionTrackingTab
 from .tabs.supplier_availability_tab import SupplierAvailabilityTab
 
 class ProcessTabs(QWidget):
-    def __init__(self):
+    def __init__(self,db_manager):
         super().__init__()
+        self.db_manager = db_manager
         self.init_ui()
 
     def init_ui(self):
         tab_widget = QTabWidget()
 
         # Production Tracking Tab
-        production_tab = ProductionTrackingTab()
+        production_tab = ProductionTrackingTab(self.db_manager)
 
         # Supplier Availability Tab
-        process_history_tab = SupplierAvailabilityTab()
+        process_history_tab = SupplierAvailabilityTab(self.db_manager)
 
         # Add tabs to the tab widget
         tab_widget.addTab(production_tab, "Production Tracking")

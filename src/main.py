@@ -1,6 +1,7 @@
 from PyQt5.QtWidgets import QApplication,QDialog
 from components.main_window import PLMApp
 import login.login_window as login
+import database.databaseManager as database
 import sys
 import globals
 import ctypes
@@ -22,8 +23,10 @@ if __name__ == "__main__":
     # Affiche la fenêtre de connexion
     login_dialog = login.LoginDialog()
     if login_dialog.exec_() == QDialog.Accepted:  # Si la connexion réussit
+        # initalise la liaison avec la bdd
+        db_manager = database.SQLiteManager()
         # Crée et lance la fenêtre principale
-        window = PLMApp(VERSION)  # Passe la version à la fenêtre principale
+        window = PLMApp(VERSION,db_manager)  # Passe la version à la fenêtre principale
         window.show()
         print(globals.current_user)
         sys.exit(app.exec_())

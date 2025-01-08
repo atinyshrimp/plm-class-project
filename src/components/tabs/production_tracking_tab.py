@@ -9,11 +9,12 @@ from dialogs.batch_details_window import BatchDetailsDialog
 import csv
 
 class ProductionTrackingTab(QWidget):
-    def __init__(self):
+    def __init__(self,db_manager):
         super().__init__()
         self.page_size = 10
         self.current_page = 1
         self.total_pages = 1
+        self.db_manager = db_manager
         self.production_data = []
         self.filtered_production_data = []
         self.init_ui()
@@ -124,18 +125,18 @@ class ProductionTrackingTab(QWidget):
         self.setLayout(main_layout)
 
         # Load Dummy Data
-        self.load_dummy_data()
+        self.load_data()
         self.update_production_table()
 
-    def load_dummy_data(self):
-        """Load dummy production data for testing."""
-        self.production_data = [
+    def load_data(self):
+        self.production_data = self.db_manager.fetch_query("fetch_production_tracking")
+        '''[
             ("L001", "P001", "Mixing", "2024-01-15", "Usine A", "Sugar, Water", "M001"),
             ("L002", "P002", "Filling", "2024-02-10", "Usine B", "Flour, Eggs", "M002"),
             ("L003", "P003", "Packaging", "2024-03-20", "Usine A", "Honey, Wax", "M003"),
             ("L004", "P004", "Sealing", "2024-04-25", "Usine C", "Salt, Pepper", "M004"),
             ("L005", "P005", "Labeling", "2024-05-30", "Usine A", "Oil, Herbs", "M005"),
-        ]
+        ]'''
         self.filtered_production_data = self.production_data[:]
         self.total_pages = (len(self.production_data) + self.page_size - 1) // self.page_size
 

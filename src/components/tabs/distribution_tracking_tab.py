@@ -10,7 +10,7 @@ from widgets.collapsible import CollapsibleSection
 
 
 class DistributionTrackingTab(QWidget):
-    def __init__(self):
+    def __init__(self,db_manager):
         super().__init__()
         self.page_size = 10  # Number of rows per page
         self.current_page = 1
@@ -18,6 +18,7 @@ class DistributionTrackingTab(QWidget):
         self.distribution_data = []  # Full dataset
         self.filtered_distribution_data = []  # Filtered dataset
         self.days_until_delivery = 7
+        self.db_manager = db_manager
         self.init_ui()
 
     def init_ui(self):
@@ -162,15 +163,16 @@ class DistributionTrackingTab(QWidget):
 
         self.setLayout(main_layout)
 
-        # Dummy Data
-        self.distribution_data = [
+        self.distribution_data = self.db_manager.fetch_query('fetch_distribution_tracking')
+
+        '''[
             ("2023-01-15", "2023-01-10", "L001", 100, "Warehouse A", "Distributor A", "Location A", "P001"),
             ("2023-02-20", "2023-02-15", "L002", 50, "Warehouse B", "Distributor B", "Location B", "P002"),
             ("2023-03-25", "2023-03-20", "L003", 75, "Warehouse A", "Distributor A", "Location C", "P001"),
             ("2023-04-10", "2023-04-05", "L004", 120, "Warehouse C", "Distributor C", "Location D", "P003"),
             ("2023-05-30", "2023-05-25", "L005", 60, "Warehouse B", "Distributor B", "Location B", "P002"),
             ("2024-12-15", "2024-05-30", "L006", 80, "Warehouse C", "Distributor C", "Location D", "P004"),
-        ]
+        ]'''
         self.filtered_distribution_data = self.distribution_data[:]  # Start with unfiltered data
         self.total_pages = (len(self.distribution_data) + self.page_size - 1) // self.page_size
         self.update_distribution_table()

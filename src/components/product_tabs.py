@@ -10,9 +10,9 @@ from .tabs.cost_details_tab import ProductCostDetailsTab
 from .tabs.stock_and_location_tab import StockLocationTab
 
 class ProductTabs(QWidget):
-    def __init__(self):
+    def __init__(self,db_manager):
         super().__init__()
-        
+        self.db_manager = db_manager
         self.is_editing = False
         
          # Initialize all fields before calling init_ui
@@ -29,7 +29,7 @@ class ProductTabs(QWidget):
         self.page_size = 10  # Number of rows per page
         self.current_page = 1  # Current page
         self.total_pages = 1  # Total pages
-        self.dummy_data = []  # Store product data
+        self.data = []  # Store product data
         self.filtered_data = [] # Store data with filters applied
         
         self.init_ui()
@@ -42,10 +42,10 @@ class ProductTabs(QWidget):
         self._init_product_sheets(product_sheet_tab)
 
         # Cost Details Tab
-        self.cost_details_tab = ProductCostDetailsTab()
+        self.cost_details_tab = ProductCostDetailsTab(self.db_manager)
 
         # Stock & Location Tab
-        stock_location_tab = StockLocationTab()
+        stock_location_tab = StockLocationTab(self.db_manager)
 
         # Add tabs to the tab widget
         self.tab_widget.addTab(product_sheet_tab, "Product Sheets")
@@ -243,7 +243,7 @@ class ProductTabs(QWidget):
         product_sheet_tab.setLayout(overall_tab_layout)
         
         # Populate the table
-        self._load_dummy_data()
+        self._load_data()
         self._update_table()
 
     def _toggle_edit_mode(self):
@@ -310,8 +310,8 @@ class ProductTabs(QWidget):
         # Switch back to view mode
         self._toggle_edit_mode()
 
-    def _load_dummy_data(self):
-        self.dummy_data = [
+    def _load_data(self):
+        self.data = [
             ("P001", "Honey Jar", 50, "1.0", "2023-10-01", "JAR001", "Pure organic honey", "Honey (90%), Beeswax (10%)", "https://m.media-amazon.com/images/I/81XTYU+nntL.jpg"),
             ("P002", "Berry Jam", 100, "1.1", "2023-09-15", "JAR002", "Mixed berry jam", "Strawberries (70%), Sugar (30%)", "https://assets.tmecosys.com/image/upload/t_web767x639/img/recipe/ras/Assets/4B7C3510-7041-4B5D-8000-1D10B1BA4678/Derivates/6749ac4e-586d-4055-9df2-5a96832897f6.jpg"),
             ("P003", "Lemon Marmalade", 75, "2.0", "2023-08-20", "JAR003", "Zesty lemon marmalade", "Lemons (60%), Sugar (40%)", "https://images.immediate.co.uk/production/volatile/sites/30/2020/08/recipe-image-legacy-id-871488_11-35ddf4e.jpg?quality=90&resize=440,400"),
@@ -326,9 +326,9 @@ class ProductTabs(QWidget):
             ("P012", "Organic Honey", 55, "1.0", "2023-01-15", "JAR005", "", "", "https://cdn.shopify.com/s/files/1/0262/6374/8713/files/organic-honey_1000x.png?v=1726646497"),
         ]
 
-        self.filtered_data = self.dummy_data[:] # Initialize filtered data with all products
+        self.filtered_data = self.data[:] # Initialize filtered data with all products
         self.page_size = 5
-        self.total_pages = (len(self.dummy_data) + self.page_size - 1) // self.page_size
+        self.total_pages = (len(self.data) + self.page_size - 1) // self.page_size
         self.current_page = 1
         
     def _update_table(self):
@@ -402,7 +402,7 @@ class ProductTabs(QWidget):
         """Filter based on `ID` & `Name` fields
         """
         filter_text = self.search_field.text().lower()
-        self.filtered_data = [product for product in self.dummy_data if (filter_text in product[0].lower() or filter_text in product[1].lower())]  # Filter by Name (column 1)
+        self.filtered_data = [product for product in self.data if (filter_text in product[0].lower() or filter_text in product[1].lower())]  # Filter by Name (column 1)
     
         # Reset pagination for filtered data
         self.total_pages = (len(self.filtered_data) + self.page_size - 1) // self.page_size
@@ -413,7 +413,7 @@ class ProductTabs(QWidget):
 
     def _reset_filter(self):
         """Reset the search filter and show all data."""
-        self.filtered_data = self.dummy_data[:]  # Reset to full dataset
+        self.filtered_data = self.data[:]  # Reset to full dataset
         self.search_field.clear()  # Clear the search input
         self.total_pages = (len(self.filtered_data) + self.page_size - 1) // self.page_size
         self.current_page = 1

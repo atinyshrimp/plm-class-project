@@ -5,11 +5,12 @@ from PyQt5.QtGui import QColor
 import csv
 
 class ProductCostDetailsTab(QWidget):
-    def __init__(self):
+    def __init__(self,db_manager):
         super().__init__()
         self.page_size = 10
         self.current_page = 1
         self.total_pages = 1
+        self.db_manager = db_manager
         self.cost_data = []
         self.filtered_cost_data = []
         self.init_ui()
@@ -84,19 +85,20 @@ class ProductCostDetailsTab(QWidget):
         self.setLayout(main_layout)
 
         # Load Dummy Data
-        self.load_dummy_data()
+        self.load_data()
         self.update_cost_table()
 
-    def load_dummy_data(self):
+    def load_data(self):
         """Load dummy cost data for testing."""
-        self.cost_data = [
+        self.cost_data = self.db_manager.fetch_query('fetch_cost_details')
+        '''[
             ("P001", 500, 200, 100, 1000),
             ("P002", 600, 250, 150, 1200),
             ("P003", 550, 300, 200, 1300),
             ("P004", 700, 350, 250, 1500),
             ("P005", 400, 150, 100, 900),
             ("P006", 450, 180, 120, 950),
-        ]
+        ]'''
 
         # Add Total Cost and Margin as calculated columns
         self.cost_data = [
