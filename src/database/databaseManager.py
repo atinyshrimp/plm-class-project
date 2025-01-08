@@ -161,9 +161,6 @@ class SQLiteManager:
             print(f"Une erreur inattendue s'est produite : {e}")
             return None
 
-
-
-
     def get_table_as_list(self, table_name: str) -> List[Tuple]:
         """Récupère les données d'une table SQLite et les transforme en tableau."""
         if not self.connection:
