@@ -9,9 +9,11 @@ from components.data_tabs import DataTabs
 from utils.styling import apply_stylesheet
 
 class PLMApp(QWidget):
-    def __init__(self, version):
+    def __init__(self, version,db_manager):
         super().__init__()
         self.version = version  # Store the version
+        self.db_manager = db_manager
+
         self.setWindowTitle(f"Hive (PLM Internal Software) v{self.version}")
         self.setWindowIcon(QtGui.QIcon("assets/img/mgo_sa_icon_resized.png"))
 
@@ -20,6 +22,8 @@ class PLMApp(QWidget):
         
         self.init_ui()
         self.resize_window()
+
+     
         
     def resize_window(self):
         """Resize the window based on the screen size to maintain the aspect ratio."""
@@ -45,12 +49,12 @@ class PLMApp(QWidget):
         self.tab_widget_stack = QStackedWidget(self)
 
         # Initialize and add tab widgets
-        self.product_tabs = ProductTabs()
-        self.data_tabs = DataTabs()
+        self.product_tabs = ProductTabs(self.db_manager)
+        self.data_tabs = DataTabs(self.db_manager)
         
         self.tab_widget_stack.addWidget(self.product_tabs)
-        self.tab_widget_stack.addWidget(PeopleTabs())
-        self.tab_widget_stack.addWidget(ProcessTabs())
+        self.tab_widget_stack.addWidget(PeopleTabs(self.db_manager))
+        self.tab_widget_stack.addWidget(ProcessTabs(self.db_manager))
         self.tab_widget_stack.addWidget(self.data_tabs)
         self.tab_widget_stack.setCurrentIndex(0)  # Default to the first tab set
 

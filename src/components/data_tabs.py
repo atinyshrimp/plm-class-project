@@ -3,15 +3,16 @@ from utils.table import CustomTable
 from .tabs.batch_history_tab import BatchHistoryTab
 
 class DataTabs(QWidget):
-    def __init__(self):
+    def __init__(self, db_manager):
         super().__init__()
+        self.db_manager = db_manager
         self.init_ui()
 
     def init_ui(self):
         tab_widget = QTabWidget()
 
         # Batch History Tab
-        self.batch_history_tab = BatchHistoryTab()
+        self.batch_history_tab = BatchHistoryTab(self.db_manager)
         tab_widget.addTab(self.batch_history_tab, "Batch History")
 
         # Main Layout

@@ -9,11 +9,12 @@ import csv
 from dialogs.stock_trends_window import StockTrendsWindow
 
 class StockLocationTab(QWidget):
-    def __init__(self):
+    def __init__(self, db_manager):
         super().__init__()
         self.page_size = 5
         self.current_page = 1
         self.total_pages = 1
+        self.db_manager = db_manager
         self.stock_data = []
         self.filtered_stock_data = []
         self.init_ui()
@@ -124,18 +125,19 @@ class StockLocationTab(QWidget):
         self.setLayout(main_layout)
 
         # Load Dummy Data
-        self.load_dummy_data()
+        self.load_data()
         self.update_stock_table()
 
-    def load_dummy_data(self):
+    def load_data(self):
         """Load dummy stock data for testing."""
-        self.stock_data = [
+        self.stock_data = self.db_manager.fetch_query("fetch_stock_and_location")
+        '''[
             ("L001", "P001", 50, "2024-06-01", "2024-01-15", "Warehouse A", "Paris"),
             ("L002", "P002", 80, "2024-03-01", "2024-02-10", "Warehouse B", "Lyon"),
             ("L003", "P003", 100, "2023-12-15", "2023-11-20", "Warehouse C", "Marseille"),
             ("L004", "P004", 75, "2024-05-01", "2024-02-01", "Warehouse D", "Paris"),
             ("L005", "P005", 60, "2023-12-30", "2023-12-10", "Warehouse E", "Lyon"),
-        ]
+        ]'''
         self.filtered_stock_data = self.stock_data[:]
         self.total_pages = (len(self.stock_data) + self.page_size - 1) // self.page_size
 

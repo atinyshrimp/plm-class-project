@@ -7,8 +7,9 @@ from utils.table import CustomTable
 import csv
 
 class BatchHistoryTab(QWidget):
-    def __init__(self):
+    def __init__(self,db_manager):
         super().__init__()
+        self.db_manager = db_manager
         self.page_size = 5  # Number of rows per page
         self.current_page = 1
         self.total_pages = 1
@@ -89,16 +90,17 @@ class BatchHistoryTab(QWidget):
         main_layout.addLayout(pagination_layout)
 
         self.setLayout(main_layout)
-
+        self.batch_data = self.db_manager.fetch_query("fetch_lot_history")
+        
         # Dummy Data
-        self.batch_data = [
+        '''[
             ("L001", "P001", 100, "2023-01-15", "2023-06-15", "Active", "None"),
             ("L002", "P002", 50, "2023-02-20", "2023-07-20", "Shipped", "None"),
             ("L003", "P001", 75, "2023-03-10", "2023-08-10", "Active", "Returned"),
             ("L004", "P003", 120, "2023-04-25", "2023-09-25", "Inactive", "None"),
             ("L005", "P002", 30, "2023-05-05", "2023-10-05", "Shipped", "None"),
             ("L006", "P001", 60, "2023-06-10", "2023-11-10", "Expired", "Returned"),
-        ]
+        ]'''
         self.filtered_batch_data = self.batch_data[:]  # Start with unfiltered data
         self.total_pages = (len(self.batch_data) + self.page_size - 1) // self.page_size
         self.update_batch_table()

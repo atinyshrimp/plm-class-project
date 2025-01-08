@@ -12,11 +12,12 @@ import csv
 
 
 class SupplierAvailabilityTab(QWidget):
-    def __init__(self):
+    def __init__(self,db_manager):
         super().__init__()
         self.page_size = 10
         self.current_page = 1
         self.total_pages = 1
+        self.db_manager = db_manager
         self.supplier_data = []
         self.filtered_supplier_data = []
         self.init_ui()
@@ -109,7 +110,7 @@ class SupplierAvailabilityTab(QWidget):
         self.setLayout(main_layout)
 
         # Load Dummy Data
-        self.load_dummy_data()
+        self.load_data()
         self.update_supplier_table()
 
     def show_context_menu(self, position):
@@ -138,15 +139,16 @@ class SupplierAvailabilityTab(QWidget):
         analytics_window = SupplierAnalyticsWindow(self.supplier_data, self)
         analytics_window.exec_()
 
-    def load_dummy_data(self):
+    def load_data(self):
         """Load dummy supplier data for testing."""
-        self.supplier_data = [
+        self.supplier_data = self.db_manager.fetch_query("fetch_merchant_tracking")
+        '''[
             ("M001", "2024-01-10", "Sugar", 1000, "Usine A", "Supplier A"),
             ("M002", "2024-02-15", "Flour", 2000, "Usine B", "Supplier B"),
             ("M003", "2024-03-20", "Oil", 1500, "Usine A", "Supplier A"),
             ("M004", "2024-04-25", "Salt", 500, "Usine C", "Supplier C"),
             ("M005", "2024-05-30", "Honey", 800, "Usine B", "Supplier D"),
-        ]
+        ]'''
         self.filtered_supplier_data = self.supplier_data[:]
         self.total_pages = (len(self.supplier_data) + self.page_size - 1) // self.page_size
 
