@@ -19,8 +19,6 @@ class SQLiteManager:
 
         # Vérifie le rôle de l'utilisateur
         self.is_admin = (globals.current_user == "admin")
-        if self.is_admin:
-            print("is_admin true")
         # Initialise la base de données si nécessaire
         if not os.path.exists(self.db_path):
             print(f"La base de données '{self.db_path}' n'existe pas. Initialisation...")
@@ -78,26 +76,29 @@ class SQLiteManager:
                 return False
             
     def execute_query(self, query, params=None):
-            cursor = self.connection.cursor()
-            try:
-                if params:
-                    cursor.execute(query, params)
-                else:
-                    cursor.execute(query)
+        """
+        Exécute une requête SQL et retourne les résultats s'ils existent.
+        """
+        cursor = self.connection.cursor()
+        try:
+            # Exécution de la requête avec ou sans paramètres
+            if params:
+                cursor.execute(query, params)
+            else:
+                cursor.execute(query)
 
-            # Si la requête est une sélection, récupérer les résultats
-                if query.strip().upper().startswith("SELECT"):
-                    result = cursor.fetchall()
-                    return result
-                
-                # Si ce n'est pas une requête SELECT, on commit et retourne rien
-                self.connection.commit()
-                return None
+            # Récupérer les résultats s'ils existent
+            result = cursor.fetchall() if cursor.description else True
+
+            # Commit si ce n'est pas une requête de lecture
+            self.connection.commit()
             
-            except sqlite3.Error as e:
-                print(f"Erreur lors de l'exécution de la requête : {e}")
-            finally:
-                cursor.close()
+            return result
+        except sqlite3.Error as e:
+            print(f"Erreur lors de l'exécution de la requête : {e}")
+            return False
+        finally:
+            cursor.close()
 
     def get_query_executor(self):
         """
@@ -160,7 +161,97 @@ class SQLiteManager:
         except Exception as e:
             print(f"Une erreur inattendue s'est produite : {e}")
             return None
+        
 
+    def update_row(self, table_name, data_line):
+        """
+        Met à jour une ligne dans une table donnée.
+        
+        :param table_name: Nom de la table.
+        :param data_line: Dictionnaire contenant les colonnes et leurs nouvelles valeurs, 
+                        y compris 'id' pour spécifier la ligne à mettre à jour.
+        """
+                
+        if 'id' not in data_line.keys():
+            raise ValueError("La clé 'id' est requise dans 'data_line' pour identifier la ligne à mettre à jour.")
+
+        # Préparer la clause SET et les paramètres
+        set_clause = ", ".join([f"{key} = ?" for key in data_line.keys() if key != 'id'])
+        query = f"UPDATE {table_name} SET {set_clause} WHERE id = ?"
+        params = tuple(data_line[key] for key in data_line.keys() if key != 'id') + (data_line['id'],)
+
+        # Exécuter la requête
+        if self.execute_query(query, params):
+            print(f"Ligne avec id {data_line['id']} mise à jour dans '{table_name}'.")
+
+
+    def delete_row(self, table_name,row_id):
+        """
+        Supprime une ligne dans une table donnée.
+        """
+        query = f"DELETE FROM {table_name} WHERE id = ?"
+        if self.execute_query(query, (row_id,)):
+            print(f"Ligne avec id {row_id} supprimée de '{table_name}'.")
+
+    def get_row_suggestion(self, table_name):
+        """
+        Récupère les suggestions basées sur les relations de clés étrangères.
+        """
+        foreign_key_query = f"""
+        PRAGMA foreign_key_list({table_name});
+        """
+        foreign_keys = self.execute_query(foreign_key_query)
+
+        suggestions = {}
+        if foreign_keys is not None:
+            for fk in foreign_keys:
+                fk_table = fk[2]  # Table référencée
+                fk_column = fk[3]  # Colonne locale (id de la clé étrangère)
+                ref_column = fk[4]  # Colonne dans la table référencée
+
+                # Vérifie si le champ est une colonne présente
+                column_query = f"PRAGMA table_info({fk_table});"
+                columns = [col[1] for col in self.execute_query(column_query)]
+
+                if "nom" in columns:
+                    suggestion_query = f"SELECT id, nom FROM {fk_table}"
+                    suggestions[fk_column] = self.execute_query(suggestion_query)
+                elif "localisation" in columns:
+                    suggestion_query = f"SELECT id, localisation FROM {fk_table}"
+                    suggestions[fk_column] = self.execute_query(suggestion_query)
+                else:
+                    suggestion_query = f"SELECT id FROM {fk_table}"
+                    suggestions[fk_column] = self.execute_query(suggestion_query)
+
+            return suggestions
+ 
+    def get_table_metadata(self, table_name: str) -> dict:
+        """
+        Récupère les métadonnées d'une table, y compris les clés primaires, colonnes et relations FK.
+        
+        :param table_name: Nom de la table cible.
+        :return: Dictionnaire contenant les colonnes, clés primaires, et relations FK.
+        """
+        try:
+            # Récupérer les colonnes de la table
+            columns_query = f"PRAGMA table_info({table_name})"
+            columns = self.execute_query(columns_query)
+            column_info = {
+                col[1]: {"type": col[2], "notnull": col[3], "pk": col[5]} for col in columns
+            }
+
+            # Récupérer les clés étrangères
+            fk_query = f"PRAGMA foreign_key_list({table_name})"
+            foreign_keys = self.execute_query(fk_query)
+            relations = [
+                {"column": fk[3], "ref_table": fk[2], "ref_column": fk[4]} for fk in foreign_keys
+            ]
+
+            return {"columns": column_info, "foreign_keys": relations}
+        except sqlite3.Error as e:
+            print(f"Erreur lors de la récupération des métadonnées pour '{table_name}': {e}")
+            return {}
+        
     def get_table_as_list(self, table_name: str) -> List[Tuple]:
         """Récupère les données d'une table SQLite et les transforme en tableau."""
         if not self.connection:
@@ -175,28 +266,4 @@ class SQLiteManager:
             print(f"Erreur lors de la récupération des données: {e}")
             return []
 
-    def save_table_from_list(self, table_name: str, data: List[Tuple]):
-
-        """Insère ou met à jour les données dans une table SQLite à partir d'un tableau."""
-        if not self.is_admin:
-            raise PermissionError("Modification non autorisée : accès réservé aux administrateurs.")
-
-        if not self.connection:
-            raise ConnectionError("La connexion à la base de données n'est pas établie.")
-
-        cursor = self.connection.cursor()
-        try:
-            # Supprime les anciennes données (optionnel, selon vos besoins)
-            cursor.execute(f"DELETE FROM {table_name}")
-
-            # Prépare une commande d'insertion
-            placeholders = ", ".join(["?"] * len(data[0]))  # Nombre de colonnes
-            insert_query = f"INSERT INTO {table_name} VALUES ({placeholders})"
-
-            # Insère les nouvelles données
-            cursor.executemany(insert_query, data)
-            self.connection.commit()
-            print(f"{len(data)} lignes insérées dans la table {table_name}.")
-        except sqlite3.Error as e:
-            print(f"Erreur lors de l'insertion des données: {e}")
-
+  
