@@ -5,21 +5,23 @@ The input fields are dynamically created based on the column types of the table,
 The dialog also handles saving the data to the database and displaying error messages if the data cannot be saved.
 """
 
+from typing import Callable
+
+from PyQt5.QtCore import QDateTime
 from PyQt5.QtWidgets import (
-    QWidget,
+    QComboBox,
+    QDateTimeEdit,
     QDialog,
-    QVBoxLayout,
+    QDoubleSpinBox,
     QFormLayout,
     QLineEdit,
-    QSpinBox,
-    QDoubleSpinBox,
-    QDateTimeEdit,
-    QPushButton,
     QMessageBox,
-    QComboBox,
+    QPushButton,
+    QSpinBox,
+    QVBoxLayout,
+    QWidget,
 )
-from PyQt5.QtCore import QDateTime
-from typing import Callable
+
 from database.databaseManager import SQLiteManager
 
 
@@ -48,6 +50,7 @@ class DatabaseDialog(QDialog):
         """Initializes the UI for the DatabaseDialog."""
         # Set the window title
         self.setWindowTitle(f"{'Edit' if self.is_edit_mode else 'Add'} Row")
+        self.setFixedWidth(400)
 
         # Create the main layout
         layout = QVBoxLayout()
@@ -78,7 +81,13 @@ class DatabaseDialog(QDialog):
                         else QDateTime.currentDateTime()
                     )
                 elif isinstance(input_field, QComboBox):
-                    index = input_field.findText(str(value))
+                    index = (
+                        input_field.findText(str(value))
+                        if column_name not in ["type", "statut", "retour"]
+                        else int(value)
+                    )
+                    print(str(value))
+                    print(index)
                     if index != -1:
                         input_field.setCurrentIndex(index)
                 else:
@@ -122,7 +131,7 @@ class DatabaseDialog(QDialog):
                 input_field.addItem(f"{str(row[0])}")
 
         # Check if the column type is INTEGER or BOOLEAN
-        elif column_type in ["INTEGER", "BOOLEAN"] and column_name != "cout_marketing":
+        elif column_type == "INTEGER" and column_name != "cout_marketing":
             input_field = QSpinBox()
             input_field.setMaximum(999999999)  # Set maximum value for the spin box
 
@@ -149,6 +158,19 @@ class DatabaseDialog(QDialog):
         # Check if the column type is TEXT
         elif column_type == "TEXT":
             input_field = QLineEdit()
+
+        elif column_type == "BOOLEAN":
+            input_field = QComboBox()
+            if column_name == "statut":
+                input_field.addItems(["Inactive", "Active"])
+            elif column_name == "type":
+                input_field.addItems(
+                    ["Distributor", "Supplier"]
+                    if self.table_name == "Fournisseurs_Distributeurs"
+                    else ["Factory", "Warehouse"]
+                )
+            elif column_name == "retour":
+                input_field.addItems(["No", "Yes"])
 
         # Default case for other column types
         else:
@@ -194,7 +216,11 @@ class DatabaseDialog(QDialog):
             elif column_type == "REAL" or column_name == "cout_marketing":
                 data[column_name] = self.inputs[column_name].value()
             elif isinstance(self.inputs[column_name], QComboBox):
-                data[column_name] = self.inputs[column_name].currentText()
+                data[column_name] = (
+                    self.inputs[column_name].currentText()
+                    if column_type != "BOOLEAN"
+                    else self.inputs[column_name].currentIndex()
+                )
             else:
                 data[column_name] = self.inputs[column_name].text()
 

@@ -25,7 +25,7 @@ class BatchHistoryTab(QWidget):
     def __init__(self, db_manager):
         super().__init__()
         self.db_manager = db_manager
-        self.page_size = 5  # Number of rows per page
+        self.page_size = 20  # Number of rows per page
         self.current_page = 1
         self.total_pages = 1
         self.batch_data = []  # Full dataset
@@ -167,19 +167,31 @@ class BatchHistoryTab(QWidget):
                 item = QTableWidgetItem(str(col_data))
                 # Apply color-coding for Status
                 if col_index == 5:  # Status column
-                    item.setBackground(self.get_status_color(row_data[5]))
+                    status = "Active" if col_data == 1 else "Inactive"
+                    item.setText(status)
+                    item.setBackground(self.get_background_color(status))
+                elif col_index == 6:
+                    return_status = "Yes" if col_data == 1 else "No"
+                    item.setText(return_status)
+                    item.setBackground(self.get_background_color(return_status))
+
                 self.batch_table.setItem(row_index, col_index, item)
 
         # self.batch_table.resizeColumnsToContents()
 
-    def get_status_color(self, status):
-        """Return a color based on the batch status."""
+    def get_background_color(self, status: str) -> QColor:
+        """Return a color based on the batch status.
+
+        Args:
+            status (str): The status of the batch.
+
+        Returns:
+            QColor: The color corresponding to the status.
+        """
         colors = {
             "Active": QColor("#b3ffcc"),  # Green
-            "Shipped": QColor("#cce0ff"),  # Blue
             "Inactive": QColor("#ffe6cc"),  # Orange
-            "Expired": QColor("#ffcccc"),  # Red
-            "Returned": QColor("#ffff99"),  # Yellow
+            "Yes": QColor("#ffe6cc"),  # Orange
         }
         return colors.get(status, QColor("#ffffff"))  # Default: White
 
@@ -196,7 +208,11 @@ class BatchHistoryTab(QWidget):
             self.update_batch_table()
 
     def show_context_menu(self, position):
-        """Display context menu for batch actions."""
+        """Display context menu for batch actions.
+
+        Args:
+            position (QPoint): The position of the context menu.
+        """
         selected_row = self.batch_table.currentRow()
         if selected_row == -1:
             return
@@ -208,14 +224,6 @@ class BatchHistoryTab(QWidget):
         report_action = QAction("View Report", self)
         report_action.triggered.connect(self.show_batch_report)
         menu.addAction(report_action)
-
-        mark_inactive_action = QAction("Mark as Inactive", self)
-        mark_inactive_action.triggered.connect(self.mark_batch_as_inactive)
-        menu.addAction(mark_inactive_action)
-
-        mark_shipped_action = QAction("Mark as Shipped", self)
-        mark_shipped_action.triggered.connect(self.mark_batch_as_shipped)
-        menu.addAction(mark_shipped_action)
 
         if self.db_manager.is_admin:
             menu.addSeparator()
@@ -248,24 +256,17 @@ class BatchHistoryTab(QWidget):
         """
         QMessageBox.information(self, "Batch Report", report_text)
 
-    def mark_batch_as_inactive(self):
+    def toggle_batch_status(self):
         """Mark the selected batch as inactive."""
         selected_row = self.batch_table.currentRow()
         if selected_row == -1:
             return
         global_row_index = (self.current_page - 1) * self.page_size + selected_row
         batch = self.filtered_batch_data[global_row_index]
-        self.filtered_batch_data[global_row_index] = batch[:5] + ("Inactive", batch[6])
-        self.update_batch_table()
-
-    def mark_batch_as_shipped(self):
-        """Mark the selected batch as shipped."""
-        selected_row = self.batch_table.currentRow()
-        if selected_row == -1:
-            return
-        global_row_index = (self.current_page - 1) * self.page_size + selected_row
-        batch = self.filtered_batch_data[global_row_index]
-        self.filtered_batch_data[global_row_index] = batch[:5] + ("Shipped", batch[6])
+        self.filtered_batch_data[global_row_index] = batch[:5] + (
+            "Inactive" if batch[5] == 0 else "Active",
+            batch[6],
+        )
         self.update_batch_table()
 
     def export_batch_history(self):
