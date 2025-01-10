@@ -344,7 +344,7 @@ class ProductTabs(QWidget):
         self._toggle_edit_mode()
 
     def _load_data(self):
-        loginAndData
+        
         self.data = self.db_manager.fetch_query("fetch_product_details")
         '''
         [
