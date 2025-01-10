@@ -6,7 +6,7 @@ import sys
 import globals
 import ctypes
 
-VERSION = "0.8.0"
+VERSION = "1.0.0"
 
 # Variable globale pour stocker l'utilisateur connecté
 globals.current_user = None
