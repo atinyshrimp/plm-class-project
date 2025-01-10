@@ -1,15 +1,30 @@
-from PyQt5.QtWidgets import (
-    QWidget, QVBoxLayout, QHBoxLayout, QTableWidgetItem, QLabel, QLineEdit,
-    QDateEdit, QComboBox, QPushButton, QFileDialog, QMessageBox, QSizePolicy,
-    QMenu, QAction
-)
-from PyQt5.QtCore import Qt, QDate
-from utils.table import CustomTable
-from dialogs.batch_details_window import BatchDetailsDialog
 import csv
 
+from PyQt5.QtCore import QDate, Qt
+from PyQt5.QtWidgets import (
+    QAction,
+    QComboBox,
+    QDateEdit,
+    QFileDialog,
+    QHBoxLayout,
+    QLabel,
+    QLineEdit,
+    QMenu,
+    QMessageBox,
+    QPushButton,
+    QSizePolicy,
+    QTableWidgetItem,
+    QVBoxLayout,
+    QWidget,
+)
+
+from dialogs.batch_details_window import BatchDetailsDialog
+from dialogs.database_dialog import open_dialog
+from utils.table import CustomTable
+
+
 class ProductionTrackingTab(QWidget):
-    def __init__(self,db_manager):
+    def __init__(self, db_manager):
         super().__init__()
         self.page_size = 10
         self.current_page = 1
@@ -52,7 +67,8 @@ class ProductionTrackingTab(QWidget):
         # Factory Location Filter
         factory_label = QLabel("Factory Location:")
         self.factory_dropdown = QComboBox()
-        self.factory_dropdown.setStyleSheet("""
+        self.factory_dropdown.setStyleSheet(
+            """
             QComboBox {
                 border: 1px solid #F4C542;
                 border-radius: 5px;
@@ -73,7 +89,8 @@ class ProductionTrackingTab(QWidget):
                 selection-color: #000;
                 padding: 5px;
             }
-        """)
+        """
+        )
 
         self.factory_dropdown.addItem("All")
         self.factory_dropdown.addItem("Usine A")
@@ -85,7 +102,6 @@ class ProductionTrackingTab(QWidget):
         self.filter_button.setSizePolicy(QSizePolicy.Fixed, QSizePolicy.Fixed)
         self.filter_button.adjustSize()
         self.filter_button.clicked.connect(self.filter_production_data)
-
 
         # Add filters to layout
         filter_layout.addWidget(start_date_label)
@@ -102,10 +118,17 @@ class ProductionTrackingTab(QWidget):
         # Production Records Table
         self.production_table = CustomTable()
         self.production_table.setColumnCount(7)
-        self.production_table.setHorizontalHeaderLabels([
-            "Lot ID", "Product ID", "Process Name", "Date",
-            "Factory", "Ingredients", "Merchandise ID"
-        ])
+        self.production_table.setHorizontalHeaderLabels(
+            [
+                "Lot ID",
+                "Product ID",
+                "Process Name",
+                "Date",
+                "Factory",
+                "Ingredients",
+                "Merchandise ID",
+            ]
+        )
         self.setup_context_menu()
 
         main_layout.addWidget(self.production_table)
@@ -130,24 +153,22 @@ class ProductionTrackingTab(QWidget):
 
     def load_data(self):
         self.production_data = self.db_manager.fetch_query("fetch_production_tracking")
-        '''[
-            ("L001", "P001", "Mixing", "2024-01-15", "Usine A", "Sugar, Water", "M001"),
-            ("L002", "P002", "Filling", "2024-02-10", "Usine B", "Flour, Eggs", "M002"),
-            ("L003", "P003", "Packaging", "2024-03-20", "Usine A", "Honey, Wax", "M003"),
-            ("L004", "P004", "Sealing", "2024-04-25", "Usine C", "Salt, Pepper", "M004"),
-            ("L005", "P005", "Labeling", "2024-05-30", "Usine A", "Oil, Herbs", "M005"),
-        ]'''
         self.filtered_production_data = self.production_data[:]
-        self.total_pages = (len(self.production_data) + self.page_size - 1) // self.page_size
+        self.total_pages = (
+            len(self.production_data) + self.page_size - 1
+        ) // self.page_size
 
         # Determine the oldest expiration and arrival dates
         earliest_date = min(row[3] for row in self.production_data)
         most_recent_date = max(row[3] for row in self.production_data)
 
         # Set date pickers to the oldest dates minus one day
-        self.start_date_picker.setDate(QDate.fromString(earliest_date, "yyyy-MM-dd").addDays(-1))
-        self.end_date_picker.setDate(QDate.fromString(most_recent_date, "yyyy-MM-dd").addDays(1))
-
+        self.start_date_picker.setDate(
+            QDate.fromString(earliest_date, "yyyy-MM-dd").addDays(-1)
+        )
+        self.end_date_picker.setDate(
+            QDate.fromString(most_recent_date, "yyyy-MM-dd").addDays(1)
+        )
 
     def update_production_table(self):
         """Update the production table for the current page."""
@@ -158,7 +179,9 @@ class ProductionTrackingTab(QWidget):
         self.production_table.setRowCount(len(page_data))
         for row_index, row_data in enumerate(page_data):
             for col_index, col_data in enumerate(row_data):
-                self.production_table.setItem(row_index, col_index, QTableWidgetItem(str(col_data)))
+                self.production_table.setItem(
+                    row_index, col_index, QTableWidgetItem(str(col_data))
+                )
 
         # Update pagination controls
         self.page_label.setText(f"Page {self.current_page} of {self.total_pages}")
@@ -173,13 +196,16 @@ class ProductionTrackingTab(QWidget):
         factory = self.factory_dropdown.currentText()
 
         self.filtered_production_data = [
-            row for row in self.production_data
+            row
+            for row in self.production_data
             if start_date <= row[3] <= end_date  # Date Range Filter
             and (not product_id or product_id in row[1].lower())  # Product ID Filter
             and (factory == "All" or row[4] == factory)  # Factory Location Filter
         ]
 
-        self.total_pages = (len(self.filtered_production_data) + self.page_size - 1) // self.page_size
+        self.total_pages = (
+            len(self.filtered_production_data) + self.page_size - 1
+        ) // self.page_size
         self.current_page = 1
         self.update_production_table()
 
@@ -197,16 +223,27 @@ class ProductionTrackingTab(QWidget):
 
     def export_data(self):
         """Export filtered production data to a CSV file."""
-        file_path, _ = QFileDialog.getSaveFileName(self, "Export Production Data", "", "CSV Files (*.csv)")
+        file_path, _ = QFileDialog.getSaveFileName(
+            self, "Export Production Data", "", "CSV Files (*.csv)"
+        )
         if file_path:
             with open(file_path, "w", newline="") as file:
                 writer = csv.writer(file)
-                writer.writerow([
-                    "Lot ID", "Product ID", "Process Name", "Date",
-                    "Factory", "Ingredients", "Merchandise ID"
-                ])
+                writer.writerow(
+                    [
+                        "Lot ID",
+                        "Product ID",
+                        "Process Name",
+                        "Date",
+                        "Factory",
+                        "Ingredients",
+                        "Merchandise ID",
+                    ]
+                )
                 writer.writerows(self.filtered_production_data)
-            QMessageBox.information(self, "Export Successful", f"Data exported to {file_path}")
+            QMessageBox.information(
+                self, "Export Successful", f"Data exported to {file_path}"
+            )
 
     def setup_context_menu(self):
         self.production_table.setContextMenuPolicy(Qt.CustomContextMenu)
@@ -223,17 +260,50 @@ class ProductionTrackingTab(QWidget):
         menu = QMenu(self)
 
         batch_details_action = QAction("Open Batch Details", self)
-        batch_details_action.triggered.connect(lambda: self.show_batch_details(batch_data))
+        batch_details_action.triggered.connect(
+            lambda: self.show_batch_details(batch_data)
+        )
 
         batch_history_action = QAction(f"View Batch History ({batch_data[0]})", self)
-        batch_history_action.triggered.connect(lambda: self.navigate_to_batch_history(batch_data[0]))
+        batch_history_action.triggered.connect(
+            lambda: self.navigate_to_batch_history(batch_data[0])
+        )
 
         cost_details_action = QAction(f"View Cost Details ({batch_data[1]})", self)
-        cost_details_action.triggered.connect(lambda: self.navigate_to_cost_details(batch_data[1]))
+        cost_details_action.triggered.connect(
+            lambda: self.navigate_to_cost_details(batch_data[1])
+        )
 
         menu.addAction(batch_details_action)
         menu.addAction(batch_history_action)
         menu.addAction(cost_details_action)
+
+        if self.db_manager.is_admin:
+            menu.addSeparator()
+
+            tables = {
+                "Lots": {
+                    "display_name": "Batch",
+                    "id_column": batch_data[0],
+                },
+                "Marchandises": {
+                    "display_name": "Merchandise",
+                    "id_column": batch_data[6],
+                },
+            }
+
+            for table in tables:
+                action = QAction(
+                    f"Edit {tables[table]['display_name']} ({tables[table]['id_column']})",
+                    self,
+                )
+                action.triggered.connect(
+                    lambda _, t=table, id=tables[table]["id_column"]: open_dialog(
+                        self.db_manager, t, id, self, self.refresh_table, True
+                    )
+                )
+                menu.addAction(action)
+
         menu.exec_(self.production_table.viewport().mapToGlobal(position))
 
     def show_batch_details(self, batch_data):
@@ -243,12 +313,30 @@ class ProductionTrackingTab(QWidget):
 
     def navigate_to_batch_history(self, lot_id):
         """Navigate to Batch History tab for the selected lot."""
-        parent_widget = self.parentWidget().parentWidget().parentWidget().parentWidget().parentWidget()
+        parent_widget = (
+            self.parentWidget()
+            .parentWidget()
+            .parentWidget()
+            .parentWidget()
+            .parentWidget()
+        )
         if hasattr(parent_widget, "switch_to_batch_tab"):
             parent_widget.switch_to_batch_tab(lot_id)
 
     def navigate_to_cost_details(self, product_id):
         """Navigate to Cost Details tab for the selected product."""
-        parent_widget = self.parentWidget().parentWidget().parentWidget().parentWidget().parentWidget()
+        parent_widget = (
+            self.parentWidget()
+            .parentWidget()
+            .parentWidget()
+            .parentWidget()
+            .parentWidget()
+        )
         if hasattr(parent_widget, "switch_to_cost_tab"):
             parent_widget.switch_to_cost_tab(product_id)
+
+    def refresh_table(self):
+        """Refresh the production table."""
+        self.load_data()
+        self.filter_production_data()
+        self.update_production_table()

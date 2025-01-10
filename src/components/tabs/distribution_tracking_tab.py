@@ -1,16 +1,30 @@
 import csv
 from PyQt5.QtWidgets import (
-    QWidget, QVBoxLayout, QHBoxLayout, QLineEdit, QTableWidgetItem, QLabel, QMenu, QAction,
-    QPushButton, QComboBox, QFileDialog, QMessageBox, QDateEdit, QListWidget, QToolBox
+    QWidget,
+    QVBoxLayout,
+    QHBoxLayout,
+    QLineEdit,
+    QTableWidgetItem,
+    QLabel,
+    QMenu,
+    QAction,
+    QPushButton,
+    QComboBox,
+    QFileDialog,
+    QMessageBox,
+    QDateEdit,
+    QListWidget,
+    QToolBox,
 )
 from PyQt5.QtCore import Qt
 from utils.table import CustomTable
 from datetime import datetime, timedelta
 from widgets.collapsible import CollapsibleSection
+from dialogs.database_dialog import DatabaseDialog, open_dialog
 
 
 class DistributionTrackingTab(QWidget):
-    def __init__(self,db_manager):
+    def __init__(self, db_manager):
         super().__init__()
         self.page_size = 10  # Number of rows per page
         self.current_page = 1
@@ -30,13 +44,16 @@ class DistributionTrackingTab(QWidget):
 
         # Search Field
         self.search_field = QLineEdit()
-        self.search_field.setPlaceholderText("Search by Distributor, Lot ID, or Product ID...")
+        self.search_field.setPlaceholderText(
+            "Search by Distributor, Lot ID, or Product ID..."
+        )
         self.search_field.textChanged.connect(self.filter_distribution_data)
         control_layout.addWidget(self.search_field)
 
         # Grouping Dropdown
         self.grouping_dropdown = QComboBox()
-        self.grouping_dropdown.setStyleSheet("""
+        self.grouping_dropdown.setStyleSheet(
+            """
             QComboBox {
                 border: 1px solid #F4C542;
                 border-radius: 5px;
@@ -57,8 +74,11 @@ class DistributionTrackingTab(QWidget):
                 selection-color: #000;
                 padding: 5px;
             }
-        """)
-        self.grouping_dropdown.addItems(["No Grouping", "Group by Distributor", "Group by Product ID"])
+        """
+        )
+        self.grouping_dropdown.addItems(
+            ["No Grouping", "Group by Distributor", "Group by Product ID"]
+        )
         self.grouping_dropdown.currentIndexChanged.connect(self.group_distribution_data)
         control_layout.addWidget(self.grouping_dropdown)
 
@@ -81,7 +101,8 @@ class DistributionTrackingTab(QWidget):
 
         # Add warehouse filter
         self.warehouse_dropdown = QComboBox()
-        self.warehouse_dropdown.setStyleSheet("""
+        self.warehouse_dropdown.setStyleSheet(
+            """
             QComboBox {
                 border: 1px solid #F4C542;
                 border-radius: 5px;
@@ -102,7 +123,8 @@ class DistributionTrackingTab(QWidget):
                 selection-color: #000;
                 padding: 5px;
             }
-        """)
+        """
+        )
         self.warehouse_dropdown.addItem("All Warehouses")
         self.warehouse_dropdown.addItems(["Warehouse A", "Warehouse B", "Warehouse C"])
 
@@ -115,17 +137,28 @@ class DistributionTrackingTab(QWidget):
         filter_layout.addWidget(self.filter_button)
         main_layout.addLayout(filter_layout)
 
-
         # Distribution Table
         self.distribution_table = CustomTable(10, 8)  # Initial size: 10 rows, 8 columns
-        self.distribution_table.setHorizontalHeaderLabels([
-            "Delivery Date", "Contract Date", "Lot", "Lot Quantity",
-            "Departure Warehouse", "Distributor", "Distributor Location", "Product ID"
-        ])
-        self.distribution_table.setSizePolicy(self.distribution_table.sizePolicy().Expanding,
-                                              self.distribution_table.sizePolicy().Expanding)
+        self.distribution_table.setHorizontalHeaderLabels(
+            [
+                "Delivery Date",
+                "Contract Date",
+                "Lot",
+                "Lot Quantity",
+                "Departure Warehouse",
+                "Distributor",
+                "Distributor Location",
+                "Product ID",
+            ]
+        )
+        self.distribution_table.setSizePolicy(
+            self.distribution_table.sizePolicy().Expanding,
+            self.distribution_table.sizePolicy().Expanding,
+        )
         self.distribution_table.setContextMenuPolicy(Qt.CustomContextMenu)
-        self.distribution_table.customContextMenuRequested.connect(self.show_context_menu)
+        self.distribution_table.customContextMenuRequested.connect(
+            self.show_context_menu
+        )
         main_layout.addWidget(self.distribution_table)
 
         # Pagination Controls
@@ -143,7 +176,9 @@ class DistributionTrackingTab(QWidget):
         # Upcoming Deliveries List and Button
         self.upcoming_deliveries_list = QListWidget()
         self.refresh_upcoming_deliveries_button = QPushButton("Refresh")
-        self.refresh_upcoming_deliveries_button.clicked.connect(self.show_upcoming_deliveries)
+        self.refresh_upcoming_deliveries_button.clicked.connect(
+            self.show_upcoming_deliveries
+        )
 
         # Create content widget for upcoming deliveries
         upcoming_content_widget = QWidget()
@@ -153,29 +188,35 @@ class DistributionTrackingTab(QWidget):
         upcoming_content_widget.setLayout(upcoming_content_layout)
 
         # Add collapsible section for upcoming deliveries
-        upcoming_section = CollapsibleSection("Upcoming Deliveries", upcoming_content_widget)
-        
+        upcoming_section = CollapsibleSection(
+            "Upcoming Deliveries", upcoming_content_widget
+        )
+
         # Connect the toggled signal to refresh the deliveries when expanded
-        upcoming_section.toggled.connect(lambda expanded: self.show_upcoming_deliveries() if expanded else None)
-        
+        upcoming_section.toggled.connect(
+            lambda expanded: self.show_upcoming_deliveries() if expanded else None
+        )
+
         # Add the section to the main layout
         main_layout.addWidget(upcoming_section)
 
         self.setLayout(main_layout)
 
-        self.distribution_data = self.db_manager.fetch_query('fetch_distribution_tracking')
+        self.load_data()
 
-        '''[
-            ("2023-01-15", "2023-01-10", "L001", 100, "Warehouse A", "Distributor A", "Location A", "P001"),
-            ("2023-02-20", "2023-02-15", "L002", 50, "Warehouse B", "Distributor B", "Location B", "P002"),
-            ("2023-03-25", "2023-03-20", "L003", 75, "Warehouse A", "Distributor A", "Location C", "P001"),
-            ("2023-04-10", "2023-04-05", "L004", 120, "Warehouse C", "Distributor C", "Location D", "P003"),
-            ("2023-05-30", "2023-05-25", "L005", 60, "Warehouse B", "Distributor B", "Location B", "P002"),
-            ("2024-12-15", "2024-05-30", "L006", 80, "Warehouse C", "Distributor C", "Location D", "P004"),
-        ]'''
-        self.filtered_distribution_data = self.distribution_data[:]  # Start with unfiltered data
-        self.total_pages = (len(self.distribution_data) + self.page_size - 1) // self.page_size
+        self.total_pages = (
+            len(self.distribution_data) + self.page_size - 1
+        ) // self.page_size
         self.update_distribution_table()
+
+    def load_data(self):
+        """Load distribution data from the database."""
+        self.distribution_data = self.db_manager.fetch_query(
+            "fetch_distribution_tracking"
+        )
+        self.filtered_distribution_data = self.distribution_data[
+            :
+        ]  # Start with unfiltered data
 
     def filter_by_date_and_warehouse(self):
         """Filter distributions by date range and warehouse."""
@@ -184,11 +225,14 @@ class DistributionTrackingTab(QWidget):
         selected_warehouse = self.warehouse_dropdown.currentText()
 
         self.filtered_distribution_data = [
-            row for row in self.distribution_data
+            row
+            for row in self.distribution_data
             if start_date <= datetime.strptime(row[0], "%Y-%m-%d").date() <= end_date
             and (selected_warehouse == "All Warehouses" or row[4] == selected_warehouse)
         ]
-        self.total_pages = (len(self.filtered_distribution_data) + self.page_size - 1) // self.page_size
+        self.total_pages = (
+            len(self.filtered_distribution_data) + self.page_size - 1
+        ) // self.page_size
         self.current_page = 1
         self.update_distribution_table()
 
@@ -196,10 +240,13 @@ class DistributionTrackingTab(QWidget):
         """Filter distribution data based on the search input."""
         filter_text = self.search_field.text().lower()
         self.filtered_distribution_data = [
-            row for row in self.distribution_data
+            row
+            for row in self.distribution_data
             if any(filter_text in str(cell).lower() for cell in row)
         ]
-        self.total_pages = (len(self.filtered_distribution_data) + self.page_size - 1) // self.page_size
+        self.total_pages = (
+            len(self.filtered_distribution_data) + self.page_size - 1
+        ) // self.page_size
         self.current_page = 1
         self.update_distribution_table()
 
@@ -213,7 +260,7 @@ class DistributionTrackingTab(QWidget):
         elif group_by == "Group by Product ID":
             key_index = 7  # Product ID column
         else:
-            key_index = 0 # Delivery Date
+            key_index = 0  # Delivery Date
 
         if key_index is not None:
             self.filtered_distribution_data.sort(key=lambda x: x[key_index])
@@ -250,26 +297,63 @@ class DistributionTrackingTab(QWidget):
 
     def export_distribution_data(self):
         """Export distribution data to a CSV file."""
-        file_path, _ = QFileDialog.getSaveFileName(self, "Export to CSV", "", "CSV Files (*.csv)")
+        file_path, _ = QFileDialog.getSaveFileName(
+            self, "Export to CSV", "", "CSV Files (*.csv)"
+        )
         if not file_path:
             return
 
         # Write data to CSV
         with open(file_path, "w", newline="") as file:
             writer = csv.writer(file)
-            writer.writerow([
-                "Delivery Date", "Contract Date", "Lot", "Lot Quantity",
-                "Departure Warehouse", "Distributor", "Distributor Location", "Product ID"
-            ])
+            writer.writerow(
+                [
+                    "Delivery Date",
+                    "Contract Date",
+                    "Lot",
+                    "Lot Quantity",
+                    "Departure Warehouse",
+                    "Distributor",
+                    "Distributor Location",
+                    "Product ID",
+                ]
+            )
             writer.writerows(self.filtered_distribution_data)
 
     def show_context_menu(self, position):
         """Display context menu for distribution actions."""
+        selected_row = self.distribution_table.currentRow()
+        if selected_row == -1:
+            return
+
         menu = QMenu(self)
 
         view_details_action = QAction("View Distribution Details", self)
         view_details_action.triggered.connect(self.show_distribution_details)
         menu.addAction(view_details_action)
+
+        if self.db_manager.is_admin:
+            menu.addSeparator()
+            batch_id = self.distribution_table.item(selected_row, 2).text()
+
+            tables = {
+                "Lots": {
+                    "display_name": "Batch",
+                    "id_column": batch_id,
+                },
+            }
+
+            for table in tables:
+                action = QAction(
+                    f"Edit {tables[table]['display_name']} ({tables[table]['id_column']})",
+                    self,
+                )
+                action.triggered.connect(
+                    lambda _, t=table, id=tables[table]["id_column"]: open_dialog(
+                        self.db_manager, t, id, self, self.refresh_table, True
+                    )
+                )
+                menu.addAction(action)
 
         menu.exec_(self.distribution_table.viewport().mapToGlobal(position))
 
@@ -292,19 +376,29 @@ class DistributionTrackingTab(QWidget):
         Product ID: {distribution[7]}
         """
         QMessageBox.information(self, "Distribution Details", details_text)
-        
+
     def show_upcoming_deliveries(self):
         """Display a list of deliveries scheduled within the next X days."""
         today = datetime.today().date()
 
         upcoming = [
-            row for row in self.distribution_data
-            if today <= datetime.strptime(row[0], "%Y-%m-%d").date() <= today + timedelta(days=self.days_until_delivery)
+            row
+            for row in self.distribution_data
+            if today
+            <= datetime.strptime(row[0], "%Y-%m-%d").date()
+            <= today + timedelta(days=self.days_until_delivery)
         ]
 
         # Clear the list widget and add upcoming deliveries
         self.upcoming_deliveries_list.clear()
         for row in upcoming:
             self.upcoming_deliveries_list.addItem(f"Lot {row[2]}: {row[0]} ({row[5]})")
-            
+
         # print(self.upcoming_deliveries_list.item(0)[5])
+
+    def refresh_table(self):
+        self.load_data()
+        self.update_distribution_table()
+        self.show_upcoming_deliveries()
+        self.filter_by_date_and_warehouse()
+        self.group_distribution_data()

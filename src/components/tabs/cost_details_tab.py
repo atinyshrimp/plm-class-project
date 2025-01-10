@@ -1,11 +1,26 @@
-from PyQt5.QtWidgets import QWidget, QVBoxLayout, QHBoxLayout, QLineEdit, QLabel, QPushButton, QTableWidgetItem, QMenu, QAction, QFileDialog
-from utils.table import CustomTable
-from PyQt5.QtCore import Qt
-from PyQt5.QtGui import QColor
 import csv
 
+from PyQt5.QtCore import Qt
+from PyQt5.QtGui import QColor
+from PyQt5.QtWidgets import (
+    QAction,
+    QFileDialog,
+    QHBoxLayout,
+    QLabel,
+    QLineEdit,
+    QMenu,
+    QPushButton,
+    QTableWidgetItem,
+    QVBoxLayout,
+    QWidget,
+)
+
+from utils.table import CustomTable
+from dialogs.database_dialog import DatabaseDialog
+
+
 class ProductCostDetailsTab(QWidget):
-    def __init__(self,db_manager):
+    def __init__(self, db_manager):
         super().__init__()
         self.page_size = 10
         self.current_page = 1
@@ -17,7 +32,7 @@ class ProductCostDetailsTab(QWidget):
 
     def init_ui(self):
         main_layout = QVBoxLayout()
-        
+
         # Search Bar
         search_layout = QHBoxLayout()
         self.search_field = QLineEdit()
@@ -57,11 +72,18 @@ class ProductCostDetailsTab(QWidget):
         # Table for Cost Details
         self.cost_table = CustomTable()
         self.cost_table.setColumnCount(7)
-        self.cost_table.setHorizontalHeaderLabels([
-            "Product ID", "Production Cost (€)", "Raw Materials Cost (€)", "Marketing Cost (€)",
-            "Selling Price (€)", "Total Cost (€)", "Margin (%)"
-        ])
-         # Enable context menu on the table
+        self.cost_table.setHorizontalHeaderLabels(
+            [
+                "Product ID",
+                "Production Cost (€)",
+                "Raw Materials Cost (€)",
+                "Selling Price (€)",
+                "Marketing Cost (€)",
+                "Total Cost (€)",
+                "Margin (%)",
+            ]
+        )
+        # Enable context menu on the table
         self.cost_table.setContextMenuPolicy(Qt.CustomContextMenu)
         self.cost_table.customContextMenuRequested.connect(self.show_context_menu)
         main_layout.addWidget(self.cost_table)
@@ -90,20 +112,7 @@ class ProductCostDetailsTab(QWidget):
 
     def load_data(self):
         """Load dummy cost data for testing."""
-        self.cost_data = self.db_manager.fetch_query('fetch_cost_details')
-        '''[
-            ("P001", 500, 200, 100, 1000),
-            ("P002", 600, 250, 150, 1200),
-            ("P003", 550, 300, 200, 1300),
-            ("P004", 700, 350, 250, 1500),
-            ("P005", 400, 150, 100, 900),
-            ("P006", 450, 180, 120, 950),
-        ]'''
-
-        # Add Total Cost and Margin as calculated columns
-        self.cost_data = [
-            row + (row[1] + row[2] + row[3], (row[4] - (row[1] + row[2] + row[3])) / row[4] * 100) for row in self.cost_data
-        ]
+        self.cost_data = self.db_manager.fetch_query("fetch_cost_details")
         self.filtered_cost_data = self.cost_data[:]
         self.total_pages = (len(self.cost_data) + self.page_size - 1) // self.page_size
 
@@ -116,7 +125,9 @@ class ProductCostDetailsTab(QWidget):
         self.cost_table.setRowCount(len(page_data))
         for row_index, row_data in enumerate(page_data):
             for col_index, col_data in enumerate(row_data):
-                item = QTableWidgetItem(f"{col_data:.2f}" if isinstance(col_data, float) else str(col_data))
+                item = QTableWidgetItem(
+                    f"{col_data:.2f}" if isinstance(col_data, float) else str(col_data)
+                )
 
                 # Highlight rows with negative margins
                 if col_index == 6 and col_data < 0:
@@ -148,26 +159,38 @@ class ProductCostDetailsTab(QWidget):
         """Filter cost data based on search input."""
         filter_text = self.search_field.text().lower()
         self.filtered_cost_data = [
-            row for row in self.cost_data
+            row
+            for row in self.cost_data
             if filter_text in row[0].lower() or filter_text in row[0].lower()
         ]
-        self.total_pages = (len(self.filtered_cost_data) + self.page_size - 1) // self.page_size
+        self.total_pages = (
+            len(self.filtered_cost_data) + self.page_size - 1
+        ) // self.page_size
         self.current_page = 1
         self.update_cost_table()
-     
+
     def export_cost_details(self):
         """Export batch history to a CSV file."""
-        file_path, _ = QFileDialog.getSaveFileName(self, "Export to CSV", "", "CSV Files (*.csv)")
+        file_path, _ = QFileDialog.getSaveFileName(
+            self, "Export to CSV", "", "CSV Files (*.csv)"
+        )
         if not file_path:
             return
 
         # Write data to CSV
         with open(file_path, "w", newline="", encoding="utf8") as file:
             writer = csv.writer(file)
-            writer.writerow([
-                "Product ID", "Production Cost (€)", "Raw Materials Cost (€)", "Marketing Cost (€)",
-                "Selling Price (€)", "Total Cost (€)", "Margin (%)"
-            ])  # Header
+            writer.writerow(
+                [
+                    "Product ID",
+                    "Production Cost (€)",
+                    "Raw Materials Cost (€)",
+                    "Marketing Cost (€)",
+                    "Selling Price (€)",
+                    "Total Cost (€)",
+                    "Margin (%)",
+                ]
+            )  # Header
             writer.writerows(self.filtered_cost_data)  # Rows
 
     def go_to_previous_page(self):
@@ -191,26 +214,47 @@ class ProductCostDetailsTab(QWidget):
         product_id = self.cost_table.item(selected_row, 0).text()
 
         menu = QMenu(self)
-        
+
         link_action = QAction(f"View Product Details ({product_id})", self)
         link_action.triggered.connect(lambda: self.navigate_to_product_tab(product_id))
         menu.addAction(link_action)
-        
+
         link_batch_action = QAction(f"View Batch History ({product_id})", self)
-        link_batch_action.triggered.connect(lambda: self.navigate_to_batch_tab(product_id))
+        link_batch_action.triggered.connect(
+            lambda: self.navigate_to_batch_tab(product_id)
+        )
         menu.addAction(link_batch_action)
 
+        if self.db_manager.is_admin:
+            menu.addSeparator()
+
+            edit_action = QAction(f"Edit Cost Details ({selected_row + 1})", self)
+            edit_action.triggered.connect(self.__edit_cost_details)
+            menu.addAction(edit_action)
+
         menu.exec_(self.cost_table.viewport().mapToGlobal(position))
-        
+
     def navigate_to_product_tab(self, product_id):
         """Navigate to the Product Sheets tab and focus on the selected product."""
-        parent_widget = self.parentWidget().parentWidget().parentWidget().parentWidget().parentWidget()
+        parent_widget = (
+            self.parentWidget()
+            .parentWidget()
+            .parentWidget()
+            .parentWidget()
+            .parentWidget()
+        )
         if hasattr(parent_widget, "switch_to_product_tab"):
             parent_widget.switch_to_product_tab(product_id)
-        
+
     def navigate_to_batch_tab(self, product_id):
         """Navigate to the Batch History tab and filter by the given product."""
-        parent_widget = self.parentWidget().parentWidget().parentWidget().parentWidget().parentWidget()
+        parent_widget = (
+            self.parentWidget()
+            .parentWidget()
+            .parentWidget()
+            .parentWidget()
+            .parentWidget()
+        )
         print(parent_widget)
         if hasattr(parent_widget, "switch_to_batch_tab"):
             parent_widget.switch_to_batch_tab(product_id)
@@ -222,20 +266,55 @@ class ProductCostDetailsTab(QWidget):
         min_cost = float(self.min_cost_field.text() or 0)
         max_cost = float(self.max_cost_field.text() or float("inf"))
         show_negative_margins = self.negative_margin_filter.isChecked()
-        
+
         # Change button label if it's checked
-        if (self.negative_margin_filter.isChecked()):
+        if self.negative_margin_filter.isChecked():
             self.negative_margin_filter.setText("Show All Margins")
         else:
-            self.negative_margin_filter.setText("Show Negative Margins Only")  
+            self.negative_margin_filter.setText("Show Negative Margins Only")
 
         self.filtered_cost_data = [
-            row for row in self.cost_data
-            if (filter_text in row[0].lower()) and  # Search by Product ID
-            (min_cost <= row[1] <= max_cost) and  # Production Cost in Range
-            (not show_negative_margins or row[6] < 0)  # Negative Margins
+            row
+            for row in self.cost_data
+            if (filter_text in str(row[0]).lower())  # Search by Product ID
+            and (min_cost <= row[1] <= max_cost)  # Production Cost in Range
+            and (not show_negative_margins or row[6] < 0)  # Negative Margins
         ]
 
-        self.total_pages = (len(self.filtered_cost_data) + self.page_size - 1) // self.page_size
+        self.total_pages = (
+            len(self.filtered_cost_data) + self.page_size - 1
+        ) // self.page_size
         self.current_page = 1
         self.update_cost_table()
+
+    def __edit_cost_details(self):
+        """Edit the cost details for the selected product."""
+        selected_row = self.cost_table.currentRow()
+        if selected_row == -1:
+            return
+
+        # product_id = self.cost_table.item(selected_row, 0).text()
+        table_name = "Details_Couts"
+        columns = self.db_manager.get_table_columns(table_name)
+        print(columns)
+        row_data = self.db_manager.execute_query(
+            f"SELECT * FROM Details_Couts WHERE id = {selected_row + 1}"
+        )[0]
+        print(row_data)
+        # row_data = self.db_manager.fetch_query("fetch_cost_details")[selected_row]
+        row_data = dict(zip([col["name"] for col in columns], row_data))
+        print(row_data)
+
+        dialog = DatabaseDialog(
+            self.db_manager,
+            table_name,
+            columns,
+            row_data,
+            self,
+            is_edit_mode=True,
+        )
+        dialog.exec_()
+
+        if dialog.result() == dialog.Accepted:
+            self.load_data()
+            self.filter_cost_data()

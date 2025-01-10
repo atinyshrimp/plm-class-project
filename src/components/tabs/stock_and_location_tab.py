@@ -1,12 +1,28 @@
-from PyQt5.QtWidgets import (
-    QWidget, QVBoxLayout, QHBoxLayout, QTableWidgetItem, QLabel,
-    QPushButton, QDateEdit, QComboBox, QFileDialog, QMessageBox, QSizePolicy
-)
-from PyQt5.QtCore import Qt, QDate
-from PyQt5.QtGui import QColor
-from utils.table import CustomTable
 import csv
+
+from PyQt5.QtCore import QDate, Qt
+from PyQt5.QtGui import QColor
+from PyQt5.QtWidgets import (
+    QAction,
+    QComboBox,
+    QDateEdit,
+    QFileDialog,
+    QHBoxLayout,
+    QLabel,
+    QMenu,
+    QMessageBox,
+    QPushButton,
+    QSizePolicy,
+    QTableWidgetItem,
+    QVBoxLayout,
+    QWidget,
+    QDialog,
+)
+
 from dialogs.stock_trends_window import StockTrendsWindow
+from dialogs.database_dialog import DatabaseDialog
+from utils.table import CustomTable
+
 
 class StockLocationTab(QWidget):
     def __init__(self, db_manager):
@@ -60,7 +76,8 @@ class StockLocationTab(QWidget):
         # Location Filter
         location_label = QLabel("Location:")
         self.location_dropdown = QComboBox()
-        self.location_dropdown.setStyleSheet("""
+        self.location_dropdown.setStyleSheet(
+            """
             QComboBox {
                 border: 1px solid #F4C542;
                 border-radius: 5px;
@@ -81,7 +98,8 @@ class StockLocationTab(QWidget):
                 selection-color: #000;
                 padding: 5px;
             }
-        """)
+        """
+        )
         self.location_dropdown.addItem("All")
         self.location_dropdown.addItem("Paris")
         self.location_dropdown.addItem("Lyon")
@@ -104,10 +122,23 @@ class StockLocationTab(QWidget):
         # Table for Stock Details
         self.stock_table = CustomTable()
         self.stock_table.setColumnCount(7)
-        self.stock_table.setHorizontalHeaderLabels([
-            "Lot ID", "Product ID", "Quantity", "Expiration Date",
-            "Arrival Date", "Warehouse", "Location"
-        ])
+        self.stock_table.setHorizontalHeaderLabels(
+            [
+                "Lot ID",
+                "Product ID",
+                "Quantity",
+                "Expiration Date",
+                "Arrival Date",
+                "Warehouse",
+                "Location",
+            ]
+        )
+
+        if self.db_manager.is_admin:
+            # Enable context menu on the table
+            self.stock_table.setContextMenuPolicy(Qt.CustomContextMenu)
+            self.stock_table.customContextMenuRequested.connect(self.show_context_menu)
+
         main_layout.addWidget(self.stock_table)
 
         # Pagination Controls
@@ -131,13 +162,13 @@ class StockLocationTab(QWidget):
     def load_data(self):
         """Load dummy stock data for testing."""
         self.stock_data = self.db_manager.fetch_query("fetch_stock_and_location")
-        '''[
+        """[
             ("L001", "P001", 50, "2024-06-01", "2024-01-15", "Warehouse A", "Paris"),
             ("L002", "P002", 80, "2024-03-01", "2024-02-10", "Warehouse B", "Lyon"),
             ("L003", "P003", 100, "2023-12-15", "2023-11-20", "Warehouse C", "Marseille"),
             ("L004", "P004", 75, "2024-05-01", "2024-02-01", "Warehouse D", "Paris"),
             ("L005", "P005", 60, "2023-12-30", "2023-12-10", "Warehouse E", "Lyon"),
-        ]'''
+        ]"""
         self.filtered_stock_data = self.stock_data[:]
         self.total_pages = (len(self.stock_data) + self.page_size - 1) // self.page_size
 
@@ -146,8 +177,12 @@ class StockLocationTab(QWidget):
         oldest_arrival_date = min(row[4] for row in self.stock_data)
 
         # Set date pickers to the oldest dates minus one day
-        self.expiration_date_picker.setDate(QDate.fromString(oldest_expiration_date, "yyyy-MM-dd").addDays(-1))
-        self.arrival_date_picker.setDate(QDate.fromString(oldest_arrival_date, "yyyy-MM-dd").addDays(-1))
+        self.expiration_date_picker.setDate(
+            QDate.fromString(oldest_expiration_date, "yyyy-MM-dd").addDays(-1)
+        )
+        self.arrival_date_picker.setDate(
+            QDate.fromString(oldest_arrival_date, "yyyy-MM-dd").addDays(-1)
+        )
 
     def update_stock_table(self):
         """Update the stock table for the current page."""
@@ -167,7 +202,10 @@ class StockLocationTab(QWidget):
                 # Highlight expiring soon
                 if col_index == 3:
                     expiration_date = QDate.fromString(row_data[3], "yyyy-MM-dd")
-                    if expiration_date <= QDate.currentDate().addDays(30) and expiration_date > QDate.currentDate():  # Expiring in 30 days
+                    if (
+                        expiration_date <= QDate.currentDate().addDays(30)
+                        and expiration_date > QDate.currentDate()
+                    ):  # Expiring in 30 days
                         item.setBackground(QColor("#ffc4c4"))  # Light red
 
                 self.stock_table.setItem(row_index, col_index, item)
@@ -184,15 +222,47 @@ class StockLocationTab(QWidget):
         location = self.location_dropdown.currentText()
 
         self.filtered_stock_data = [
-            row for row in self.stock_data
+            row
+            for row in self.stock_data
             if row[3] > expiration_date  # Expiration Date Filter
             and row[4] > arrival_date  # Arrival Date Filter
             and (location == "All" or row[6] == location)  # Location Filter
         ]
 
-        self.total_pages = (len(self.filtered_stock_data) + self.page_size - 1) // self.page_size
+        self.total_pages = (
+            len(self.filtered_stock_data) + self.page_size - 1
+        ) // self.page_size
         self.current_page = 1
         self.update_stock_table()
+
+    def show_context_menu(self, position: int):
+        """Show a context menu with actions for the selected product.
+
+        Args:
+            position (int): The position of the context menu.
+        """
+        selected_row = self.stock_table.currentRow()
+        if selected_row == -1:
+            return
+
+        batch_id = self.stock_table.item(selected_row, 0).text()
+        warehouse_id = self.stock_table.item(selected_row, 5).text()
+
+        menu = QMenu(self)
+
+        edit_batch_action = QAction(f"Edit Batch ({batch_id})", self)
+        edit_batch_action.triggered.connect(
+            lambda: self.open_database_dialog("Lots", batch_id)
+        )
+        menu.addAction(edit_batch_action)
+
+        edit_warehouse_action = QAction(f"Edit Warehouse ({warehouse_id})", self)
+        edit_warehouse_action.triggered.connect(
+            lambda: self.open_database_dialog("Usines_Entrepots", warehouse_id)
+        )
+        menu.addAction(edit_warehouse_action)
+
+        menu.exec_(self.stock_table.viewport().mapToGlobal(position))
 
     def go_to_previous_page(self):
         """Navigate to the previous page."""
@@ -208,15 +278,46 @@ class StockLocationTab(QWidget):
 
     def export_data(self):
         """Export filtered stock data to a CSV file."""
-        file_path, _ = QFileDialog.getSaveFileName(self, "Export Stock Data", "", "CSV Files (*.csv)")
+        file_path, _ = QFileDialog.getSaveFileName(
+            self, "Export Stock Data", "", "CSV Files (*.csv)"
+        )
         if file_path:
             with open(file_path, "w", newline="") as file:
                 writer = csv.writer(file)
-                writer.writerow(["Lot ID", "Product ID", "Quantity", "Expiration Date", "Arrival Date", "Warehouse", "Location"])
+                writer.writerow(
+                    [
+                        "Lot ID",
+                        "Product ID",
+                        "Quantity",
+                        "Expiration Date",
+                        "Arrival Date",
+                        "Warehouse",
+                        "Location",
+                    ]
+                )
                 writer.writerows(self.filtered_stock_data)
-            QMessageBox.information(self, "Export Successful", f"Data exported to {file_path}")
+            QMessageBox.information(
+                self, "Export Successful", f"Data exported to {file_path}"
+            )
 
     def open_stock_trends_window(self):
         """Open the Stock Trends Window."""
         trends_window = StockTrendsWindow(self)
         trends_window.exec_()  # Open the dialog as a modal window
+
+    def open_database_dialog(self, table_name: str, column_id: str):
+        """Open the Database Dialog."""
+        columns = self.db_manager.get_table_columns(table_name)
+        row_data = self.db_manager.execute_query(
+            f"SELECT * FROM {table_name} WHERE id = ?", (column_id,)
+        )[0]
+        row_data = dict(zip([col["name"] for col in columns], row_data))
+
+        database_dialog = DatabaseDialog(
+            self.db_manager, table_name, columns, row_data, self, True
+        )
+        database_dialog.exec_()
+
+        if database_dialog.result() == QDialog.Accepted:
+            self.load_data()
+            self.update_stock_table()

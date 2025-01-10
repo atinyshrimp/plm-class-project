@@ -25,7 +25,8 @@ SQL_QUERIES = {
             cout_matieres_premieres AS cout_matieres_premieres,
             prix_de_vente AS prix_de_vente,
             cout_marketing AS cout_marketing,
-            (cout_prod + cout_matieres_premieres + cout_marketing) AS somme_des_couts
+            (cout_prod + cout_matieres_premieres + cout_marketing) AS somme_des_couts,
+            (prix_de_vente - (cout_prod + cout_matieres_premieres + cout_marketing)) / prix_de_vente * 100 AS marge
         FROM 
             Details_Couts
     """,
@@ -161,5 +162,5 @@ SQL_QUERIES = {
             Product_info PI ON L.id_produit = PI.id
         ORDER BY
             L.id;
-    """
+    """,
 }
