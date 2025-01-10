@@ -1,15 +1,26 @@
 import webbrowser
 from PyQt5 import QtGui
-from PyQt5.QtWidgets import QAction, QWidget, QHBoxLayout, QVBoxLayout, QStackedWidget, QMenuBar, QDesktopWidget, QMessageBox
+from PyQt5.QtWidgets import (
+    QAction,
+    QWidget,
+    QHBoxLayout,
+    QVBoxLayout,
+    QStackedWidget,
+    QMenuBar,
+    QDesktopWidget,
+    QMessageBox,
+)
 from components.navbar import NavBar
 from components.product_tabs import ProductTabs
 from components.people_tabs import PeopleTabs
 from components.process_tabs import ProcessTabs
 from components.data_tabs import DataTabs
+from components.database_tabs import DatabaseTabs
 from utils.styling import apply_stylesheet
 
+
 class PLMApp(QWidget):
-    def __init__(self, version,db_manager):
+    def __init__(self, version, db_manager):
         super().__init__()
         self.version = version  # Store the version
         self.db_manager = db_manager
@@ -19,12 +30,10 @@ class PLMApp(QWidget):
 
         # Apply the stylesheet
         apply_stylesheet(self, "assets/styles/palette_style.qss")
-        
+
         self.init_ui()
         self.resize_window()
 
-     
-        
     def resize_window(self):
         """Resize the window based on the screen size to maintain the aspect ratio."""
         screen = QDesktopWidget().screenGeometry()
@@ -39,27 +48,29 @@ class PLMApp(QWidget):
     def init_ui(self):
         main_layout = QVBoxLayout(self)  # Use QVBoxLayout to include the menu bar
 
-        # Initialize the menu bar
-        menubar = self.init_menu_bar()
-        main_layout.setMenuBar(menubar)
-
         # Main content layout
         content_layout = QHBoxLayout()
-        self.navbar = NavBar()
+        self.navbar = NavBar(self.db_manager)
         self.tab_widget_stack = QStackedWidget(self)
 
         # Initialize and add tab widgets
         self.product_tabs = ProductTabs(self.db_manager)
         self.data_tabs = DataTabs(self.db_manager)
-        
+        self.database_tabs = DatabaseTabs(self.db_manager)
+
         self.tab_widget_stack.addWidget(self.product_tabs)
         self.tab_widget_stack.addWidget(PeopleTabs(self.db_manager))
         self.tab_widget_stack.addWidget(ProcessTabs(self.db_manager))
         self.tab_widget_stack.addWidget(self.data_tabs)
+        self.tab_widget_stack.addWidget(self.database_tabs)
         self.tab_widget_stack.setCurrentIndex(0)  # Default to the first tab set
 
         # Connect navbar clicks to change the displayed content
         self.navbar.currentRowChanged.connect(self.display_tabs)
+
+        # Initialize the menu bar
+        menubar = self.init_menu_bar()
+        main_layout.setMenuBar(menubar)
 
         # Add navbar and tab widget stack to the layout
         content_layout.addWidget(self.navbar)
@@ -89,17 +100,57 @@ class PLMApp(QWidget):
         edit_menu.addAction("Copy", self.copy_action)
         edit_menu.addAction("Paste", self.paste_action)
 
+        if self.db_manager.is_admin:
+            # Database Menu
+            database_menu = menubar.addMenu("Database")
+            database_menu.addAction(
+                "View Database", lambda: self.tab_widget_stack.setCurrentIndex(4)
+            )
+
+            add_row_menu = database_menu.addMenu("Add New Row")
+            table_names = self.db_manager.get_all_tables()
+            readable_table_names = [
+                self.database_tabs._get_readable_table_name(table_name)
+                for table_name in table_names
+            ]
+            tables = {
+                readable_table_name: table_name
+                for readable_table_name, table_name in zip(
+                    readable_table_names, table_names
+                )
+            }
+
+            print(tables)
+
+            for table_name in sorted(readable_table_names):
+                real_table_name = tables[table_name]
+                add_row_menu.addAction(
+                    table_name,
+                    lambda table_name=real_table_name: self.database_tabs._open_dialog(
+                        table_name,
+                        self.database_tabs.get_table_widget(table_name),
+                        is_edit_mode=False,
+                    ),
+                )
+
         # Help Menu
         help_menu = menubar.addMenu("Help")
         help_menu.addAction("About", self.show_about)
         help_menu.addAction("Help", self.show_help_documentation)
         help_menu.addSeparator()
-        help_menu.addAction("Visit GitHub Repository", lambda: webbrowser.open("https://github.com/atinyshrimp/plm-class-project"))
+        help_menu.addAction(
+            "Visit GitHub Repository",
+            lambda: webbrowser.open("https://github.com/atinyshrimp/plm-class-project"),
+        )
 
         return menubar
 
-    def display_tabs(self, index):
-        """Update the content displayed based on the selected item in the navbar."""
+    def display_tabs(self, index: int):
+        """Update the content displayed based on the selected item in the navbar.
+
+        Args:
+            index (int): The index of the selected item in the navbar.
+        """
         self.tab_widget_stack.setCurrentIndex(index)
 
     def switch_to_product_tab(self, product_id):

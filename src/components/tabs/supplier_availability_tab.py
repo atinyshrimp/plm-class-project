@@ -1,18 +1,31 @@
-from PyQt5.QtWidgets import (
-    QWidget, QVBoxLayout, QHBoxLayout, QLabel, QDateEdit, QLineEdit,
-    QPushButton, QTableWidgetItem, QFileDialog, QMessageBox, QSizePolicy,
-    QMenu, QAction
-)
-from PyQt5.QtCore import Qt, QDate
-from PyQt5.QtGui import QColor
-from utils.table import CustomTable
-from dialogs.supplier_contact_window import SupplierContactDialog
-from dialogs.supplier_analytics_window import SupplierAnalyticsWindow
 import csv
+
+from PyQt5.QtCore import QDate, Qt
+from PyQt5.QtGui import QColor
+from PyQt5.QtWidgets import (
+    QAction,
+    QDateEdit,
+    QFileDialog,
+    QHBoxLayout,
+    QLabel,
+    QLineEdit,
+    QMenu,
+    QMessageBox,
+    QPushButton,
+    QSizePolicy,
+    QTableWidgetItem,
+    QVBoxLayout,
+    QWidget,
+)
+
+from dialogs.database_dialog import open_dialog
+from dialogs.supplier_analytics_window import SupplierAnalyticsWindow
+from dialogs.supplier_contact_window import SupplierContactDialog
+from utils.table import CustomTable
 
 
 class SupplierAvailabilityTab(QWidget):
-    def __init__(self,db_manager):
+    def __init__(self, db_manager):
         super().__init__()
         self.page_size = 10
         self.current_page = 1
@@ -34,7 +47,6 @@ class SupplierAvailabilityTab(QWidget):
         analytics_button.adjustSize()
         analytics_button.clicked.connect(self.show_supplier_analytics)
         buttons_layout.addWidget(analytics_button)
-
 
         # Export Button
         export_button = QPushButton("Export to CSV")
@@ -87,10 +99,16 @@ class SupplierAvailabilityTab(QWidget):
         # Supplier Data Table
         self.supplier_table = CustomTable()
         self.supplier_table.setColumnCount(6)
-        self.supplier_table.setHorizontalHeaderLabels([
-            "Merchandise ID", "Delivery Date", "Ingredient",
-            "Quantity", "Factory Location", "Supplier Name"
-        ])
+        self.supplier_table.setHorizontalHeaderLabels(
+            [
+                "Merchandise ID",
+                "Delivery Date",
+                "Ingredient",
+                "Quantity",
+                "Factory Location",
+                "Supplier Name",
+            ]
+        )
         self.supplier_table.setContextMenuPolicy(Qt.CustomContextMenu)
         self.supplier_table.customContextMenuRequested.connect(self.show_context_menu)
         main_layout.addWidget(self.supplier_table)
@@ -124,9 +142,28 @@ class SupplierAvailabilityTab(QWidget):
         menu = QMenu(self)
 
         supplier_contact_action = QAction("Contact Supplier", self)
-        supplier_contact_action.triggered.connect(lambda: self.show_supplier_contact(supplier_data[5]))
+        supplier_contact_action.triggered.connect(
+            lambda: self.show_supplier_contact(supplier_data[5])
+        )
 
         menu.addAction(supplier_contact_action)
+
+        if self.db_manager.is_admin:
+            menu.addSeparator()
+            merch_id = supplier_data[0]
+            edit_action = QAction(f"Edit Merchandise ({merch_id})", self)
+            edit_action.triggered.connect(
+                lambda: open_dialog(
+                    self.db_manager,
+                    "Marchandises",
+                    merch_id,
+                    self,
+                    self.refresh_table,
+                    True,
+                )
+            )
+            menu.addAction(edit_action)
+
         menu.exec_(self.supplier_table.viewport().mapToGlobal(position))
 
     def show_supplier_contact(self, supplier_name):
@@ -142,24 +179,23 @@ class SupplierAvailabilityTab(QWidget):
     def load_data(self):
         """Load dummy supplier data for testing."""
         self.supplier_data = self.db_manager.fetch_query("fetch_merchant_tracking")
-        '''[
-            ("M001", "2024-01-10", "Sugar", 1000, "Usine A", "Supplier A"),
-            ("M002", "2024-02-15", "Flour", 2000, "Usine B", "Supplier B"),
-            ("M003", "2024-03-20", "Oil", 1500, "Usine A", "Supplier A"),
-            ("M004", "2024-04-25", "Salt", 500, "Usine C", "Supplier C"),
-            ("M005", "2024-05-30", "Honey", 800, "Usine B", "Supplier D"),
-        ]'''
         self.filtered_supplier_data = self.supplier_data[:]
-        self.total_pages = (len(self.supplier_data) + self.page_size - 1) // self.page_size
+        self.total_pages = (
+            len(self.supplier_data) + self.page_size - 1
+        ) // self.page_size
 
         # Determine the oldest and earliest delivery dates
         oldest_date = min(row[1] for row in self.supplier_data)
         earliest_date = max(row[1] for row in self.supplier_data)
 
         # Set date pickers to the oldest date minus one day
-        self.start_date_picker.setDate(QDate.fromString(oldest_date, "yyyy-MM-dd").addDays(-1))
+        self.start_date_picker.setDate(
+            QDate.fromString(oldest_date, "yyyy-MM-dd").addDays(-1)
+        )
         # Set date pickers to the most recent date plus one day
-        self.end_date_picker.setDate(QDate.fromString(earliest_date, "yyyy-MM-dd").addDays(1))
+        self.end_date_picker.setDate(
+            QDate.fromString(earliest_date, "yyyy-MM-dd").addDays(1)
+        )
 
     def update_supplier_table(self):
         """Update the supplier table for the current page."""
@@ -171,11 +207,14 @@ class SupplierAvailabilityTab(QWidget):
         for row_index, row_data in enumerate(page_data):
             for col_index, col_data in enumerate(row_data):
                 item = QTableWidgetItem(str(col_data))
-                
+
                 # Highlight critical deliveries
                 if col_index == 1:  # Delivery Date column
                     delivery_date = QDate.fromString(row_data[1], "yyyy-MM-dd")
-                    if delivery_date <= QDate.currentDate().addDays(7) and delivery_date >= QDate.currentDate():
+                    if (
+                        delivery_date <= QDate.currentDate().addDays(7)
+                        and delivery_date >= QDate.currentDate()
+                    ):
                         item.setBackground(QColor("#ffc4c4"))  # Light red
 
                 self.supplier_table.setItem(row_index, col_index, item)
@@ -188,14 +227,17 @@ class SupplierAvailabilityTab(QWidget):
     def check_upcoming_deliveries(self):
         """Check for deliveries within the next 7 days and show a notification."""
         upcoming_deliveries = [
-            row for row in self.filtered_supplier_data
-            if QDate.fromString(row[1], "yyyy-MM-dd") <= QDate.currentDate().addDays(7) and QDate.fromString(row[1], "yyyy-MM-dd") >= QDate.currentDate()
+            row
+            for row in self.filtered_supplier_data
+            if QDate.fromString(row[1], "yyyy-MM-dd") <= QDate.currentDate().addDays(7)
+            and QDate.fromString(row[1], "yyyy-MM-dd") >= QDate.currentDate()
         ]
 
         if upcoming_deliveries:
             QMessageBox.information(
-                self, "Upcoming Deliveries",
-                f"There are {len(upcoming_deliveries)} deliveries scheduled within the next 7 days."
+                self,
+                "Upcoming Deliveries",
+                f"There are {len(upcoming_deliveries)} deliveries scheduled within the next 7 days.",
             )
 
     def filter_supplier_data(self):
@@ -206,13 +248,16 @@ class SupplierAvailabilityTab(QWidget):
         ingredient = self.ingredient_field.text().lower()
 
         self.filtered_supplier_data = [
-            row for row in self.supplier_data
+            row
+            for row in self.supplier_data
             if start_date <= row[1] <= end_date  # Date Range Filter
             and (not supplier or supplier in row[5].lower())  # Supplier Filter
             and (not ingredient or ingredient in row[2].lower())  # Ingredient Filter
         ]
 
-        self.total_pages = (len(self.filtered_supplier_data) + self.page_size - 1) // self.page_size
+        self.total_pages = (
+            len(self.filtered_supplier_data) + self.page_size - 1
+        ) // self.page_size
         self.current_page = 1
         self.update_supplier_table()
         self.check_upcoming_deliveries()
@@ -231,13 +276,30 @@ class SupplierAvailabilityTab(QWidget):
 
     def export_data(self):
         """Export filtered supplier data to a CSV file."""
-        file_path, _ = QFileDialog.getSaveFileName(self, "Export Supplier Data", "", "CSV Files (*.csv)")
+        file_path, _ = QFileDialog.getSaveFileName(
+            self, "Export Supplier Data", "", "CSV Files (*.csv)"
+        )
         if file_path:
             with open(file_path, "w", newline="") as file:
                 writer = csv.writer(file)
-                writer.writerow([
-                    "Merchandise ID", "Delivery Date", "Ingredient",
-                    "Quantity", "Factory Location", "Supplier Name"
-                ])
+                writer.writerow(
+                    [
+                        "Merchandise ID",
+                        "Delivery Date",
+                        "Ingredient",
+                        "Quantity",
+                        "Factory Location",
+                        "Supplier Name",
+                    ]
+                )
                 writer.writerows(self.filtered_supplier_data)
-            QMessageBox.information(self, "Export Successful", f"Data exported to {file_path}")
+            QMessageBox.information(
+                self, "Export Successful", f"Data exported to {file_path}"
+            )
+
+    def refresh_table(self):
+        """Refresh the supplier data table."""
+        self.load_data()
+        self.filter_supplier_data()
+        self.update_supplier_table()
+        self.check_upcoming_deliveries()

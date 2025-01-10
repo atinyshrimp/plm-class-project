@@ -1,6 +1,15 @@
 from PyQt5.QtWidgets import (
-    QWidget, QVBoxLayout, QHBoxLayout, QTabWidget, QTableWidgetItem, QGridLayout,
-    QLineEdit, QTextEdit, QLabel, QSizePolicy, QPushButton
+    QWidget,
+    QVBoxLayout,
+    QHBoxLayout,
+    QTabWidget,
+    QTableWidgetItem,
+    QGridLayout,
+    QLineEdit,
+    QTextEdit,
+    QLabel,
+    QSizePolicy,
+    QPushButton,
 )
 from PyQt5.QtGui import QPixmap
 from PyQt5.QtCore import Qt
@@ -9,13 +18,14 @@ from widgets.product_photo_widget import ProductPhotoWidget
 from .tabs.cost_details_tab import ProductCostDetailsTab
 from .tabs.stock_and_location_tab import StockLocationTab
 
+
 class ProductTabs(QWidget):
-    def __init__(self,db_manager):
+    def __init__(self, db_manager):
         super().__init__()
         self.db_manager = db_manager
         self.is_editing = False
-        
-         # Initialize all fields before calling init_ui
+
+        # Initialize all fields before calling init_ui
         self.id_field = QLineEdit()
         self.name_field = QLineEdit()
         self.description_field = QTextEdit()
@@ -24,14 +34,14 @@ class ProductTabs(QWidget):
         self.version_field = QLineEdit()
         self.date_field = QLineEdit()
         self.ingredients_field = QTextEdit()
-        
+
         # Pagination Configuration
         self.page_size = 10  # Number of rows per page
         self.current_page = 1  # Current page
         self.total_pages = 1  # Total pages
         self.data = []  # Store product data
-        self.filtered_data = [] # Store data with filters applied
-        
+        self.filtered_data = []  # Store data with filters applied
+
         self.init_ui()
 
     def init_ui(self):
@@ -61,12 +71,13 @@ class ProductTabs(QWidget):
         """Highlight and display details for the given product."""
         self.search_field.setText(product_id)
         for row in range(self.product_table.rowCount()):
-            item = self.product_table.item(row, 0)  # Assuming Product ID is in the first column
+            item = self.product_table.item(
+                row, 0
+            )  # Assuming Product ID is in the first column
             if item and item.text() == product_id:
                 self.product_table.selectRow(row)
                 self._display_product_details()  # Call the existing method to show details
                 break
-
 
     def _init_product_sheets(self, product_sheet_tab):
         # Create the main horizontal layout for the table and details view
@@ -74,28 +85,32 @@ class ProductTabs(QWidget):
         self.search_field = QLineEdit()
         self.search_field.setPlaceholderText("Search by name or ID...")
         self.search_field.textChanged.connect(self.__filter_products)
-        
+
         self.search_field.setContentsMargins(10, 0, 20, 0)
 
         overall_tab_layout.addWidget(self.search_field)
-        
+
         product_sheet_tab_layout = QHBoxLayout()
-        
+
         # Product Table (on the left, larger size)
         table_layout = QVBoxLayout()
         self.product_table = CustomTable()
         self.product_table.setColumnCount(5)
-        self.product_table.setHorizontalHeaderLabels(["ID", "Name", "Quantity", "Version", "Production Date"])
+        self.product_table.setHorizontalHeaderLabels(
+            ["ID", "Name", "Quantity", "Version", "Production Date"]
+        )
         self.product_table.itemSelectionChanged.connect(self._display_product_details)
         self.product_table.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
-        self.product_table.setMinimumWidth(500)  # Set a larger minimum width for the table
-        
+        self.product_table.setMinimumWidth(
+            500
+        )  # Set a larger minimum width for the table
+
         # Monitor selection changes
         selection_model = self.product_table.selectionModel()
         selection_model.selectionChanged.connect(self._on_selection_changed)
 
         table_layout.addWidget(self.product_table)
-        
+
         # Add pagination controls
         pagination_layout = QHBoxLayout()
         self.previous_button = QPushButton("Previous")
@@ -109,25 +124,32 @@ class ProductTabs(QWidget):
         pagination_layout.addWidget(self.page_label)
         pagination_layout.addWidget(self.next_button)
         table_layout.addLayout(pagination_layout)
-        
-        product_sheet_tab_layout.addLayout(table_layout, stretch=3)  # Assign more space to the table
+
+        product_sheet_tab_layout.addLayout(
+            table_layout, stretch=3
+        )  # Assign more space to the table
 
         # Product Details Form (on the right)
         details_widget = QWidget()
-        details_layout = QVBoxLayout()  # Use a vertical layout for a modern stacked design
+        details_layout = (
+            QVBoxLayout()
+        )  # Use a vertical layout for a modern stacked design
 
-        self.toggle_edit_button = QPushButton("Edit Product")
-        self.toggle_edit_button.clicked.connect(self._toggle_edit_mode)
-        details_layout.addWidget(self.toggle_edit_button)
+        if self.db_manager.is_admin:
+            self.toggle_edit_button = QPushButton("Edit Product")
+            self.toggle_edit_button.clicked.connect(self._toggle_edit_mode)
+            details_layout.addWidget(self.toggle_edit_button)
 
         # Group box for details with a more modern look
         details_group_box = QWidget()
-        details_group_box.setStyleSheet("""
+        details_group_box.setStyleSheet(
+            """
             QWidget {
                 background-color: white;
                 border-radius: 12px;
             }
-        """)
+        """
+        )
         details_group_layout = QVBoxLayout()
 
         # Photo Section
@@ -150,22 +172,25 @@ class ProductTabs(QWidget):
             ("Quantity", self.quantity_field),
             ("Container", self.container_field),
             ("Version", self.version_field),
-            ("Production Date", self.date_field)
+            ("Production Date", self.date_field),
         ]
 
         # Create fields with modern styling
         for row, (label, field) in enumerate(field_info):
             label_widget = QLabel(f"<b>{label}:</b>")
-            label_widget.setStyleSheet("""
+            label_widget.setStyleSheet(
+                """
                 QLabel {
                     color: #333;
                     font-size: 14px;
                     padding: 0;
                 }
-            """)
-            
+            """
+            )
+
             field.setReadOnly(True)
-            field.setStyleSheet("""
+            field.setStyleSheet(
+                """
                 QLineEdit {
                     background-color: #f8f9fa;
                     border: 1px solid #ced4da;
@@ -176,22 +201,26 @@ class ProductTabs(QWidget):
                 QLineEdit:focus {
                     border-color: #80bdff;
                 }
-            """)
-            
+            """
+            )
+
             details_grid.addWidget(label_widget, row, 0)
             details_grid.addWidget(field, row, 1)
 
         # Description Section
         description_label = QLabel("<b>Description:</b>")
-        description_label.setStyleSheet("""
+        description_label.setStyleSheet(
+            """
             QLabel {
                 color: #333;
                 font-size: 14px;
                 padding: 0;
             }
-        """)
+        """
+        )
         self.description_field.setReadOnly(True)
-        self.description_field.setStyleSheet("""
+        self.description_field.setStyleSheet(
+            """
             QTextEdit {
                 background-color: #f8f9fa;
                 border: 1px solid #ced4da;
@@ -199,18 +228,22 @@ class ProductTabs(QWidget):
                 padding: 6px;
                 font-size: 14px;
             }
-        """)
+        """
+        )
 
         # Ingredients Section
         ingredients_label = QLabel("<b>Ingredients:</b>")
-        ingredients_label.setStyleSheet("""
+        ingredients_label.setStyleSheet(
+            """
             QLabel {
                 color: #333;
                 font-size: 14px;
             }
-        """)
+        """
+        )
         self.ingredients_field.setReadOnly(True)
-        self.ingredients_field.setStyleSheet("""
+        self.ingredients_field.setStyleSheet(
+            """
             QTextEdit {
                 background-color: #f8f9fa;
                 border: 1px solid #ced4da;
@@ -218,7 +251,8 @@ class ProductTabs(QWidget):
                 padding: 6px;
                 font-size: 14px;
             }
-        """)
+        """
+        )
 
         # Add sections to the layout
         details_group_layout.addLayout(details_grid)
@@ -241,7 +275,7 @@ class ProductTabs(QWidget):
         product_sheet_tab_layout.setContentsMargins(10, 10, 10, 10)  # Add some padding
         overall_tab_layout.addLayout(product_sheet_tab_layout)
         product_sheet_tab.setLayout(overall_tab_layout)
-        
+
         # Populate the table
         self._load_data()
         self._update_table()
@@ -252,10 +286,9 @@ class ProductTabs(QWidget):
         if selected_row == -1:
             return
 
-        
-        if (not self.is_editing):
+        if not self.is_editing:
             self.is_editing = True
-            
+
             self.name_field.setReadOnly(False)
             self.quantity_field.setReadOnly(False)
             self.version_field.setReadOnly(False)
@@ -263,12 +296,12 @@ class ProductTabs(QWidget):
             self.container_field.setReadOnly(False)
             self.description_field.setReadOnly(False)
             self.ingredients_field.setReadOnly(False)
-            
+
             self.toggle_edit_button.setText("Save Edits")
             self.toggle_edit_button.clicked.connect(self._save_product_details)
-            
+
         else:
-            
+
             self.name_field.setReadOnly(True)
             self.quantity_field.setReadOnly(True)
             self.version_field.setReadOnly(True)
@@ -276,12 +309,12 @@ class ProductTabs(QWidget):
             self.container_field.setReadOnly(True)
             self.description_field.setReadOnly(True)
             self.ingredients_field.setReadOnly(True)
-            
+
             self.is_editing = False
 
             self.toggle_edit_button.setText("Edit Product")
             self.toggle_edit_button.clicked.connect(self._toggle_edit_mode)
-        
+
     def _save_product_details(self):
         """Save updated product details and disable editing."""
         selected_row = self.product_table.currentRow()
@@ -311,6 +344,7 @@ class ProductTabs(QWidget):
         self._toggle_edit_mode()
 
     def _load_data(self):
+        loginAndData
         self.data = self.db_manager.fetch_query("fetch_product_details")
         '''
         [
@@ -328,11 +362,11 @@ class ProductTabs(QWidget):
             ("P012", "Organic Honey", 55, "1.0", "2023-01-15", "JAR005", "", "", "assets/img/product/lavande_maritime.png"),
         ]'''
 
-        self.filtered_data = self.data[:] # Initialize filtered data with all products
+        self.filtered_data = self.data[:]  # Initialize filtered data with all products
         self.page_size = 5
         self.total_pages = (len(self.data) + self.page_size - 1) // self.page_size
         self.current_page = 1
-        
+
     def _update_table(self):
         """Update the table to display the current page's data."""
         self.product_table.clearContents()
@@ -342,8 +376,12 @@ class ProductTabs(QWidget):
 
         self.product_table.setRowCount(len(page_data))
         for row_index, row_data in enumerate(page_data):
-            for col_index, col_data in enumerate(row_data[:5]):  # Limit to displayed columns
-                self.product_table.setItem(row_index, col_index, QTableWidgetItem(str(col_data)))
+            for col_index, col_data in enumerate(
+                row_data[:5]
+            ):  # Limit to displayed columns
+                self.product_table.setItem(
+                    row_index, col_index, QTableWidgetItem(str(col_data))
+                )
 
         # Update pagination controls
         self.page_label.setText(f"Page {self.current_page} of {self.total_pages}")
@@ -362,7 +400,9 @@ class ProductTabs(QWidget):
 
     def _display_product_details(self):
         """Display detailed information about the selected product."""
-        selected_row = self.product_table.currentRow()  # Get the row index in the paginated table
+        selected_row = (
+            self.product_table.currentRow()
+        )  # Get the row index in the paginated table
         if selected_row == -1:  # No selection
             self.__clear_details_view()
             return
@@ -387,11 +427,11 @@ class ProductTabs(QWidget):
         self.version_field.setText(product[3])
         self.date_field.setText(product[4])  # Date
         self.ingredients_field.setText(product[7])  # Ingredients
-    
+
     def __clear_details_view(self):
         self.photo_widget.photo_label.setPixmap(QPixmap())
         self.photo_widget.photo_label.setText("No Image Found")
-        
+
         self.id_field.setText("")
         self.name_field.setText("")
         self.description_field.setText("")  # Description
@@ -402,15 +442,20 @@ class ProductTabs(QWidget):
         self.ingredients_field.setText("")  # Ingredients
 
     def __filter_products(self):
-        """Filter based on `ID` & `Name` fields
-        """
+        """Filter based on `ID` & `Name` fields"""
         filter_text = self.search_field.text().lower()
-        self.filtered_data = [product for product in self.data if (filter_text in product[0].lower() or filter_text in product[1].lower())]  # Filter by Name (column 1)
-    
+        self.filtered_data = [
+            product
+            for product in self.data
+            if (filter_text in product[0].lower() or filter_text in product[1].lower())
+        ]  # Filter by Name (column 1)
+
         # Reset pagination for filtered data
-        self.total_pages = (len(self.filtered_data) + self.page_size - 1) // self.page_size
+        self.total_pages = (
+            len(self.filtered_data) + self.page_size - 1
+        ) // self.page_size
         self.current_page = 1
-        
+
         # Update the table to show the filtered data
         self._update_table()
 
@@ -418,7 +463,9 @@ class ProductTabs(QWidget):
         """Reset the search filter and show all data."""
         self.filtered_data = self.data[:]  # Reset to full dataset
         self.search_field.clear()  # Clear the search input
-        self.total_pages = (len(self.filtered_data) + self.page_size - 1) // self.page_size
+        self.total_pages = (
+            len(self.filtered_data) + self.page_size - 1
+        ) // self.page_size
         self.current_page = 1
         self._update_table()
 
@@ -426,4 +473,3 @@ class ProductTabs(QWidget):
         """Handle selection changes and clear the detailed view if nothing is selected."""
         if not self.product_table.selectionModel().hasSelection():  # No rows selected
             self.__clear_details_view()
-

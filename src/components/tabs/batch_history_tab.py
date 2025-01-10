@@ -1,16 +1,31 @@
-from PyQt5.QtWidgets import (
-    QWidget, QVBoxLayout, QHBoxLayout, QLineEdit, QTableWidgetItem, QFileDialog, QPushButton, QComboBox, QLabel, QAbstractItemView, QMenu, QAction, QMessageBox
-)
-from PyQt5.QtGui import QColor
-from PyQt5.QtCore import Qt
-from utils.table import CustomTable
 import csv
 
+from PyQt5.QtCore import Qt
+from PyQt5.QtGui import QColor
+from PyQt5.QtWidgets import (
+    QAction,
+    QComboBox,
+    QFileDialog,
+    QHBoxLayout,
+    QLabel,
+    QLineEdit,
+    QMenu,
+    QMessageBox,
+    QPushButton,
+    QTableWidgetItem,
+    QVBoxLayout,
+    QWidget,
+)
+
+from dialogs.database_dialog import open_dialog
+from utils.table import CustomTable
+
+
 class BatchHistoryTab(QWidget):
-    def __init__(self,db_manager):
+    def __init__(self, db_manager):
         super().__init__()
         self.db_manager = db_manager
-        self.page_size = 5  # Number of rows per page
+        self.page_size = 20  # Number of rows per page
         self.current_page = 1
         self.total_pages = 1
         self.batch_data = []  # Full dataset
@@ -26,13 +41,16 @@ class BatchHistoryTab(QWidget):
 
         # Search Field
         self.search_field = QLineEdit()
-        self.search_field.setPlaceholderText("Search by Lot ID, Product ID, or Status...")
+        self.search_field.setPlaceholderText(
+            "Search by Lot ID, Product ID, or Status..."
+        )
         self.search_field.textChanged.connect(self.filter_batch_history)
         control_layout.addWidget(self.search_field)
 
         # Grouping Dropdown
         self.grouping_dropdown = QComboBox()
-        self.grouping_dropdown.setStyleSheet("""
+        self.grouping_dropdown.setStyleSheet(
+            """
             QComboBox {
                 border: 1px solid #F4C542;
                 border-radius: 5px;
@@ -53,9 +71,12 @@ class BatchHistoryTab(QWidget):
                 selection-color: #000;
                 padding: 5px;
             }
-        """)
+        """
+        )
 
-        self.grouping_dropdown.addItems(["No Grouping", "Group by Product ID", "Group by Status"])
+        self.grouping_dropdown.addItems(
+            ["No Grouping", "Group by Product ID", "Group by Status"]
+        )
         self.grouping_dropdown.currentIndexChanged.connect(self.group_batch_history)
         control_layout.addWidget(self.grouping_dropdown)
 
@@ -68,11 +89,21 @@ class BatchHistoryTab(QWidget):
 
         # Batch Table
         self.batch_table = CustomTable(10, 7)  # Initial size: 10 rows, 7 columns
-        self.batch_table.setHorizontalHeaderLabels([
-            "Lot ID", "Product ID", "Quantity", "Production Date",
-            "Expiry Date", "Status", "Return"
-        ])
-        self.batch_table.setSizePolicy(self.batch_table.sizePolicy().Expanding, self.batch_table.sizePolicy().Expanding)
+        self.batch_table.setHorizontalHeaderLabels(
+            [
+                "Lot ID",
+                "Product ID",
+                "Quantity",
+                "Production Date",
+                "Expiry Date",
+                "Status",
+                "Return",
+            ]
+        )
+        self.batch_table.setSizePolicy(
+            self.batch_table.sizePolicy().Expanding,
+            self.batch_table.sizePolicy().Expanding,
+        )
         self.batch_table.setContextMenuPolicy(Qt.CustomContextMenu)
         self.batch_table.customContextMenuRequested.connect(self.show_context_menu)
         main_layout.addWidget(self.batch_table)
@@ -89,18 +120,11 @@ class BatchHistoryTab(QWidget):
         pagination_layout.addWidget(self.next_button)
         main_layout.addLayout(pagination_layout)
 
+        self.load_data()
         self.setLayout(main_layout)
+
+    def load_data(self):
         self.batch_data = self.db_manager.fetch_query("fetch_lot_history")
-        
-        # Dummy Data
-        '''[
-            ("L001", "P001", 100, "2023-01-15", "2023-06-15", "Active", "None"),
-            ("L002", "P002", 50, "2023-02-20", "2023-07-20", "Shipped", "None"),
-            ("L003", "P001", 75, "2023-03-10", "2023-08-10", "Active", "Returned"),
-            ("L004", "P003", 120, "2023-04-25", "2023-09-25", "Inactive", "None"),
-            ("L005", "P002", 30, "2023-05-05", "2023-10-05", "Shipped", "None"),
-            ("L006", "P001", 60, "2023-06-10", "2023-11-10", "Expired", "Returned"),
-        ]'''
         self.filtered_batch_data = self.batch_data[:]  # Start with unfiltered data
         self.total_pages = (len(self.batch_data) + self.page_size - 1) // self.page_size
         self.update_batch_table()
@@ -111,7 +135,8 @@ class BatchHistoryTab(QWidget):
 
         # Apply filter
         self.filtered_batch_data = [
-            row for row in self.batch_data
+            row
+            for row in self.batch_data
             if any(filter_text in str(cell).lower() for cell in row)
         ]
 
@@ -142,19 +167,31 @@ class BatchHistoryTab(QWidget):
                 item = QTableWidgetItem(str(col_data))
                 # Apply color-coding for Status
                 if col_index == 5:  # Status column
-                    item.setBackground(self.get_status_color(row_data[5]))
+                    status = "Active" if col_data == 1 else "Inactive"
+                    item.setText(status)
+                    item.setBackground(self.get_background_color(status))
+                elif col_index == 6:
+                    return_status = "Yes" if col_data == 1 else "No"
+                    item.setText(return_status)
+                    item.setBackground(self.get_background_color(return_status))
+
                 self.batch_table.setItem(row_index, col_index, item)
 
         # self.batch_table.resizeColumnsToContents()
 
-    def get_status_color(self, status):
-        """Return a color based on the batch status."""
+    def get_background_color(self, status: str) -> QColor:
+        """Return a color based on the batch status.
+
+        Args:
+            status (str): The status of the batch.
+
+        Returns:
+            QColor: The color corresponding to the status.
+        """
         colors = {
             "Active": QColor("#b3ffcc"),  # Green
-            "Shipped": QColor("#cce0ff"),  # Blue
             "Inactive": QColor("#ffe6cc"),  # Orange
-            "Expired": QColor("#ffcccc"),  # Red
-            "Returned": QColor("#ffff99"),  # Yellow
+            "Yes": QColor("#ffe6cc"),  # Orange
         }
         return colors.get(status, QColor("#ffffff"))  # Default: White
 
@@ -169,25 +206,37 @@ class BatchHistoryTab(QWidget):
         if self.current_page < self.total_pages:
             self.current_page += 1
             self.update_batch_table()
-            
+
     def show_context_menu(self, position):
-        """Display context menu for batch actions."""
+        """Display context menu for batch actions.
+
+        Args:
+            position (QPoint): The position of the context menu.
+        """
+        selected_row = self.batch_table.currentRow()
+        if selected_row == -1:
+            return
+
+        batch_data = self.filtered_batch_data[selected_row]
+
         menu = QMenu(self)
 
         report_action = QAction("View Report", self)
         report_action.triggered.connect(self.show_batch_report)
         menu.addAction(report_action)
 
-        mark_inactive_action = QAction("Mark as Inactive", self)
-        mark_inactive_action.triggered.connect(self.mark_batch_as_inactive)
-        menu.addAction(mark_inactive_action)
-
-        mark_shipped_action = QAction("Mark as Shipped", self)
-        mark_shipped_action.triggered.connect(self.mark_batch_as_shipped)
-        menu.addAction(mark_shipped_action)
+        if self.db_manager.is_admin:
+            menu.addSeparator()
+            edit_batch_action = QAction(f"Edit Batch ({batch_data[0]})", self)
+            edit_batch_action.triggered.connect(
+                lambda: open_dialog(
+                    self.db_manager, "Lots", batch_data[0], self, self.load_data, True
+                )
+            )
+            menu.addAction(edit_batch_action)
 
         menu.exec_(self.batch_table.viewport().mapToGlobal(position))
-        
+
     def show_batch_report(self):
         """Display detailed batch information in a popup."""
         selected_row = self.batch_table.currentRow()
@@ -207,37 +256,41 @@ class BatchHistoryTab(QWidget):
         """
         QMessageBox.information(self, "Batch Report", report_text)
 
-    def mark_batch_as_inactive(self):
+    def toggle_batch_status(self):
         """Mark the selected batch as inactive."""
         selected_row = self.batch_table.currentRow()
         if selected_row == -1:
             return
         global_row_index = (self.current_page - 1) * self.page_size + selected_row
         batch = self.filtered_batch_data[global_row_index]
-        self.filtered_batch_data[global_row_index] = batch[:5] + ("Inactive", batch[6])
-        self.update_batch_table()
-
-    def mark_batch_as_shipped(self):
-        """Mark the selected batch as shipped."""
-        selected_row = self.batch_table.currentRow()
-        if selected_row == -1:
-            return
-        global_row_index = (self.current_page - 1) * self.page_size + selected_row
-        batch = self.filtered_batch_data[global_row_index]
-        self.filtered_batch_data[global_row_index] = batch[:5] + ("Shipped", batch[6])
+        self.filtered_batch_data[global_row_index] = batch[:5] + (
+            "Inactive" if batch[5] == 0 else "Active",
+            batch[6],
+        )
         self.update_batch_table()
 
     def export_batch_history(self):
         """Export batch history to a CSV file."""
-        file_path, _ = QFileDialog.getSaveFileName(self, "Export to CSV", "", "CSV Files (*.csv)")
+        file_path, _ = QFileDialog.getSaveFileName(
+            self, "Export to CSV", "", "CSV Files (*.csv)"
+        )
         if not file_path:
             return
 
         # Write data to CSV
         with open(file_path, "w", newline="") as file:
             writer = csv.writer(file)
-            writer.writerow(["Lot ID", "Product ID", "Quantity", "Production Date",
-                             "Expiry Date", "Status", "Return"])  # Header
+            writer.writerow(
+                [
+                    "Lot ID",
+                    "Product ID",
+                    "Quantity",
+                    "Production Date",
+                    "Expiry Date",
+                    "Status",
+                    "Return",
+                ]
+            )  # Header
             writer.writerows(self.filtered_batch_data)  # Rows
 
     def filter_by_product(self, product_id):
