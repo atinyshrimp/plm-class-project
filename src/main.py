@@ -25,7 +25,6 @@ if __name__ == "__main__":
     if login_dialog.exec_() == QDialog.Accepted:  # Si la connexion réussit
         # initalise la liaison avec la bdd
         db_manager = database.SQLiteManager()
-    loginAndData
         # Crée et lance la fenêtre principale
         window = PLMApp(VERSION,db_manager)  # Passe la version à la fenêtre principale
 
