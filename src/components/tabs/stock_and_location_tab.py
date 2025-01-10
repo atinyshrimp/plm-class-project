@@ -27,7 +27,7 @@ from utils.table import CustomTable
 class StockLocationTab(QWidget):
     def __init__(self, db_manager):
         super().__init__()
-        self.page_size = 5
+        self.page_size = 20
         self.current_page = 1
         self.total_pages = 1
         self.db_manager = db_manager
@@ -302,7 +302,8 @@ class StockLocationTab(QWidget):
 
     def open_stock_trends_window(self):
         """Open the Stock Trends Window."""
-        trends_window = StockTrendsWindow(self)
+        data = [(row[6], row[2], row[4]) for row in self.filtered_stock_data]
+        trends_window = StockTrendsWindow(data, self)
         trends_window.exec_()  # Open the dialog as a modal window
 
     def open_database_dialog(self, table_name: str, column_id: str):
