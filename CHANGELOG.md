@@ -2,6 +2,16 @@
 
 All notable changes to this project will be documented in this file.
 
+## [1.2.0] - 2025-01-10
+
+### 🚀 Features
+
+- *(stock-trends)* Use data from table for viz
+
+### ⚙️ Miscellaneous Tasks
+
+- Update CHANGELOG.md for version 1.1.0
+
 ## [1.1.0] - 2025-01-10
 
 ### 🚀 Features
