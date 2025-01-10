@@ -2,6 +2,26 @@
 
 All notable changes to this project will be documented in this file.
 
+## [1.1.0] - 2025-01-10
+
+### 🚀 Features
+
+- *(login)* Improve styling and add brand logo
+
+### ⚙️ Miscellaneous Tasks
+
+- [**breaking**] Update version to 1.0.0
+
+## [1.0.0] - 2025-01-10
+
+### 🚀 Features
+
+- Add edit/add functionality linked to db
+
+### ⚙️ Miscellaneous Tasks
+
+- Update CHANGELOG.md
+
 ## [0.8.0] - 2024-12-13
 
 ### 🚀 Features
@@ -34,11 +54,19 @@ All notable changes to this project will be documented in this file.
 ### 🚀 Features
 
 - *(ui)* Style products' stock and location tab
-- *(ui)* Style the cost details tab in "Product"
 
 ### ⚙️ Miscellaneous Tasks
 
 - Update CHANGELOG.md
+
+## [0.5.0] - 2024-12-11
+
+### 🚀 Features
+
+- *(ui)* Style the cost details tab in "Product"
+
+### ⚙️ Miscellaneous Tasks
+
 - Add git-cliff for changelog generation
 
 ## [0.4.0] - 2024-12-11
