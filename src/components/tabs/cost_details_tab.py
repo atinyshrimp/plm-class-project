@@ -16,7 +16,7 @@ from PyQt5.QtWidgets import (
 )
 
 from utils.table import CustomTable
-from dialogs.database_dialog import DatabaseDialog
+from dialogs.database_dialog import open_dialog, get_integer_from_column_name
 
 
 class ProductCostDetailsTab(QWidget):
@@ -293,28 +293,19 @@ class ProductCostDetailsTab(QWidget):
         if selected_row == -1:
             return
 
-        # product_id = self.cost_table.item(selected_row, 0).text()
+        cost_data = self.filtered_cost_data[selected_row]
         table_name = "Details_Couts"
-        columns = self.db_manager.get_table_columns(table_name)
-        print(columns)
-        row_data = self.db_manager.execute_query(
-            f"SELECT * FROM Details_Couts WHERE id = {selected_row + 1}"
-        )[0]
-        print(row_data)
-        # row_data = self.db_manager.fetch_query("fetch_cost_details")[selected_row]
-        row_data = dict(zip([col["name"] for col in columns], row_data))
-        print(row_data)
 
-        dialog = DatabaseDialog(
+        open_dialog(
             self.db_manager,
             table_name,
-            columns,
-            row_data,
+            cost_data[0],
             self,
-            is_edit_mode=True,
+            self.refresh_data,
+            True,
         )
-        dialog.exec_()
 
-        if dialog.result() == dialog.Accepted:
-            self.load_data()
-            self.filter_cost_data()
+    def refresh_data(self):
+        """Refresh the data in the tab."""
+        self.load_data()
+        self.filter_cost_data()

@@ -328,7 +328,7 @@ class ProductTabs(QWidget):
             self.filtered_data[global_row_index] = (
                 self.filtered_data[global_row_index][0],  # ID (unchanged)
                 self.name_field.text(),
-                int(self.quantity_field.text()),
+                int(float(self.quantity_field.text())),
                 self.version_field.text(),
                 self.date_field.text(),
                 self.container_field.text(),
@@ -344,9 +344,9 @@ class ProductTabs(QWidget):
         self._toggle_edit_mode()
 
     def _load_data(self):
-        
+
         self.data = self.db_manager.fetch_query("fetch_product_details")
-        '''
+        """
         [
             ("P001", "Honey Jar", 50, "1.0", "2023-10-01", "JAR001", "Pure organic honey", "Honey (90%), Beeswax (10%)", "assets/img/product/sarrasin.png"),
             ("P002", "Berry Jam", 100, "1.1", "2023-09-15", "JAR002", "Mixed berry jam", "Strawberries (70%), Sugar (30%)", "https://assets.tmecosys.com/image/upload/t_web767x639/img/recipe/ras/Assets/4B7C3510-7041-4B5D-8000-1D10B1BA4678/Derivates/6749ac4e-586d-4055-9df2-5a96832897f6.jpg"),
@@ -360,7 +360,7 @@ class ProductTabs(QWidget):
             ("P010", "Citrus Marmalade", 70, "2.1", "2023-03-01", "JAR003", "", "", "https://www.bigbearfarms.in/cdn/shop/products/ThreeCitrusMarmalade-1.png?v=1663151497"),
             ("P011", "Caramel Sauce", 40, "1.0", "2023-02-01", "JAR001", "", "", "https://handletheheat.com/wp-content/uploads/2022/06/caramel-sauce-SQUARE-1.png"),
             ("P012", "Organic Honey", 55, "1.0", "2023-01-15", "JAR005", "", "", "assets/img/product/lavande_maritime.png"),
-        ]'''
+        ]"""
 
         self.filtered_data = self.data[:]  # Initialize filtered data with all products
         self.page_size = 5
@@ -417,7 +417,7 @@ class ProductTabs(QWidget):
 
         # Retrieve the product data
         product = self.filtered_data[global_row_index]
-        print(f'\n \n {product}')
+        print(f"\n \n {product}")
         self.photo_widget.set_photo(str(product[8]))  # Set the photo
         self.id_field.setText(str(product[0]))
         self.name_field.setText(product[1])

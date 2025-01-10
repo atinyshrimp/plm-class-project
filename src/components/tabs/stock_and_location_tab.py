@@ -20,7 +20,7 @@ from PyQt5.QtWidgets import (
 )
 
 from dialogs.stock_trends_window import StockTrendsWindow
-from dialogs.database_dialog import DatabaseDialog
+from dialogs.database_dialog import open_dialog
 from utils.table import CustomTable
 
 
@@ -308,17 +308,11 @@ class StockLocationTab(QWidget):
 
     def open_database_dialog(self, table_name: str, column_id: str):
         """Open the Database Dialog."""
-        columns = self.db_manager.get_table_columns(table_name)
-        row_data = self.db_manager.execute_query(
-            f"SELECT * FROM {table_name} WHERE id = ?", (column_id,)
-        )[0]
-        row_data = dict(zip([col["name"] for col in columns], row_data))
-
-        database_dialog = DatabaseDialog(
-            self.db_manager, table_name, columns, row_data, self, True
+        open_dialog(
+            self.db_manager, table_name, column_id, self, self.refresh_data, True
         )
-        database_dialog.exec_()
 
-        if database_dialog.result() == QDialog.Accepted:
-            self.load_data()
-            self.update_stock_table()
+    def refresh_data(self):
+        """Refresh the stock data and update the table."""
+        self.load_data()
+        self.update_stock_table()

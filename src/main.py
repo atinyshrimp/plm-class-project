@@ -1,36 +1,37 @@
-from PyQt5.QtWidgets import QApplication, QDialog
-from components.main_window import PLMApp
-import dialogs.login.login_window as login
-import database.databaseManager as database
-import sys
-import globals
 import ctypes
+import sys
 
-VERSION = "1.2.0"
+from PyQt5.QtWidgets import QApplication, QDialog
 
-# Variable globale pour stocker l'utilisateur connecté
+import database.databaseManager as database
+import dialogs.login.login_window as login
+import globals
+from components.main_window import PLMApp
+
+VERSION = "1.2.1"
+
+# Global variable to store the logged-in user
 globals.current_user = None
 
-
 if __name__ == "__main__":
-    # Configure l'icône de la barre des tâches sur Windows
+    # Set the taskbar icon on Windows
     myappid = f"mgo_sa.plm_internal_software.{VERSION}"
     ctypes.windll.shell32.SetCurrentProcessExplicitAppUserModelID(myappid)
 
-    # Initialisation de l'application
+    # Initialize the application
     app = QApplication(sys.argv)
 
-    # Affiche la fenêtre de connexion
+    # Display the login window
     login_dialog = login.LoginDialog(VERSION)
-    if login_dialog.exec_() == QDialog.Accepted:  # Si la connexion réussit
-        # initalise la liaison avec la bdd
+    if login_dialog.exec_() == QDialog.Accepted:  # If login is successful
+        # Initialize the database connection
         db_manager = database.SQLiteManager()
-        # Crée et lance la fenêtre principale
-        window = PLMApp(VERSION,db_manager)  # Passe la version à la fenêtre principale
 
+        # Create and launch the main window
+        window = PLMApp(VERSION, db_manager)  # Pass the version to the main window
         window.show()
-        print(globals.current_user)
+
         sys.exit(app.exec_())
     else:
-        # Quitte l'application si la connexion échoue ou si l'utilisateur ferme la fenêtre
+        # Exit the application if login fails or the user closes the window
         sys.exit()

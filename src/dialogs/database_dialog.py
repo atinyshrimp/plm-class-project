@@ -5,6 +5,7 @@ The input fields are dynamically created based on the column types of the table,
 The dialog also handles saving the data to the database and displaying error messages if the data cannot be saved.
 """
 
+import re
 from typing import Callable
 
 from PyQt5.QtCore import QDateTime
@@ -254,7 +255,8 @@ def open_dialog(
     """Opens the DatabaseDialog to add or edit a row in the table."""
     columns = db_manager.get_table_columns(table_name)
     row_data = db_manager.execute_query(
-        f"SELECT * FROM {table_name} WHERE id = ?", (column_id,)
+        f"SELECT * FROM {table_name} WHERE id = ?",
+        (get_integer_from_column_name(column_id),),
     )[0]
     row_data = dict(zip([col["name"] for col in columns], row_data))
 
@@ -263,3 +265,18 @@ def open_dialog(
     )
     if dialog.exec_() == QDialog.Accepted:
         refresh_fn()
+
+
+def get_integer_from_column_name(column_name):
+    """Extract integer from column name formatted as 'P###'.
+
+    Args:
+        column_name (str): The column name in the format 'P###'.
+
+    Returns:
+        int: The extracted integer.
+    """
+    match = re.search(r"\d+", column_name)
+    if match:
+        return int(match.group(0))
+    return None

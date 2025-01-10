@@ -20,7 +20,7 @@ from PyQt5.QtCore import Qt
 from utils.table import CustomTable
 from datetime import datetime, timedelta
 from widgets.collapsible import CollapsibleSection
-from dialogs.database_dialog import DatabaseDialog, open_dialog
+from dialogs.database_dialog import open_dialog
 
 
 class DistributionTrackingTab(QWidget):
@@ -145,9 +145,9 @@ class DistributionTrackingTab(QWidget):
                 "Contract Date",
                 "Lot",
                 "Lot Quantity",
-                "Departure Warehouse",
+                "Dept. Warehouse",
                 "Distributor",
-                "Distributor Location",
+                "Distr. Location",
                 "Product ID",
             ]
         )
