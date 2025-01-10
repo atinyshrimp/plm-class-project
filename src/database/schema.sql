@@ -7,7 +7,7 @@ CREATE TABLE IF NOT EXISTS `Product_info` (
 	`id_contenant` INTEGER NOT NULL,
 	`photo` TEXT NOT NULL,
 	`version` INTEGER NOT NULL,
-	`date_mise_en_prod` REAL NOT NULL
+	`date_mise_en_prod` TEXT NOT NULL
 );
 CREATE TABLE IF NOT EXISTS `Details_Couts` (
 	`id` integer primary key NOT NULL UNIQUE,
@@ -39,8 +39,8 @@ CREATE TABLE IF NOT EXISTS `Fournisseurs_Distributeurs` (
 );
 CREATE TABLE IF NOT EXISTS `Marchandises` (
 	`id` integer primary key NOT NULL UNIQUE,
-	`date_contractualisation` REAL NOT NULL,
-	`date_livraison` REAL NOT NULL,
+	`date_contractualisation` TEXT NOT NULL,
+	`date_livraison` TEXT NOT NULL,
 	`id_ingredient` INTEGER NOT NULL,
 	`quantite_kg` REAL NOT NULL,
 	`id_usine_livraison` INTEGER NOT NULL,
@@ -58,7 +58,7 @@ CREATE TABLE IF NOT EXISTS `Usines_Entrepots` (
 CREATE TABLE IF NOT EXISTS `Process` (
 	`id_usine` INTEGER NOT NULL,
 	`id_process_type` INTEGER NOT NULL,
-	`date` REAL NOT NULL,
+	`date` TEXT NOT NULL,
 	`id` INTEGER NOT NULL,
 	`id_marchandise` INTEGER,
 	`id_ingredient` INTEGER NOT NULL,
@@ -75,14 +75,14 @@ CREATE TABLE IF NOT EXISTS `Stock` (
 	`id` integer primary key NOT NULL UNIQUE,
 	`id_entrepot` INTEGER NOT NULL,
 	`id_lot` INTEGER NOT NULL,
-	`date_arrivee` REAL NOT NULL,
+	`date_arrivee` TEXT NOT NULL,
 FOREIGN KEY(`id_entrepot`) REFERENCES `Usines/entrepots`(`id`),
 FOREIGN KEY(`id_lot`) REFERENCES `Lots`(`id`)
 );
 CREATE TABLE IF NOT EXISTS `Lots` (
 	`id` integer primary key NOT NULL UNIQUE,
-	`date_de_prod` REAL,
-	`date_de_peremption` REAL,
+	`date_de_prod` TEXT,
+	`date_de_peremption` TEXT,
 	`id_produit` INTEGER NOT NULL,
 	`quantite` INTEGER NOT NULL,
 	`statut` BOOLEAN NOT NULL,
@@ -100,8 +100,8 @@ CREATE TABLE IF NOT EXISTS `Distributions` (
 	`id_entrepot` INTEGER NOT NULL,
 	`id_lot` INTEGER NOT NULL,
 	`id_distributeur` INTEGER NOT NULL,
-	`date_contractualisation` REAL NOT NULL,
-	`date_livraison` REAL NOT NULL,
+	`date_contractualisation` TEXT NOT NULL,
+	`date_livraison` TEXT NOT NULL,
 FOREIGN KEY(`id_entrepot`) REFERENCES `Usines/entrepots`(`id`),
 FOREIGN KEY(`id_lot`) REFERENCES `Lots`(`id`),
 FOREIGN KEY(`id_distributeur`) REFERENCES `Fournisseurs_Distributeurs`(`id`)
