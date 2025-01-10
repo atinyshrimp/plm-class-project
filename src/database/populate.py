@@ -436,6 +436,7 @@ USINES_ENTREPOTS = [
     {"id": 9, "localisation": "Tozeur, Tunisie", "contact": "contact@dattestunisie.usine.com", "type": True},
     {"id": 10, "localisation": "Regions côtières, Kenya", "contact": "contact@goyavekenya.usine.com", "type": True},
     {"id": 11, "localisation": "Provinces du Cap, Afrique du Sud", "contact": "contact@eucalyptusafriquedusud.usine.com", "type": True},
+
     {"id": 12, "localisation": "Bangkok, Thaïlande", "contact": "contact@bangkok.usine.com", "type": False},
     {"id": 13, "localisation": "Ho Chi Minh Ville, Vietnam", "contact": "contact@hochiminh.usine.com", "type": False},
     {"id": 14, "localisation": "Dakar, Senegal", "contact": "contact@dakar.usine.com", "type": False},
@@ -445,68 +446,90 @@ USINES_ENTREPOTS = [
 
 PROCESS_DATA = [
     # Miel de lavande maritime
-    {"id_usine": 1, "id_process_type": 1, "date": "2024-06-01", "id": 1, "id_marchandise": 1, "id_ingredient": 1},  # Extraction
+    {"id_usine": 1, "id_process_type": 5, "date": "2024-06-01", "id": 1, "id_marchandise": 1, "id_ingredient": 1},  # maturation
     {"id_usine": 1, "id_process_type": 3, "date": "2024-06-10", "id": 2, "id_marchandise": 1, "id_ingredient": 1},  # Emballage
+    {"id_usine": 16, "id_process_type": 4, "date": "2024-06-12", "id": 3, "id_marchandise": 1, "id_ingredient": 1},  # Conservation
 
     # Miel de sarrasin
-    {"id_usine": 2, "id_process_type": 1, "date": "2024-08-01", "id": 3, "id_marchandise": 2, "id_ingredient": 2},  # Extraction
-    {"id_usine": 2, "id_process_type": 3, "date": "2024-08-15", "id": 4, "id_marchandise": 2, "id_ingredient": 2},  # Emballage
+    {"id_usine": 2, "id_process_type": 5, "date": "2024-06-01", "id": 4, "id_marchandise": 2, "id_ingredient": 2},  # maturation
+    {"id_usine": 2, "id_process_type": 3, "date": "2024-06-15", "id": 5, "id_marchandise": 2, "id_ingredient": 2},  # Emballage
+    {"id_usine": 16, "id_process_type": 4, "date": "2024-06-17", "id": 6, "id_marchandise": 2, "id_ingredient": 2},  # Conservation
 
     # Confiture de pêche de vigne
-    {"id_usine": 2, "id_process_type": 1, "date": "2024-08-01", "id": 5, "id_marchandise": 3, "id_ingredient": 3},  # Extraction
-    {"id_usine": 2, "id_process_type": 2, "date": "2024-08-20", "id": 6, "id_marchandise": 3, "id_ingredient": 3},  # Melange
-    {"id_usine": 2, "id_process_type": 3, "date": "2024-08-25", "id": 7, "id_marchandise": 3, "id_ingredient": 12}, # Emballage
+    {"id_usine": 2, "id_process_type": 1, "date": "2024-08-18", "id": 7, "id_marchandise": 3, "id_ingredient": 3},  # cuisson
+    {"id_usine": 2, "id_process_type": 2, "date": "2024-08-20", "id": 8, "id_marchandise": 3, "id_ingredient": 3},  # Melange
+    {"id_usine": 2, "id_process_type": 2, "date": "2024-08-20", "id": 9, "id_marchandise": 12, "id_ingredient": 12},  # Melange sucre
+    {"id_usine": 2, "id_process_type": 2, "date": "2024-08-20", "id": 10, "id_marchandise": 14, "id_ingredient": 14},  # Melange citron
+    {"id_usine": 2, "id_process_type": 2, "date": "2024-08-20", "id": 11, "id_marchandise": 15, "id_ingredient": 15},  # Melange peptine
+    {"id_usine": 2, "id_process_type": 3, "date": "2024-08-22", "id": 12, "id_marchandise": 3, "id_ingredient": 3}, # Emballage
+    {"id_usine": 16, "id_process_type": 4, "date": "2024-08-30", "id": 13, "id_marchandise": 3, "id_ingredient": 3},  # Conservation
+
 
     # Confiture de rhubarbe
-    {"id_usine": 3, "id_process_type": 1, "date": "2024-04-01", "id": 8, "id_marchandise": 4, "id_ingredient": 4},  # Extraction
-    {"id_usine": 3, "id_process_type": 3, "date": "2024-04-10", "id": 9, "id_marchandise": 4, "id_ingredient": 4},  # Emballage
+    {"id_usine": 3, "id_process_type": 1, "date": "2024-04-18", "id": 14, "id_marchandise": 4, "id_ingredient": 4},  # cuisson
+    {"id_usine": 3, "id_process_type": 2, "date": "2024-04-20", "id": 15, "id_marchandise": 4, "id_ingredient": 4},  # Melange
+    {"id_usine": 3, "id_process_type": 2, "date": "2024-04-20", "id": 16, "id_marchandise": 12, "id_ingredient": 12},  # Melange sucre
+    {"id_usine": 3, "id_process_type": 2, "date": "2024-04-20", "id": 17, "id_marchandise": 15, "id_ingredient": 15},  # Melange pectine
+    {"id_usine": 3, "id_process_type": 2, "date": "2024-04-20", "id": 18, "id_marchandise": 14, "id_ingredient": 14},  # Melange citron
+    {"id_usine": 3, "id_process_type": 3, "date": "2024-04-22", "id": 19, "id_marchandise": 4, "id_ingredient": 4},  # Emballage
+    {"id_usine": 16, "id_process_type": 4, "date": "2024-04-30", "id": 20, "id_marchandise": 4, "id_ingredient": 4},  # Conservation
 
     # Miel de jujubier
-    {"id_usine": 1, "id_process_type": 1, "date": "2024-09-01", "id": 10, "id_marchandise": 5, "id_ingredient": 5},  # Extraction
-    {"id_usine": 1, "id_process_type": 3, "date": "2024-09-10", "id": 11, "id_marchandise": 5, "id_ingredient": 5},  # Emballage
+    {"id_usine": 5, "id_process_type": 5, "date": "2024-09-01", "id": 21, "id_marchandise": 5, "id_ingredient": 5},  # maturation
+    {"id_usine": 5, "id_process_type": 3, "date": "2024-09-10", "id": 22, "id_marchandise": 5, "id_ingredient": 5},  # Emballage
+    {"id_usine": 12, "id_process_type": 4, "date": "2024-09-11", "id": 23, "id_marchandise": 5, "id_ingredient": 5},  # Conservation
 
     # Miel de the
-    {"id_usine": 7, "id_process_type": 1, "date": "2024-05-01", "id": 12, "id_marchandise": 6, "id_ingredient": 6},  # Extraction
-    {"id_usine": 7, "id_process_type": 2, "date": "2024-05-15", "id": 13, "id_marchandise": 6, "id_ingredient": 6},  # Melange
+    {"id_usine": 7, "id_process_type": 5, "date": "2024-05-01", "id": 24, "id_marchandise": 6, "id_ingredient": 6},  # maturation
+    {"id_usine": 7, "id_process_type": 2, "date": "2024-05-15", "id": 25, "id_marchandise": 6, "id_ingredient": 6},  # Melange
+    {"id_usine": 7, "id_process_type": 2, "date": "2024-05-15", "id": 26, "id_marchandise": 13, "id_ingredient": 13},  # Melange arôme de the
+    {"id_usine": 7, "id_process_type": 3, "date": "2024-05-17", "id": 27, "id_marchandise": 6, "id_ingredient": 6},  # emballage
+    {"id_usine": 12, "id_process_type": 4, "date": "2024-05-18", "id": 28, "id_marchandise": 6, "id_ingredient": 6},  # conservation
+    
+    # Confiture de fruit du dragon et mangue
+    {"id_usine": 6, "id_process_type": 1, "date": "2024-03-01", "id": 29, "id_marchandise": 7, "id_ingredient": 7},  # cuisson
+    {"id_usine": 6, "id_process_type": 1, "date": "2024-03-01", "id": 30, "id_marchandise": 8, "id_ingredient": 8},  # cuisson
+    {"id_usine": 6, "id_process_type": 2, "date": "2024-03-03", "id": 31, "id_marchandise": 12, "id_ingredient": 12},  # Melange sucre
+    {"id_usine": 6, "id_process_type": 2, "date": "2024-03-03", "id": 32, "id_marchandise": 15, "id_ingredient": 15},  # Melange pectine
+    {"id_usine": 6, "id_process_type": 2, "date": "2024-03-03", "id": 33, "id_marchandise": 14, "id_ingredient": 14},  # Melange citron
+    {"id_usine": 6, "id_process_type": 2, "date": "2024-03-03", "id": 34, "id_marchandise": 7, "id_ingredient": 7},  # Melange fruit du dragon
+    {"id_usine": 6, "id_process_type": 2, "date": "2024-03-03", "id": 35, "id_marchandise": 8, "id_ingredient": 8},  # Melange mangue
+    {"id_usine": 6, "id_process_type": 3, "date": "2024-03-05", "id": 36, "id_marchandise": 7, "id_ingredient": 7},  # Emballage
+    {"id_usine": 12, "id_process_type": 4, "date": "2024-03-15", "id": 37, "id_marchandise": 7, "id_ingredient": 7},  # Conservation
 
-    # Confiture de fruit du dragon
-    {"id_usine": 6, "id_process_type": 1, "date": "2024-03-01", "id": 14, "id_marchandise": 7, "id_ingredient": 7},  # Extraction
-    {"id_usine": 6, "id_process_type": 4, "date": "2024-03-15", "id": 15, "id_marchandise": 7, "id_ingredient": 7},  # Conservation
-
-    # Confiture de mangue
-    {"id_usine": 6, "id_process_type": 1, "date": "2024-03-01", "id": 16, "id_marchandise": 8, "id_ingredient": 8},  # Extraction
-    {"id_usine": 6, "id_process_type": 4, "date": "2024-03-15", "id": 17, "id_marchandise": 8, "id_ingredient": 8},  # Conservation
 
     # Miel d’eucalyptus
-    {"id_usine": 11, "id_process_type": 1, "date": "2024-09-01", "id": 18, "id_marchandise": 9, "id_ingredient": 9},  # Extraction
-    {"id_usine": 11, "id_process_type": 3, "date": "2024-09-20", "id": 19, "id_marchandise": 9, "id_ingredient": 9},  # Emballage
+    {"id_usine": 11, "id_process_type": 5, "date": "2024-09-01", "id": 38, "id_marchandise": 9, "id_ingredient": 9},  # maturation
+    {"id_usine": 11, "id_process_type": 3, "date": "2024-09-20", "id": 39, "id_marchandise": 9, "id_ingredient": 9},  # Emballage
+    {"id_usine": 15, "id_process_type": 4, "date": "2024-09-30", "id": 40, "id_marchandise": 9, "id_ingredient": 9},  # Conservation
 
     # Confiture de goyave
-    {"id_usine": 10, "id_process_type": 1, "date": "2023-09-01", "id": 20, "id_marchandise": 10, "id_ingredient": 10},  # Extraction
-    {"id_usine": 10, "id_process_type": 2, "date": "2023-09-15", "id": 21, "id_marchandise": 10, "id_ingredient": 10},  # Melange
+    {"id_usine": 10, "id_process_type": 1, "date": "2023-09-01", "id": 41, "id_marchandise": 10, "id_ingredient": 10},  # cuisson
+    {"id_usine": 10, "id_process_type": 2, "date": "2024-09-03", "id": 42, "id_marchandise": 12, "id_ingredient": 12},  # Melange sucre
+    {"id_usine": 10, "id_process_type": 2, "date": "2024-09-03", "id": 43, "id_marchandise": 15, "id_ingredient": 15},  # Melange pectine
+    {"id_usine": 10, "id_process_type": 2, "date": "2024-09-03", "id": 44, "id_marchandise": 14, "id_ingredient": 14},  # Melange citron
+    {"id_usine": 10, "id_process_type": 2, "date": "2023-09-03", "id": 45, "id_marchandise": 10, "id_ingredient": 10},  # Melange
+    {"id_usine": 10, "id_process_type": 3, "date": "2024-09-05", "id": 46, "id_marchandise": 10, "id_ingredient": 10},  # Emballage
+    {"id_usine": 12, "id_process_type": 4, "date": "2024-09-15", "id": 47, "id_marchandise": 10, "id_ingredient": 10},  # Conservation
 
     # Confiture de dattes
-    {"id_usine": 9, "id_process_type": 1, "date": "2024-08-01", "id": 22, "id_marchandise": 11, "id_ingredient": 11},  # Extraction
-    {"id_usine": 9, "id_process_type": 4, "date": "2024-08-30", "id": 23, "id_marchandise": 11, "id_ingredient": 11},  # Conservation
+    {"id_usine": 9, "id_process_type": 1, "date": "2024-08-01", "id": 48, "id_marchandise": 11, "id_ingredient": 11},  # cuisson
+    {"id_usine": 9, "id_process_type": 2, "date": "2024-08-03", "id": 49, "id_marchandise": 12, "id_ingredient": 12},  # Melange sucre
+    {"id_usine": 9, "id_process_type": 2, "date": "2024-08-03", "id": 50, "id_marchandise": 15, "id_ingredient": 15},  # Melange pectine
+    {"id_usine": 9, "id_process_type": 2, "date": "2024-08-03", "id": 51, "id_marchandise": 14, "id_ingredient": 14},  # Melange citron
+    {"id_usine": 9, "id_process_type": 2, "date": "2023-08-03", "id": 52, "id_marchandise": 11, "id_ingredient": 11},  # Melange
+    {"id_usine": 9, "id_process_type": 3, "date": "2024-08-05", "id": 53, "id_marchandise": 11, "id_ingredient": 11},  # Emballage
+    {"id_usine": 14, "id_process_type": 4, "date": "2024-08-30", "id": 54, "id_marchandise": 11, "id_ingredient": 11},  # Conservation
 
-    # Sucre
-    {"id_usine": 2, "id_process_type": 4, "date": "2024-08-01", "id": 24, "id_marchandise": 12, "id_ingredient": 12},  # Conservation
 
-    # Arôme de the
-    {"id_usine": 7, "id_process_type": 3, "date": "2024-04-01", "id": 25, "id_marchandise": 13, "id_ingredient": 13},  # Emballage
-
-    # Jus de citron
-    {"id_usine": 2, "id_process_type": 4, "date": "2024-04-01", "id": 26, "id_marchandise": 14, "id_ingredient": 14},  # Conservation
-
-    # Pectine
-    {"id_usine": 2, "id_process_type": 4, "date": "2024-04-01", "id": 27, "id_marchandise": 15, "id_ingredient": 15},  # Conservation
 ]
 
 PROCESS_TYPES = [
-    {"id": 1, "nom": "Extraction"},
+    {"id": 1, "nom": "Cuisson"},
     {"id": 2, "nom": "Melange"},
     {"id": 3, "nom": "Emballage"},
     {"id": 4, "nom": "Conservation"},
+    {"id":5, "nom": "Maturation"},
 ]
 
 LOTS = [
@@ -666,63 +689,81 @@ STOCK = [
 ]
 
 HISTORIQUE_PROCESS = [
-    # Miel de lavande maritime (id_produit: 1)
-    {"id_lot": 1, "id_process": 1},  # Extraction
-    {"id_lot": 1, "id_process": 3},  # Emballage
+    # Miel de lavande maritime
+    {"id_lot": 1, "id_process": 1},
+    {"id_lot": 1, "id_process": 2},
+    {"id_lot": 1, "id_process": 3},
 
-    # Miel de sarrasin (id_produit: 2)
-    {"id_lot": 2, "id_process": 1},  # Extraction
-    {"id_lot": 2, "id_process": 3},  # Emballage
+    # Miel de sarrasin
+    {"id_lot": 2, "id_process": 4},
+    {"id_lot": 2, "id_process": 5},
+    {"id_lot": 2, "id_process": 6},
 
-    # Confiture de pêche de vigne (id_produit: 3)
-    {"id_lot": 3, "id_process": 1},  # Extraction
-    {"id_lot": 3, "id_process": 2},  # Melange
-    {"id_lot": 3, "id_process": 3},  # Emballage
+    # Confiture de pêche de vigne
+    {"id_lot": 3, "id_process": 7},
+    {"id_lot": 3, "id_process": 8},
+    {"id_lot": 3, "id_process": 9},
+    {"id_lot": 3, "id_process": 10},
+    {"id_lot": 3, "id_process": 11},
+    {"id_lot": 3, "id_process": 12},
+    {"id_lot": 3, "id_process": 13},
 
-    # Confiture de rhubarbe (id_produit: 4)
-    {"id_lot": 4, "id_process": 1},  # Extraction
-    {"id_lot": 4, "id_process": 3},  # Emballage
+    # Confiture de rhubarbe
+    {"id_lot": 4, "id_process": 14},
+    {"id_lot": 4, "id_process": 15},
+    {"id_lot": 4, "id_process": 16},
+    {"id_lot": 4, "id_process": 17},
+    {"id_lot": 4, "id_process": 18},
+    {"id_lot": 4, "id_process": 19},
+    {"id_lot": 4, "id_process": 20},
 
-    # Miel de jujubier (id_produit: 5)
-    {"id_lot": 5, "id_process": 1},  # Extraction
-    {"id_lot": 5, "id_process": 3},  # Emballage
+    # Miel de jujubier
+    {"id_lot": 5, "id_process": 21},
+    {"id_lot": 5, "id_process": 22},
+    {"id_lot": 5, "id_process": 23},
 
-    # Miel de the (id_produit: 6)
-    {"id_lot": 6, "id_process": 1},  # Extraction
-    {"id_lot": 6, "id_process": 2},  # Melange
+    # Miel de thé
+    {"id_lot": 6, "id_process": 24},
+    {"id_lot": 6, "id_process": 25},
+    {"id_lot": 6, "id_process": 26},
+    {"id_lot": 6, "id_process": 27},
+    {"id_lot": 6, "id_process": 28},
 
-    # Confiture de fruit du dragon (id_produit: 7)
-    {"id_lot": 7, "id_process": 1},  # Extraction
-    {"id_lot": 7, "id_process": 4},  # Conservation
+    # Confiture de fruit du dragon et mangue
+    {"id_lot": 7, "id_process": 29},
+    {"id_lot": 7, "id_process": 30},
+    {"id_lot": 7, "id_process": 31},
+    {"id_lot": 7, "id_process": 32},
+    {"id_lot": 7, "id_process": 33},
+    {"id_lot": 7, "id_process": 34},
+    {"id_lot": 7, "id_process": 35},
+    {"id_lot": 7, "id_process": 36},
+    {"id_lot": 7, "id_process": 37},
 
-    # Confiture de mangue (id_produit: 8)
-    {"id_lot": 8, "id_process": 1},  # Extraction
-    {"id_lot": 8, "id_process": 4},  # Conservation
+    # Miel d’eucalyptus
+    {"id_lot": 8, "id_process": 38},
+    {"id_lot": 8, "id_process": 39},
+    {"id_lot": 8, "id_process": 40},
 
-    # Miel d’eucalyptus (id_produit: 9)
-    {"id_lot": 9, "id_process": 1},  # Extraction
-    {"id_lot": 9, "id_process": 3},  # Emballage
+    # Confiture de goyave
+    {"id_lot": 9, "id_process": 41},
+    {"id_lot": 9, "id_process": 42},
+    {"id_lot": 9, "id_process": 43},
+    {"id_lot": 9, "id_process": 44},
+    {"id_lot": 9, "id_process": 45},
+    {"id_lot": 9, "id_process": 46},
+    {"id_lot": 9, "id_process": 47},
 
-    # Confiture de goyave (id_produit: 10)
-    {"id_lot": 10, "id_process": 1}, # Extraction
-    {"id_lot": 10, "id_process": 2}, # Melange
-
-    # Confiture de dattes (id_produit: 11)
-    {"id_lot": 11, "id_process": 1}, # Extraction
-    {"id_lot": 11, "id_process": 4}, # Conservation
-
-    # Sucre (id_produit: 12)
-    {"id_lot": 12, "id_process": 4}, # Conservation
-
-    # Arôme de the (id_produit: 13)
-    {"id_lot": 13, "id_process": 3}, # Emballage
-
-    # Jus de citron (id_produit: 14)
-    {"id_lot": 14, "id_process": 4}, # Conservation
-
-    # Pectine (id_produit: 15)
-    {"id_lot": 15, "id_process": 4}, # Conservation
+    # Confiture de dattes
+    {"id_lot": 10, "id_process": 48},
+    {"id_lot": 10, "id_process": 49},
+    {"id_lot": 10, "id_process": 50},
+    {"id_lot": 10, "id_process": 51},
+    {"id_lot": 10, "id_process": 52},
+    {"id_lot": 10, "id_process": 53},
+    {"id_lot": 10, "id_process": 54}
 ]
+
 
 DISTRIBUTIONS = [
     # Distribution pour Miel de lavande maritime
