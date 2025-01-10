@@ -6,7 +6,7 @@ import sys
 import globals
 import ctypes
 
-VERSION = "1.0.0"
+VERSION = "1.1.0"
 
 # Variable globale pour stocker l'utilisateur connecté
 globals.current_user = None
@@ -21,7 +21,7 @@ if __name__ == "__main__":
     app = QApplication(sys.argv)
 
     # Affiche la fenêtre de connexion
-    login_dialog = login.LoginDialog()
+    login_dialog = login.LoginDialog(VERSION)
     if login_dialog.exec_() == QDialog.Accepted:  # Si la connexion réussit
         # initalise la liaison avec la bdd
         db_manager = database.SQLiteManager()
