@@ -9,7 +9,7 @@ PRODUITS = [
         "quantite": 500,
         "photo_etiquettes": "miel_lavande.jpg",
         "id_contenant": 1,
-        "photo": "miel_lavande_bocal.jpg",
+        "photo": "assets/img/product/lavande_maritime.png",
         "version": 1,
         "date_mise_en_prod": "2024-06-01",
     },
@@ -20,7 +20,7 @@ PRODUITS = [
         "quantite": 500,
         "photo_etiquettes": "miel_sarrasin.jpg",
         "id_contenant": 1,
-        "photo": "miel_sarrasin_bocal.jpg",
+        "photo": "assets/img/product/sarrasin.png",
         "version": 1,
         "date_mise_en_prod": "2024-08-01",
     },
@@ -31,7 +31,7 @@ PRODUITS = [
         "quantite": 800,
         "photo_etiquettes": "confiture_peche.jpg",
         "id_contenant": 2,
-        "photo": "confiture_peche_bocal.jpg",
+        "photo": "assets/img/product/peche_de_vigne.png",
         "version": 1,
         "date_mise_en_prod": "2024-08-01",
     },
@@ -42,7 +42,7 @@ PRODUITS = [
         "quantite": 800,
         "photo_etiquettes": "confiture_rhubarbe.jpg",
         "id_contenant": 2,
-        "photo": "confiture_rhubarbe_bocal.jpg",
+        "photo": "assets/img/product/rhubarbe.png",
         "version": 1,
         "date_mise_en_prod": "2024-04-01",
     },
@@ -53,7 +53,7 @@ PRODUITS = [
         "quantite": 500,
         "photo_etiquettes": "miel_jujubier.jpg",
         "id_contenant": 1,
-        "photo": "miel_jujubier_bocal.jpg",
+        "photo": "assets/img/product/jujubier.png",
         "version": 1,
         "date_mise_en_prod": "2024-09-01",
     },
@@ -64,7 +64,7 @@ PRODUITS = [
         "quantite": 500,
         "photo_etiquettes": "miel_the.jpg",
         "id_contenant": 1,
-        "photo": "miel_the_bocal.jpg",
+        "photo": "assets/img/product/the.png",
         "version": 1,
         "date_mise_en_prod": "2024-05-01",
     },
@@ -75,7 +75,7 @@ PRODUITS = [
         "quantite": 1000,
         "photo_etiquettes": "confiture_fruit_mangue.jpg",
         "id_contenant": 3,
-        "photo": "confiture_fruit_mangue_bocal.jpg",
+        "photo": "assets/img/product/mangue_fruit_du_dragon.png",
         "version": 1,
         "date_mise_en_prod": "2024-03-01",
     },
@@ -86,7 +86,7 @@ PRODUITS = [
         "quantite": 500,
         "photo_etiquettes": "miel_eucalyptus.jpg",
         "id_contenant": 1,
-        "photo": "miel_eucalyptus_bocal.jpg",
+        "photo": "assets/img/product/eucalyptus.png",
         "version": 1,
         "date_mise_en_prod": "2024-09-01",
     },
@@ -97,7 +97,7 @@ PRODUITS = [
         "quantite": 1000,
         "photo_etiquettes": "confiture_goyave.jpg",
         "id_contenant": 3,
-        "photo": "confiture_goyave_bocal.jpg",
+        "photo": "assets/img/product/goyave.png",
         "version": 1,
         "date_mise_en_prod": "2023-09-01",
     },
@@ -108,7 +108,7 @@ PRODUITS = [
         "quantite": 1000,
         "photo_etiquettes": "confiture_dattes.jpg",
         "id_contenant": 3,
-        "photo": "confiture_dattes_bocal.jpg",
+        "photo": "assets/img/product/datte.png",
         "version": 1,
         "date_mise_en_prod": "2024-08-01",
     }
@@ -226,13 +226,13 @@ COMPOSITION_PRODUIT = [
     {"id": 2, "id_produit": 2, "quantite": 500, "id_ingredient": 2},  # Miel de sarrasin
 
     # Confiture de pêche de vigne
-    {"id": 3, "id_produit": 3, "quantite": 800, "id_ingredient": 3},  # Pêche de vigne
+    {"id": 3, "id_produit": 3, "quantite": 440, "id_ingredient": 3},  # Pêche de vigne
     {"id": 4, "id_produit": 3, "quantite": 300, "id_ingredient": 12}, # Sucre
     {"id": 5, "id_produit": 3, "quantite": 50, "id_ingredient": 14},  # Jus de citron
     {"id": 6, "id_produit": 3, "quantite": 10, "id_ingredient": 15},  # Pectine
 
     # Confiture de rhubarbe
-    {"id": 7, "id_produit": 4, "quantite": 800, "id_ingredient": 4},  # Rhubarbe
+    {"id": 7, "id_produit": 4, "quantite": 440, "id_ingredient": 4},  # Rhubarbe
     {"id": 8, "id_produit": 4, "quantite": 300, "id_ingredient": 12}, # Sucre
     {"id": 9, "id_produit": 4, "quantite": 50, "id_ingredient": 14},  # Jus de citron
     {"id": 10, "id_produit": 4, "quantite": 10, "id_ingredient": 15}, # Pectine
@@ -241,12 +241,12 @@ COMPOSITION_PRODUIT = [
     {"id": 11, "id_produit": 5, "quantite": 500, "id_ingredient": 5}, # Miel de jujubier
 
     # Miel de the
-    {"id": 12, "id_produit": 6, "quantite": 500, "id_ingredient": 6},  # Miel de the
+    {"id": 12, "id_produit": 6, "quantite": 490, "id_ingredient": 6},  # Miel de the
     {"id": 13, "id_produit": 6, "quantite": 10, "id_ingredient": 13},  # Arôme de the
 
     # Confiture de fruit du dragon et mangue
-    {"id": 14, "id_produit": 7, "quantite": 500, "id_ingredient": 7},  # Fruit du dragon
-    {"id": 15, "id_produit": 7, "quantite": 500, "id_ingredient": 8},  # Mangue
+    {"id": 14, "id_produit": 7, "quantite": 320, "id_ingredient": 7},  # Fruit du dragon
+    {"id": 15, "id_produit": 7, "quantite": 320, "id_ingredient": 8},  # Mangue
     {"id": 16, "id_produit": 7, "quantite": 300, "id_ingredient": 12}, # Sucre
     {"id": 17, "id_produit": 7, "quantite": 50, "id_ingredient": 14},  # Jus de citron
     {"id": 18, "id_produit": 7, "quantite": 10, "id_ingredient": 15},  # Pectine
@@ -255,13 +255,13 @@ COMPOSITION_PRODUIT = [
     {"id": 19, "id_produit": 8, "quantite": 500, "id_ingredient": 9},  # Miel d’eucalyptus
 
     # Confiture de goyave
-    {"id": 20, "id_produit": 9, "quantite": 1000, "id_ingredient": 10}, # Goyave
+    {"id": 20, "id_produit": 9, "quantite": 640, "id_ingredient": 10}, # Goyave
     {"id": 21, "id_produit": 9, "quantite": 300, "id_ingredient": 12},  # Sucre
     {"id": 22, "id_produit": 9, "quantite": 50, "id_ingredient": 14},  # Jus de citron
     {"id": 23, "id_produit": 9, "quantite": 10, "id_ingredient": 15},  # Pectine
 
     # Confiture de dattes
-    {"id": 24, "id_produit": 10, "quantite": 1000, "id_ingredient": 11}, # Dattes
+    {"id": 24, "id_produit": 10, "quantite": 640, "id_ingredient": 11}, # Dattes
     {"id": 25, "id_produit": 10, "quantite": 300, "id_ingredient": 12},  # Sucre
     {"id": 26, "id_produit": 10, "quantite": 50, "id_ingredient": 14},  # Jus de citron
     {"id": 27, "id_produit": 10, "quantite": 10, "id_ingredient": 15},  # Pectine
@@ -270,21 +270,22 @@ COMPOSITION_PRODUIT = [
 FOURNISSEURS_DISTRIBUTEURS = [
     {"id": 1, "nom": "Fournisseur Lavande Maritime", "localisation": "Côte d’Azur, France", "contact": "contact@lavandemaritime.fournisseur.com", "type": True},
     {"id": 2, "nom": "Fournisseur Sarrasin Bretagne", "localisation": "Bretagne, France", "contact": "contact@sarrasinbretagne.fournisseur.com", "type": True},
-    {"id": 3, "nom": "Fournisseur Rhubarbe Belgique", "localisation": "Belgique", "contact": "contact@rhubarbebelgique.fournisseur.com", "type": True},
-    {"id": 4, "nom": "Fournisseur Sarrasin Pays-Bas", "localisation": "Pays-Bas", "contact": "contact@sarrasinpaysbas.fournisseur.com", "type": True},
-    {"id": 5, "nom": "Fournisseur Sidr Yemen", "localisation": "Yemen", "contact": "contact@sidryemen.fournisseur.com", "type": True},
-    {"id": 6, "nom": "Fournisseur Pitaya Vietnam", "localisation": "Vietnam, Zones proches de Ho Chi Minh", "contact": "contact@pitayavietnam.fournisseur.com", "type": True},
-    {"id": 7, "nom": "Fournisseur Miel de The Chine", "localisation": "Chine, Zhejiang", "contact": "contact@mieldethechine.fournisseur.com", "type": True},
-    {"id": 8, "nom": "Fournisseur Miel de The Japon", "localisation": "Japon, Zhejiang", "contact": "contact@mieldethejapon.fournisseur.com", "type": True},
+    {"id": 3, "nom": "Fournisseur Rhubarbe Belgique", "localisation": "Bruxelles, Belgique", "contact": "contact@rhubarbebelgique.fournisseur.com", "type": True},
+    {"id": 4, "nom": "Fournisseur Sarrasin Pays-Bas", "localisation": "Amsterdam, Pays-Bas", "contact": "contact@sarrasinpaysbas.fournisseur.com", "type": True},
+    {"id": 5, "nom": "Fournisseur Sidr Yemen", "localisation": "Sana'a, Yemen", "contact": "contact@sidryemen.fournisseur.com", "type": True},
+    {"id": 6, "nom": "Fournisseur Pitaya Vietnam", "localisation": "Ho Chi Minh Ville, Vietnam", "contact": "contact@pitayavietnam.fournisseur.com", "type": True},
+    {"id": 7, "nom": "Fournisseur Miel de The Chine", "localisation": "Hangzhou, Chine", "contact": "contact@mieldethechine.fournisseur.com", "type": True},
+    {"id": 8, "nom": "Fournisseur Miel de The Japon", "localisation": "Hangzhou, Chine", "contact": "contact@mieldethejapon.fournisseur.com", "type": True},
     {"id": 9, "nom": "Fournisseur Dattes Tunisie", "localisation": "Tozeur, Tunisie", "contact": "contact@dattestunisie.fournisseur.com", "type": True},
-    {"id": 10, "nom": "Fournisseur Goyave Kenya", "localisation": "Regions côtières, Kenya", "contact": "contact@goyavekenya.fournisseur.com", "type": True},
-    {"id": 11, "nom": "Fournisseur Eucalyptus Afrique du Sud", "localisation": "Provinces du Cap, Afrique du Sud", "contact": "contact@eucalyptusafriquedusud.fournisseur.com", "type": True},
+    {"id": 10, "nom": "Fournisseur Goyave Kenya", "localisation": "Mombasa, Kenya", "contact": "contact@goyavekenya.fournisseur.com", "type": True},
+    {"id": 11, "nom": "Fournisseur Eucalyptus Afrique du Sud", "localisation": "Le Cap, Afrique du Sud", "contact": "contact@eucalyptusafriquedusud.fournisseur.com", "type": True},
     {"id": 12, "nom": "Distributeur Bangkok Thaïlande", "localisation": "Bangkok, Thaïlande", "contact": "contact@distributeurbangkok.com", "type": False},
     {"id": 13, "nom": "Distributeur Ho Chi Minh Vietnam", "localisation": "Ho Chi Minh Ville, Vietnam", "contact": "contact@distributeurhochiminh.com", "type": False},
-    {"id": 14, "nom": "Distributeur Dakar Senegal", "localisation": "Dakar, Senegal", "contact": "contact@distributeurdakar.com", "type": False},
+    {"id": 14, "nom": "Distributeur Dakar Senegal", "localisation": "Dakar, Sénégal", "contact": "contact@distributeurdakar.com", "type": False},
     {"id": 15, "nom": "Distributeur Mombasa Kenya", "localisation": "Mombasa, Kenya", "contact": "contact@distributeurmombasa.com", "type": False},
-    {"id": 16, "nom": "Distributeur Paris Bruxelles", "localisation": "Paris, France / Bruxelles, Belgique", "contact": "contact@distributeurparisbruxelles.com", "type": False}
+    {"id": 16, "nom": "Distributeur Paris", "localisation": "Paris, France", "contact": "contact@distributeurparis.com", "type": False}
 ]
+
 
 MARCHANDISES = [
         {
@@ -427,21 +428,20 @@ MARCHANDISES = [
 USINES_ENTREPOTS = [
     {"id": 1, "localisation": "Côte d’Azur, France", "contact": "contact@lavandemaritime.usine.com", "type": True},
     {"id": 2, "localisation": "Bretagne, France", "contact": "contact@sarrasinbretagne.usine.com", "type": True},
-    {"id": 3, "localisation": "Belgique", "contact": "contact@rhubarbebelgique.usine.com", "type": True},
-    {"id": 4, "localisation": "Pays-Bas", "contact": "contact@sarrasinpaysbas.usine.com", "type": True},
-    {"id": 5, "localisation": "Yemen", "contact": "contact@sidryemen.usine.com", "type": True},
-    {"id": 6, "localisation": "Vietnam, Zones proches de Ho Chi Minh", "contact": "contact@pitayavietnam.usine.com", "type": True},
-    {"id": 7, "localisation": "Chine, Zhejiang", "contact": "contact@mieldethechine.usine.com", "type": True},
-    {"id": 8, "localisation": "Japon, Zhejiang", "contact": "contact@mieldethejapon.usine.com", "type": True},
+    {"id": 3, "localisation": "Bruxelles, Belgique", "contact": "contact@rhubarbebelgique.usine.com", "type": True},
+    {"id": 4, "localisation": "Amsterdam, Pays-Bas", "contact": "contact@sarrasinpaysbas.usine.com", "type": True},
+    {"id": 5, "localisation": "Sana'a, Yemen", "contact": "contact@sidryemen.usine.com", "type": True},
+    {"id": 6, "localisation": "Ho Chi Minh Ville, Vietnam", "contact": "contact@pitayavietnam.usine.com", "type": True},
+    {"id": 7, "localisation": "Hangzhou, Chine", "contact": "contact@mieldethechine.usine.com", "type": True},
+    {"id": 8, "localisation": "Hangzhou, Chine", "contact": "contact@mieldethejapon.usine.com", "type": True},
     {"id": 9, "localisation": "Tozeur, Tunisie", "contact": "contact@dattestunisie.usine.com", "type": True},
-    {"id": 10, "localisation": "Regions côtières, Kenya", "contact": "contact@goyavekenya.usine.com", "type": True},
-    {"id": 11, "localisation": "Provinces du Cap, Afrique du Sud", "contact": "contact@eucalyptusafriquedusud.usine.com", "type": True},
-
+    {"id": 10, "localisation": "Mombasa, Kenya", "contact": "contact@goyavekenya.usine.com", "type": True},
+    {"id": 11, "localisation": "Le Cap, Afrique du Sud", "contact": "contact@eucalyptusafriquedusud.usine.com", "type": True},
     {"id": 12, "localisation": "Bangkok, Thaïlande", "contact": "contact@bangkok.usine.com", "type": False},
     {"id": 13, "localisation": "Ho Chi Minh Ville, Vietnam", "contact": "contact@hochiminh.usine.com", "type": False},
-    {"id": 14, "localisation": "Dakar, Senegal", "contact": "contact@dakar.usine.com", "type": False},
+    {"id": 14, "localisation": "Dakar, Sénégal", "contact": "contact@dakar.usine.com", "type": False},
     {"id": 15, "localisation": "Mombasa, Kenya", "contact": "contact@mombasa.usine.com", "type": False},
-    {"id": 16, "localisation": "Paris, France / Bruxelles, Belgique", "contact": "contact@parisbruxelles.usine.com", "type": False}
+    {"id": 16, "localisation": "Paris, France", "contact": "contact@paris.usine.com", "type": False}
 ]
 
 PROCESS_DATA = [

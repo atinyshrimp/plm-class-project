@@ -344,140 +344,23 @@ class ProductTabs(QWidget):
         self._toggle_edit_mode()
 
     def _load_data(self):
-        self.data = [
-            (
-                "P001",
-                "Honey Jar",
-                50,
-                "1.0",
-                "2023-10-01",
-                "JAR001",
-                "Pure organic honey",
-                "Honey (90%), Beeswax (10%)",
-                "https://m.media-amazon.com/images/I/81XTYU+nntL.jpg",
-            ),
-            (
-                "P002",
-                "Berry Jam",
-                100,
-                "1.1",
-                "2023-09-15",
-                "JAR002",
-                "Mixed berry jam",
-                "Strawberries (70%), Sugar (30%)",
-                "https://assets.tmecosys.com/image/upload/t_web767x639/img/recipe/ras/Assets/4B7C3510-7041-4B5D-8000-1D10B1BA4678/Derivates/6749ac4e-586d-4055-9df2-5a96832897f6.jpg",
-            ),
-            (
-                "P003",
-                "Lemon Marmalade",
-                75,
-                "2.0",
-                "2023-08-20",
-                "JAR003",
-                "Zesty lemon marmalade",
-                "Lemons (60%), Sugar (40%)",
-                "https://images.immediate.co.uk/production/volatile/sites/30/2020/08/recipe-image-legacy-id-871488_11-35ddf4e.jpg?quality=90&resize=440,400",
-            ),
-            (
-                "P004",
-                "Almond Butter",
-                120,
-                "1.0",
-                "2023-09-10",
-                "JAR004",
-                "Smooth almond butter",
-                "Almonds (100%)",
-                "https://www.inspiredtaste.net/wp-content/uploads/2020/06/Homemade-Almond-Butter-Recipe-1200.jpg",
-            ),
-            (
-                "P005",
-                "Herbal Honey",
-                60,
-                "1.2",
-                "2023-11-01",
-                "JAR005",
-                "Infused with natural herbs",
-                "Honey (85%), Herbs (15%)",
-                "https://www.herbco.com/images/page/herbalhoney/images/RECIPE-honey-spread2.jpg",
-            ),
-            (
-                "P006",
-                "Chocolate Spread",
-                110,
-                "2.0",
-                "2023-06-15",
-                "JAR006",
-                "",
-                "",
-                "https://assets.tmecosys.com/image/upload/t_web767x639/img/recipe/ras/Assets/8EABE1FD-5729-4A87-828E-B8C57603E5EA/Derivates/A57910CF-D62E-4713-9E77-1C281412D3DF.jpg",
-            ),
-            (
-                "P007",
-                "Strawberry Jam",
-                90,
-                "1.3",
-                "2023-07-01",
-                "JAR002",
-                "",
-                "",
-                "https://itsnotcomplicatedrecipes.com/wp-content/uploads/2022/01/Strawberry-Jam-Feature.jpg",
-            ),
-            (
-                "P008",
-                "Blueberry Jam",
-                80,
-                "1.0",
-                "2023-05-20",
-                "JAR002",
-                "",
-                "",
-                "https://www.wildernesswife.com/wp-content/uploads/2023/09/blueberry_jam1.jpg",
-            ),
-            (
-                "P009",
-                "Peanut Butter",
-                150,
-                "1.2",
-                "2023-04-10",
-                "JAR004",
-                "",
-                "",
-                "https://pinchofyum.com/wp-content/uploads/Homemade-Peanut-Butter-Square.png",
-            ),
-            (
-                "P010",
-                "Citrus Marmalade",
-                70,
-                "2.1",
-                "2023-03-01",
-                "JAR003",
-                "",
-                "",
-                "https://www.bigbearfarms.in/cdn/shop/products/ThreeCitrusMarmalade-1.png?v=1663151497",
-            ),
-            (
-                "P011",
-                "Caramel Sauce",
-                40,
-                "1.0",
-                "2023-02-01",
-                "JAR001",
-                "",
-                "",
-                "https://handletheheat.com/wp-content/uploads/2022/06/caramel-sauce-SQUARE-1.png",
-            ),
-            (
-                "P012",
-                "Organic Honey",
-                55,
-                "1.0",
-                "2023-01-15",
-                "JAR005",
-                "",
-                "",
-                "https://cdn.shopify.com/s/files/1/0262/6374/8713/files/organic-honey_1000x.png?v=1726646497",
-            ),
-        ]
+        loginAndData
+        self.data = self.db_manager.fetch_query("fetch_product_details")
+        '''
+        [
+            ("P001", "Honey Jar", 50, "1.0", "2023-10-01", "JAR001", "Pure organic honey", "Honey (90%), Beeswax (10%)", "assets/img/product/sarrasin.png"),
+            ("P002", "Berry Jam", 100, "1.1", "2023-09-15", "JAR002", "Mixed berry jam", "Strawberries (70%), Sugar (30%)", "https://assets.tmecosys.com/image/upload/t_web767x639/img/recipe/ras/Assets/4B7C3510-7041-4B5D-8000-1D10B1BA4678/Derivates/6749ac4e-586d-4055-9df2-5a96832897f6.jpg"),
+            ("P003", "Lemon Marmalade", 75, "2.0", "2023-08-20", "JAR003", "Zesty lemon marmalade", "Lemons (60%), Sugar (40%)", "https://images.immediate.co.uk/production/volatile/sites/30/2020/08/recipe-image-legacy-id-871488_11-35ddf4e.jpg?quality=90&resize=440,400"),
+            ("P004", "Almond Butter", 120, "1.0", "2023-09-10", "JAR004", "Smooth almond butter", "Almonds (100%)", "https://www.inspiredtaste.net/wp-content/uploads/2020/06/Homemade-Almond-Butter-Recipe-1200.jpg"),
+            ("P005", "Herbal Honey", 60, "1.2", "2023-11-01", "JAR005", "Infused with natural herbs", "Honey (85%), Herbs (15%)", "https://www.herbco.com/images/page/herbalhoney/images/RECIPE-honey-spread2.jpg"),
+            ("P006", "Chocolate Spread", 110, "2.0", "2023-06-15", "JAR006", "", "", "https://assets.tmecosys.com/image/upload/t_web767x639/img/recipe/ras/Assets/8EABE1FD-5729-4A87-828E-B8C57603E5EA/Derivates/A57910CF-D62E-4713-9E77-1C281412D3DF.jpg"),
+            ("P007", "Strawberry Jam", 90, "1.3", "2023-07-01", "JAR002", "", "", "https://itsnotcomplicatedrecipes.com/wp-content/uploads/2022/01/Strawberry-Jam-Feature.jpg"),
+            ("P008", "Blueberry Jam", 80, "1.0", "2023-05-20", "JAR002", "", "", "https://www.wildernesswife.com/wp-content/uploads/2023/09/blueberry_jam1.jpg"),
+            ("P009", "Peanut Butter", 150, "1.2", "2023-04-10", "JAR004", "", "", "https://pinchofyum.com/wp-content/uploads/Homemade-Peanut-Butter-Square.png"),
+            ("P010", "Citrus Marmalade", 70, "2.1", "2023-03-01", "JAR003", "", "", "https://www.bigbearfarms.in/cdn/shop/products/ThreeCitrusMarmalade-1.png?v=1663151497"),
+            ("P011", "Caramel Sauce", 40, "1.0", "2023-02-01", "JAR001", "", "", "https://handletheheat.com/wp-content/uploads/2022/06/caramel-sauce-SQUARE-1.png"),
+            ("P012", "Organic Honey", 55, "1.0", "2023-01-15", "JAR005", "", "", "assets/img/product/lavande_maritime.png"),
+        ]'''
 
         self.filtered_data = self.data[:]  # Initialize filtered data with all products
         self.page_size = 5
@@ -534,6 +417,7 @@ class ProductTabs(QWidget):
 
         # Retrieve the product data
         product = self.filtered_data[global_row_index]
+        print(f'\n \n {product}')
         self.photo_widget.set_photo(str(product[8]))  # Set the photo
         self.id_field.setText(str(product[0]))
         self.name_field.setText(product[1])
