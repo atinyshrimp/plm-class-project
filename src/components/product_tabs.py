@@ -1,20 +1,22 @@
-from PyQt5.QtWidgets import (
-    QWidget,
-    QVBoxLayout,
-    QHBoxLayout,
-    QTabWidget,
-    QTableWidgetItem,
-    QGridLayout,
-    QLineEdit,
-    QTextEdit,
-    QLabel,
-    QSizePolicy,
-    QPushButton,
-)
-from PyQt5.QtGui import QPixmap
 from PyQt5.QtCore import Qt
+from PyQt5.QtGui import QPixmap
+from PyQt5.QtWidgets import (
+    QGridLayout,
+    QHBoxLayout,
+    QLabel,
+    QLineEdit,
+    QPushButton,
+    QSizePolicy,
+    QTableWidgetItem,
+    QTabWidget,
+    QTextEdit,
+    QVBoxLayout,
+    QWidget,
+)
+
 from utils.table import CustomTable
 from widgets.product_photo_widget import ProductPhotoWidget
+
 from .tabs.cost_details_tab import ProductCostDetailsTab
 from .tabs.stock_and_location_tab import StockLocationTab
 
@@ -29,14 +31,16 @@ class ProductTabs(QWidget):
         self.id_field = QLineEdit()
         self.name_field = QLineEdit()
         self.description_field = QTextEdit()
+        self.description_field.setFixedHeight(60)
         self.quantity_field = QLineEdit()
         self.container_field = QLineEdit()
         self.version_field = QLineEdit()
         self.date_field = QLineEdit()
         self.ingredients_field = QTextEdit()
+        self.ingredients_field.setFixedHeight(60)
 
         # Pagination Configuration
-        self.page_size = 10  # Number of rows per page
+        self.page_size = 20  # Number of rows per page
         self.current_page = 1  # Current page
         self.total_pages = 1  # Total pages
         self.data = []  # Store product data
