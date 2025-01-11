@@ -1,21 +1,28 @@
+import sys
 import webbrowser
+
 from PyQt5 import QtGui
 from PyQt5.QtWidgets import (
     QAction,
-    QWidget,
-    QHBoxLayout,
-    QVBoxLayout,
-    QStackedWidget,
-    QMenuBar,
     QDesktopWidget,
+    QDialog,
+    QHBoxLayout,
+    QMenuBar,
     QMessageBox,
+    QStackedWidget,
+    QVBoxLayout,
+    QWidget,
 )
-from components.navbar import NavBar
-from components.product_tabs import ProductTabs
-from components.people_tabs import PeopleTabs
-from components.process_tabs import ProcessTabs
+
+import globals
 from components.data_tabs import DataTabs
 from components.database_tabs import DatabaseTabs
+from components.navbar import NavBar
+from components.people_tabs import PeopleTabs
+from components.process_tabs import ProcessTabs
+from components.product_tabs import ProductTabs
+from database.databaseManager import SQLiteManager
+from dialogs.login.login_window import LoginDialog
 from utils.styling import apply_stylesheet
 
 
@@ -25,7 +32,9 @@ class PLMApp(QWidget):
         self.version = version  # Store the version
         self.db_manager = db_manager
 
-        self.setWindowTitle(f"Hive (PLM Internal Software) v{self.version}")
+        self.setWindowTitle(
+            f"Hive (PLM Internal Software) v{self.version} — {globals.current_user}"
+        )
         self.setWindowIcon(QtGui.QIcon("assets/img/mgo_sa_icon_resized.png"))
 
         # Apply the stylesheet
@@ -90,6 +99,9 @@ class PLMApp(QWidget):
         save_action = QAction
         file_menu.addAction("Save", self.save_file)
         file_menu.addAction("Export", self.export_data)
+
+        file_menu.addSeparator()
+        file_menu.addAction("Log Out", self.__log_out)
         file_menu.addAction("Exit", self.close_application)
 
         # Edit Menu
@@ -191,6 +203,30 @@ class PLMApp(QWidget):
 
     def export_data(self):
         print("Exporting Data...")
+
+    def __log_out(self):
+        reply = QMessageBox.question(
+            self,
+            "Log Out",
+            "Are you sure you want to log out?",
+            QMessageBox.Yes | QMessageBox.No,
+        )
+        if reply == QMessageBox.Yes:
+            globals.current_user = None
+            self.close()
+
+            # Display the login window
+            login_dialog = LoginDialog(self.version)
+            if login_dialog.exec_() == QDialog.Accepted:  # If login is successful
+                # Initialize the database connection
+                db_manager = SQLiteManager()
+
+                # Create and launch a new instance of PLMApp
+                self.__init__(self.version, db_manager)
+                self.show()
+            else:
+                # Exit the application if login fails or the user closes the window
+                sys.exit()
 
     def close_application(self):
         self.close()
