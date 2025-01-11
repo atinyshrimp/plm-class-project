@@ -94,23 +94,8 @@ class PLMApp(QWidget):
 
         # File Menu
         file_menu = menubar.addMenu("File")
-        file_menu.addAction("New", self.new_file)
-
-        save_action = QAction
-        file_menu.addAction("Save", self.save_file)
-        file_menu.addAction("Export", self.export_data)
-
-        file_menu.addSeparator()
         file_menu.addAction("Log Out", self.__log_out)
         file_menu.addAction("Exit", self.close_application)
-
-        # Edit Menu
-        edit_menu = menubar.addMenu("Edit")
-        edit_menu.addAction("Undo", self.undo_action)
-        edit_menu.addAction("Redo", self.redo_action)
-        edit_menu.addAction("Cut", self.cut_action)
-        edit_menu.addAction("Copy", self.copy_action)
-        edit_menu.addAction("Paste", self.paste_action)
 
         if self.db_manager.is_admin:
             # Database Menu
@@ -195,15 +180,6 @@ class PLMApp(QWidget):
             parent_widget.switch_to_batch_tab(lot_id)
 
     # Menu actions
-    def new_file(self):
-        print("New File")
-
-    def save_file(self):
-        print("Save File")
-
-    def export_data(self):
-        print("Exporting Data...")
-
     def __log_out(self):
         reply = QMessageBox.question(
             self,
@@ -230,21 +206,6 @@ class PLMApp(QWidget):
 
     def close_application(self):
         self.close()
-
-    def undo_action(self):
-        print("Undo Action")
-
-    def redo_action(self):
-        print("Redo Action")
-
-    def cut_action(self):
-        print("Cut Action")
-
-    def copy_action(self):
-        print("Copy Action")
-
-    def paste_action(self):
-        print("Paste Action")
 
     def show_about(self):
         about_message = f"PLM Tool v{self.version}\nDeveloped by MGO S.A. Group for managing product lifecycle."
