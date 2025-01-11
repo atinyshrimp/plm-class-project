@@ -2,6 +2,31 @@
 
 All notable changes to this project will be documented in this file.
 
+## [1.3.0] - 2025-01-11
+
+### 🚀 Features
+
+- [**breaking**] Enhance product editing
+- Add rounded mask to product image display
+
+### 🐛 Bug Fixes
+
+- Let space for the product image
+
+## [1.2.1] - 2025-01-10
+
+### 🚀 Features
+
+- Support boolean types for display
+
+### 🐛 Bug Fixes
+
+- Make db edits work with new displayed IDs
+
+### ⚙️ Miscellaneous Tasks
+
+- Update CHANGELOG.md
+
 ## [1.2.0] - 2025-01-10
 
 ### 🚀 Features
