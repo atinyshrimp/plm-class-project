@@ -1,9 +1,10 @@
-from PyQt5.QtCore import Qt, QDate
-from PyQt5.QtGui import QIcon, QPixmap
+from PyQt5.QtCore import Qt, QDate, QLocale
+from PyQt5.QtGui import QIcon, QKeySequence, QPixmap
 from PyQt5.QtWidgets import (
     QAction,
     QApplication,
     QDateEdit,
+    QDoubleSpinBox,
     QFileDialog,
     QGridLayout,
     QHBoxLayout,
@@ -39,9 +40,16 @@ class ProductTabs(QWidget):
         self.name_field = QLineEdit()
         self.description_field = QTextEdit()
         self.description_field.setFixedHeight(60)
-        self.quantity_field = QLineEdit()
+        self.quantity_field = QDoubleSpinBox()
+        self.quantity_field.setDecimals(1)
+        self.quantity_field.setMaximum(9999999.9)
+        self.quantity_field.setLocale(QLocale(QLocale.English))
         self.container_field = QLineEdit()
+        self.container_field.setInputMask(
+            "C9999"
+        )  # Only allow C followed by four digits
         self.version_field = QLineEdit()
+        self.version_field.setInputMask("V#")  # Only allow V followed by a number
         self.date_field = QDateEdit()
         self.date_field.setCalendarPopup(True)
         self.ingredients_field = QTextEdit()
@@ -82,6 +90,15 @@ class ProductTabs(QWidget):
         self.toolbar = QToolBar("Edit Actions")
         self.toolbar.setOrientation(Qt.Vertical)
         self.toolbar.setVisible(False)
+
+        exit_edit_mode_action = QAction(
+            QIcon(QApplication.style().standardIcon(QStyle.SP_DialogCancelButton)),
+            "&Exit Edit Mode",
+            self,
+        )
+        exit_edit_mode_action.triggered.connect(self.__exit_edit_mode)
+        exit_edit_mode_action.setShortcut(QKeySequence("Ctrl+E"))
+        self.toolbar.addAction(exit_edit_mode_action)
 
         upload_photo_action = QAction(
             QIcon(QApplication.style().standardIcon(QStyle.SP_FileDialogContentsView)),
@@ -337,6 +354,7 @@ class ProductTabs(QWidget):
             self.description_field.setReadOnly(False)
 
             self.toggle_edit_button.setText("Save Edits")
+            self.toggle_edit_button.clicked.disconnect()
             self.toggle_edit_button.clicked.connect(self._save_product_to_db)
 
         else:
@@ -352,8 +370,17 @@ class ProductTabs(QWidget):
             self.is_editing = False
 
             self.toggle_edit_button.setText("Edit Product")
+            self.toggle_edit_button.clicked.disconnect()
             self.toggle_edit_button.clicked.connect(self._toggle_edit_mode)
+
+            # self.product_table.clearSelection()
+
         self.toolbar.setVisible(self.is_editing)
+
+    def __exit_edit_mode(self):
+        """Exit edit mode and reset the fields."""
+        if self.is_editing:
+            self._toggle_edit_mode()
 
     def _save_product_to_db(self):
         """Save the edited product details to the database."""
@@ -378,7 +405,7 @@ class ProductTabs(QWidget):
                 self.filtered_data[global_row_index][0]
             )
             row_data["description_etiquettes"] = self.description_field.toPlainText()
-            row_data["quantite"] = float(self.quantity_field.text())
+            row_data["quantite"] = float(self.quantity_field.value())
             # row_data["photo_etiquettes"] = self.photo_widget.get_photo_path().split(
             #     "/"
             # )[-1]
@@ -409,7 +436,6 @@ class ProductTabs(QWidget):
 
         self.data = self.db_manager.fetch_query("fetch_product_details")
         self.filtered_data = self.data[:]  # Initialize filtered data with all products
-        self.page_size = 5
         self.total_pages = (len(self.data) + self.page_size - 1) // self.page_size
         self.current_page = 1
 
@@ -468,7 +494,7 @@ class ProductTabs(QWidget):
         self.id_field.setText(str(product[0]))
         self.name_field.setText(product[1])
         self.description_field.setText(product[6])  # Description
-        self.quantity_field.setText(str(product[2]))
+        self.quantity_field.setValue(product[2])
         self.container_field.setText(product[5])  # Container ID
         self.version_field.setText(product[3])
         self.date_field.setDate(QDate.fromString(product[4], "yyyy-MM-dd"))  # Date
@@ -481,7 +507,7 @@ class ProductTabs(QWidget):
         self.id_field.setText("")
         self.name_field.setText("")
         self.description_field.setText("")  # Description
-        self.quantity_field.setText("")
+        self.quantity_field.setValue(0)
         self.container_field.setText("")  # Container ID
         self.version_field.setText("")
         self.date_field.setDate(QDate.currentDate())  # Date
