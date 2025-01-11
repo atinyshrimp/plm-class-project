@@ -2,6 +2,18 @@
 
 All notable changes to this project will be documented in this file.
 
+## [1.4.0] - 2025-01-11
+
+### 🚀 Features
+
+- Add log out functionality
+- Streamline row deletion process
+- Improve product edit mode
+
+### ⚙️ Miscellaneous Tasks
+
+- Update CHANGELOG.md for version 1.3.0
+
 ## [1.3.0] - 2025-01-11
 
 ### 🚀 Features
