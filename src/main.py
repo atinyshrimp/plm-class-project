@@ -3,7 +3,7 @@ import sys
 
 from PyQt5.QtWidgets import QApplication, QDialog
 
-import database.databaseManager as database
+import database.database_manager as database
 import dialogs.login.login_window as login
 import globals
 from components.main_window import PLMApp

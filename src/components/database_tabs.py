@@ -11,7 +11,7 @@ from PyQt5.QtWidgets import (
     QWidget,
 )
 
-from database.databaseManager import SQLiteManager
+from database.database_manager import SQLiteManager
 from dialogs.database_dialog import DatabaseDialog
 from utils.table import CustomTable
 

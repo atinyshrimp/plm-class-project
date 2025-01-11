@@ -23,7 +23,7 @@ from PyQt5.QtWidgets import (
     QWidget,
 )
 
-from database.databaseManager import SQLiteManager
+from database.database_manager import SQLiteManager
 
 
 class DatabaseDialog(QDialog):

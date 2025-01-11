@@ -21,7 +21,7 @@ from components.navbar import NavBar
 from components.people_tabs import PeopleTabs
 from components.process_tabs import ProcessTabs
 from components.product_tabs import ProductTabs
-from database.databaseManager import SQLiteManager
+from database.database_manager import SQLiteManager
 from dialogs.login.login_window import LoginDialog
 from utils.styling import apply_stylesheet
 

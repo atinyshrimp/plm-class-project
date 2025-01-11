@@ -1,5 +1,5 @@
 from PyQt5.QtWidgets import QListWidget
-from database.databaseManager import SQLiteManager
+from database.database_manager import SQLiteManager
 
 
 class NavBar(QListWidget):
