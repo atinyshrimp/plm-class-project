@@ -47,6 +47,7 @@ class ProductPhotoWidget(QWidget):
                     200, 200, Qt.KeepAspectRatio, Qt.SmoothTransformation
                 )
                 self.photo_label.setPixmap(scaled_pixmap)
+                self.__photo_path = photo_path
             else:
                 self.photo_label.setText("Image Not Found")
 
@@ -67,6 +68,7 @@ class ProductPhotoWidget(QWidget):
                         200, 200, Qt.KeepAspectRatio, Qt.SmoothTransformation
                     )
                     self.photo_label.setPixmap(scaled_pixmap)
+                    self.__photo_path = reply.url().toString()
                 else:
                     self.photo_label.setText("Failed to Load Image")
             else:
@@ -101,3 +103,7 @@ class ProductPhotoWidget(QWidget):
         painter.end()
 
         return rounded_pixmap
+
+    def get_photo_path(self):
+        """Get the path of the current photo."""
+        return getattr(self, "_ProductPhotoWidget__photo_path", "")

@@ -1,19 +1,26 @@
-from PyQt5.QtCore import Qt
-from PyQt5.QtGui import QPixmap
+from PyQt5.QtCore import Qt, QDate
+from PyQt5.QtGui import QIcon, QPixmap
 from PyQt5.QtWidgets import (
+    QAction,
+    QApplication,
+    QDateEdit,
+    QFileDialog,
     QGridLayout,
     QHBoxLayout,
     QLabel,
     QLineEdit,
     QPushButton,
     QSizePolicy,
+    QStyle,
     QTableWidgetItem,
     QTabWidget,
     QTextEdit,
+    QToolBar,
     QVBoxLayout,
     QWidget,
 )
 
+from dialogs.database_dialog import get_integer_from_column_name
 from utils.table import CustomTable
 from widgets.product_photo_widget import ProductPhotoWidget
 
@@ -35,7 +42,8 @@ class ProductTabs(QWidget):
         self.quantity_field = QLineEdit()
         self.container_field = QLineEdit()
         self.version_field = QLineEdit()
-        self.date_field = QLineEdit()
+        self.date_field = QDateEdit()
+        self.date_field.setCalendarPopup(True)
         self.ingredients_field = QTextEdit()
         self.ingredients_field.setFixedHeight(60)
 
@@ -69,7 +77,33 @@ class ProductTabs(QWidget):
         # Main layout for ProductTabs
         main_layout = QVBoxLayout()
         main_layout.addWidget(self.tab_widget)
-        self.setLayout(main_layout)
+
+        # Add toolbar for editing actions
+        self.toolbar = QToolBar("Edit Actions")
+        self.toolbar.setOrientation(Qt.Vertical)
+        self.toolbar.setVisible(False)
+
+        upload_photo_action = QAction(
+            QIcon(QApplication.style().standardIcon(QStyle.SP_FileDialogContentsView)),
+            "&Upload Photo",
+            self,
+        )
+        upload_photo_action.triggered.connect(self.__upload_photo)
+        self.toolbar.addAction(upload_photo_action)
+
+        toolbar_layout = QHBoxLayout()
+        toolbar_layout.addLayout(main_layout)
+        toolbar_layout.addWidget(self.toolbar)
+
+        self.setLayout(toolbar_layout)
+
+    def __upload_photo(self):
+        """Open a file dialog to upload a photo."""
+        file_dialog = QFileDialog(self)
+        file_dialog.setNameFilter("Images (*.png *.xpm *.jpg *.jpeg)")
+        if file_dialog.exec_():
+            file_path = file_dialog.selectedFiles()[0]
+            self.photo_widget.set_photo(file_path)
 
     def focus_on_product_sheet(self, product_id):
         """Highlight and display details for the given product."""
@@ -287,6 +321,8 @@ class ProductTabs(QWidget):
     def _toggle_edit_mode(self):
         """Enable or disable edit mode."""
         selected_row = self.product_table.currentRow()
+        print(f"Selected Row: {selected_row}")
+        print(f"Is Editing: {self.is_editing}")
         if selected_row == -1:
             return
 
@@ -299,10 +335,9 @@ class ProductTabs(QWidget):
             self.date_field.setReadOnly(False)
             self.container_field.setReadOnly(False)
             self.description_field.setReadOnly(False)
-            self.ingredients_field.setReadOnly(False)
 
             self.toggle_edit_button.setText("Save Edits")
-            self.toggle_edit_button.clicked.connect(self._save_product_details)
+            self.toggle_edit_button.clicked.connect(self._save_product_to_db)
 
         else:
 
@@ -318,54 +353,61 @@ class ProductTabs(QWidget):
 
             self.toggle_edit_button.setText("Edit Product")
             self.toggle_edit_button.clicked.connect(self._toggle_edit_mode)
+        self.toolbar.setVisible(self.is_editing)
 
-    def _save_product_details(self):
-        """Save updated product details and disable editing."""
+    def _save_product_to_db(self):
+        """Save the edited product details to the database."""
         selected_row = self.product_table.currentRow()
         if selected_row == -1:
             return
 
+        columns = self.db_manager.get_table_columns("Product_info")
+
         global_row_index = (self.current_page - 1) * self.page_size + selected_row
+        row_data = self.filtered_data[global_row_index]
+        row_data = dict(
+            zip(
+                [col["name"] for col in columns if col["name"] != "photo_etiquettes"],
+                row_data,
+            )
+        )
 
         if global_row_index < len(self.filtered_data):
-            # Update the product details in the dataset
-            self.filtered_data[global_row_index] = (
-                self.filtered_data[global_row_index][0],  # ID (unchanged)
-                self.name_field.text(),
-                int(float(self.quantity_field.text())),
-                self.version_field.text(),
-                self.date_field.text(),
-                self.container_field.text(),
-                self.description_field.toPlainText(),
-                self.ingredients_field.toPlainText(),
-                self.filtered_data[global_row_index][8],  # Photo URL (unchanged)
+            row_data["nom"] = self.name_field.text()
+            row_data["id"] = get_integer_from_column_name(
+                self.filtered_data[global_row_index][0]
+            )
+            row_data["description_etiquettes"] = self.description_field.toPlainText()
+            row_data["quantite"] = float(self.quantity_field.text())
+            # row_data["photo_etiquettes"] = self.photo_widget.get_photo_path().split(
+            #     "/"
+            # )[-1]
+            row_data["id_contenant"] = get_integer_from_column_name(
+                self.container_field.text()
+            )
+            row_data["photo"] = self.photo_widget.get_photo_path()
+            row_data["version"] = get_integer_from_column_name(
+                self.version_field.text()
+            )
+            row_data["date_mise_en_prod"] = self.date_field.date().toString(
+                "yyyy-MM-dd"
             )
 
-        # Refresh the table
-        self._update_table()
+            # Update the product details in the database
+            self.db_manager.update_row("Product_info", row_data)
 
-        # Switch back to view mode
-        self._toggle_edit_mode()
+            # Refresh the data
+            self._load_data()
+
+            # Refresh the table
+            self._update_table()
+
+            # Switch back to view mode
+            self._toggle_edit_mode()
 
     def _load_data(self):
 
         self.data = self.db_manager.fetch_query("fetch_product_details")
-        """
-        [
-            ("P001", "Honey Jar", 50, "1.0", "2023-10-01", "JAR001", "Pure organic honey", "Honey (90%), Beeswax (10%)", "assets/img/product/sarrasin.png"),
-            ("P002", "Berry Jam", 100, "1.1", "2023-09-15", "JAR002", "Mixed berry jam", "Strawberries (70%), Sugar (30%)", "https://assets.tmecosys.com/image/upload/t_web767x639/img/recipe/ras/Assets/4B7C3510-7041-4B5D-8000-1D10B1BA4678/Derivates/6749ac4e-586d-4055-9df2-5a96832897f6.jpg"),
-            ("P003", "Lemon Marmalade", 75, "2.0", "2023-08-20", "JAR003", "Zesty lemon marmalade", "Lemons (60%), Sugar (40%)", "https://images.immediate.co.uk/production/volatile/sites/30/2020/08/recipe-image-legacy-id-871488_11-35ddf4e.jpg?quality=90&resize=440,400"),
-            ("P004", "Almond Butter", 120, "1.0", "2023-09-10", "JAR004", "Smooth almond butter", "Almonds (100%)", "https://www.inspiredtaste.net/wp-content/uploads/2020/06/Homemade-Almond-Butter-Recipe-1200.jpg"),
-            ("P005", "Herbal Honey", 60, "1.2", "2023-11-01", "JAR005", "Infused with natural herbs", "Honey (85%), Herbs (15%)", "https://www.herbco.com/images/page/herbalhoney/images/RECIPE-honey-spread2.jpg"),
-            ("P006", "Chocolate Spread", 110, "2.0", "2023-06-15", "JAR006", "", "", "https://assets.tmecosys.com/image/upload/t_web767x639/img/recipe/ras/Assets/8EABE1FD-5729-4A87-828E-B8C57603E5EA/Derivates/A57910CF-D62E-4713-9E77-1C281412D3DF.jpg"),
-            ("P007", "Strawberry Jam", 90, "1.3", "2023-07-01", "JAR002", "", "", "https://itsnotcomplicatedrecipes.com/wp-content/uploads/2022/01/Strawberry-Jam-Feature.jpg"),
-            ("P008", "Blueberry Jam", 80, "1.0", "2023-05-20", "JAR002", "", "", "https://www.wildernesswife.com/wp-content/uploads/2023/09/blueberry_jam1.jpg"),
-            ("P009", "Peanut Butter", 150, "1.2", "2023-04-10", "JAR004", "", "", "https://pinchofyum.com/wp-content/uploads/Homemade-Peanut-Butter-Square.png"),
-            ("P010", "Citrus Marmalade", 70, "2.1", "2023-03-01", "JAR003", "", "", "https://www.bigbearfarms.in/cdn/shop/products/ThreeCitrusMarmalade-1.png?v=1663151497"),
-            ("P011", "Caramel Sauce", 40, "1.0", "2023-02-01", "JAR001", "", "", "https://handletheheat.com/wp-content/uploads/2022/06/caramel-sauce-SQUARE-1.png"),
-            ("P012", "Organic Honey", 55, "1.0", "2023-01-15", "JAR005", "", "", "assets/img/product/lavande_maritime.png"),
-        ]"""
-
         self.filtered_data = self.data[:]  # Initialize filtered data with all products
         self.page_size = 5
         self.total_pages = (len(self.data) + self.page_size - 1) // self.page_size
@@ -429,7 +471,7 @@ class ProductTabs(QWidget):
         self.quantity_field.setText(str(product[2]))
         self.container_field.setText(product[5])  # Container ID
         self.version_field.setText(product[3])
-        self.date_field.setText(product[4])  # Date
+        self.date_field.setDate(QDate.fromString(product[4], "yyyy-MM-dd"))  # Date
         self.ingredients_field.setText(product[7])  # Ingredients
 
     def __clear_details_view(self):
@@ -442,7 +484,7 @@ class ProductTabs(QWidget):
         self.quantity_field.setText("")
         self.container_field.setText("")  # Container ID
         self.version_field.setText("")
-        self.date_field.setText("")  # Date
+        self.date_field.setDate(QDate.currentDate())  # Date
         self.ingredients_field.setText("")  # Ingredients
 
     def __filter_products(self):

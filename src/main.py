@@ -8,7 +8,7 @@ import dialogs.login.login_window as login
 import globals
 from components.main_window import PLMApp
 
-VERSION = "1.2.1"
+VERSION = "1.3.0"
 
 # Global variable to store the logged-in user
 globals.current_user = None
