@@ -1,18 +1,19 @@
 from PyQt5.QtCore import Qt
 from PyQt5.QtWidgets import (
-    QWidget,
-    QVBoxLayout,
-    QTabWidget,
-    QTableWidgetItem,
-    QMenu,
     QAction,
+    QMenu,
     QMessageBox,
-    QTableWidget,
     QPushButton,
+    QTableWidget,
+    QTableWidgetItem,
+    QTabWidget,
+    QVBoxLayout,
+    QWidget,
 )
+
+from database.databaseManager import SQLiteManager
 from dialogs.database_dialog import DatabaseDialog
 from utils.table import CustomTable
-from database.databaseManager import SQLiteManager
 
 
 class DatabaseTabs(QWidget):
@@ -109,9 +110,15 @@ class DatabaseTabs(QWidget):
                 QMessageBox.No,
             )
             if reply == QMessageBox.Yes:
-                pass
-                # self.removeRow(selected_row)
-                # self._delete_row_from_db(selected_row)
+                current_table = self.tab_widget.currentWidget()
+                table_name = current_table.table_name
+                data_id = current_table.item(selected_row, 0).text()
+
+                self._delete_row_from_db(table_name, data_id)
+                self._refresh_table(
+                    current_table,
+                    table_name,
+                )
 
     def _delete_row_from_db(self, table_name: str, row_id: int):
         """Deletes a row from the database.
@@ -120,10 +127,7 @@ class DatabaseTabs(QWidget):
             table_name (str): The name of the table.
             row_id (int): The ID of the row to delete.
         """
-        self.db_manager.execute_query(
-            f"DELETE FROM {table_name} WHERE id = ?", (row_id,)
-        )
-        self.db_manager.commit()
+        self.db_manager.delete_row(table_name, row_id)
 
     def _open_menu(self, position: int, table: QTableWidget):
         """Opens a context menu at the given position.
