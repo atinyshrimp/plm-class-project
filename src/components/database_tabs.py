@@ -178,7 +178,11 @@ class DatabaseTabs(QWidget):
             self.db_manager, table_name, columns, row_data, self, is_edit_mode
         )
         if dialog.exec_():
-            self._refresh_table(table, table_name)
+            main_window = self.parent().parent()
+            if main_window.tab_widget_stack.currentIndex() == 4:
+                self._refresh_table(table, table_name)
+            else:
+                main_window.refresh_tables()
 
     def _get_readable_table_name(self, table_name: str) -> str:
         """Converts a table name to a more readable format.

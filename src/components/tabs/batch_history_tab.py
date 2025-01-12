@@ -296,3 +296,10 @@ class BatchHistoryTab(QWidget):
     def filter_by_product(self, product_id):
         """Filter batch history by the given product ID."""
         self.search_field.setText(product_id)  # Assuming there's a search field
+
+    def refresh_table(self):
+        """Refresh the batch history table."""
+        self.load_data()
+        self.filter_batch_history()
+        self.group_batch_history()
+        self.update_batch_table()

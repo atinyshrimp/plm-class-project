@@ -1,7 +1,7 @@
 SQL_QUERIES = {
     "fetch_product_details": """
         SELECT 
-            printf('P%04d', cp.id_produit) AS id_produit,
+            printf('P%04d', pi.id) AS id_produit,
             pi.nom AS nom_produit,
             pi.quantite AS quantité_produit,
             printf('V%d', pi.version) AS version_produit,
@@ -14,15 +14,15 @@ SQL_QUERIES = {
             ) AS ingredients_details,
             pi.photo
         FROM 
-            Composition_produit cp
+            Product_info pi
         LEFT JOIN 
-            Product_info pi ON cp.id_produit = pi.id
+            Composition_produit cp ON pi.id = cp.id_produit
         LEFT JOIN 
             Ingredients ing ON cp.id_ingredient = ing.id
         GROUP BY 
-            cp.id_produit, pi.nom, pi.quantite, pi.version, pi.date_mise_en_prod, pi.id_contenant, pi.description_etiquettes, pi.photo
+            pi.id, pi.nom, pi.quantite, pi.version, pi.date_mise_en_prod, pi.id_contenant, pi.description_etiquettes, pi.photo
         ORDER BY 
-            cp.id_produit, cp.quantite DESC;
+            pi.id, cp.quantite DESC;
     """,
     "fetch_cost_details": """
         SELECT 

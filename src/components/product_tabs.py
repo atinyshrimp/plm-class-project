@@ -548,3 +548,11 @@ class ProductTabs(QWidget):
         """Handle selection changes and clear the detailed view if nothing is selected."""
         if not self.product_table.selectionModel().hasSelection():  # No rows selected
             self.__clear_details_view()
+
+    def refresh(self):
+        """Refresh the data displayed in the tabs."""
+        self._load_data()
+        self._update_table()
+        self.__clear_details_view()
+        if self.is_editing:
+            self._toggle_edit_mode()

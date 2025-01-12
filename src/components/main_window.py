@@ -130,6 +130,13 @@ class PLMApp(QWidget):
                     ),
                 )
 
+        # View Menu
+        view_menu = menubar.addMenu("View")
+        refresh_action = QAction("Refresh", self)
+        refresh_action.triggered.connect(self.refresh_tables)
+        refresh_action.setShortcut("F5")  # Shortcut key
+        view_menu.addAction(refresh_action)
+
         # Help Menu
         help_menu = menubar.addMenu("Help")
         help_menu.addAction("About", self.show_about)
@@ -206,6 +213,12 @@ class PLMApp(QWidget):
 
     def close_application(self):
         self.close()
+
+    def refresh_tables(self):
+        for i in range(self.tab_widget_stack.count()):
+            widget = self.tab_widget_stack.widget(i)
+            if hasattr(widget, "refresh"):
+                widget.refresh()
 
     def show_about(self):
         about_message = f"PLM Tool v{self.version}\nDeveloped by MGO S.A. Group for managing product lifecycle."

@@ -1,6 +1,9 @@
-from PyQt5.QtWidgets import QWidget, QTabWidget, QVBoxLayout, QSizePolicy, QLineEdit
+from PyQt5.QtWidgets import QLineEdit, QSizePolicy, QTabWidget, QVBoxLayout, QWidget
+
 from utils.table import CustomTable
+
 from .tabs.batch_history_tab import BatchHistoryTab
+
 
 class DataTabs(QWidget):
     def __init__(self, db_manager):
@@ -25,10 +28,17 @@ class DataTabs(QWidget):
         tab = QWidget()
         layout = QVBoxLayout()
         table = CustomTable(8, 7)
-        table.setHorizontalHeaderLabels([
-            "Lot ID", "Product ID", "Quantity", "Production Date",
-            "Expiry Date", "Status", "Return"
-        ])
+        table.setHorizontalHeaderLabels(
+            [
+                "Lot ID",
+                "Product ID",
+                "Quantity",
+                "Production Date",
+                "Expiry Date",
+                "Status",
+                "Return",
+            ]
+        )
         table.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
         layout.addWidget(table)
 
@@ -37,3 +47,7 @@ class DataTabs(QWidget):
         layout.addWidget(search_field)
         tab.setLayout(layout)
         return tab
+
+    def refresh(self):
+        """Refresh the table in the active tab."""
+        self.batch_history_tab.refresh_table()
