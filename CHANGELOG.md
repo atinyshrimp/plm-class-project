@@ -2,6 +2,16 @@
 
 All notable changes to this project will be documented in this file.
 
+## [1.5.1] - 2025-01-12
+
+### 🐛 Bug Fixes
+
+- *(cost)* Update total cost computation
+
+### ⚙️ Miscellaneous Tasks
+
+- Update CHANGELOG.md for version 1.5.0
+
 ## [1.5.0] - 2025-01-12
 
 ### 🚀 Features
