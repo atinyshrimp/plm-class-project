@@ -1,4 +1,4 @@
-from PyQt5.QtCore import Qt, QDate, QLocale
+from PyQt5.QtCore import QDate, QLocale, Qt
 from PyQt5.QtGui import QIcon, QKeySequence, QPixmap
 from PyQt5.QtWidgets import (
     QAction,
@@ -97,7 +97,7 @@ class ProductTabs(QWidget):
             self,
         )
         exit_edit_mode_action.triggered.connect(self.__exit_edit_mode)
-        exit_edit_mode_action.setShortcut(QKeySequence("Ctrl+E"))
+        exit_edit_mode_action.setShortcut(QKeySequence("Esc"))
         self.toolbar.addAction(exit_edit_mode_action)
 
         upload_photo_action = QAction(
@@ -433,10 +433,13 @@ class ProductTabs(QWidget):
             self._toggle_edit_mode()
 
     def _load_data(self):
-
+        """Load the product data from the database."""
         self.data = self.db_manager.fetch_query("fetch_product_details")
+        print(self.data)
         self.filtered_data = self.data[:]  # Initialize filtered data with all products
-        self.total_pages = (len(self.data) + self.page_size - 1) // self.page_size
+        self.total_pages = (
+            len(self.filtered_data) + self.page_size - 1
+        ) // self.page_size
         self.current_page = 1
 
     def _update_table(self):

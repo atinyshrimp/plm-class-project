@@ -8,22 +8,25 @@ The dialog also handles saving the data to the database and displaying error mes
 import re
 from typing import Callable
 
-from PyQt5.QtCore import QDateTime
+from PyQt5.QtCore import QDateTime, QLocale
 from PyQt5.QtWidgets import (
     QComboBox,
     QDateTimeEdit,
     QDialog,
     QDoubleSpinBox,
+    QFileDialog,
     QFormLayout,
     QLineEdit,
     QMessageBox,
     QPushButton,
+    QTextEdit,
     QSpinBox,
     QVBoxLayout,
     QWidget,
 )
 
 from database.database_manager import SQLiteManager
+from widgets.photo_file_input import PhotoFileInput
 
 
 class DatabaseDialog(QDialog):
@@ -135,9 +138,11 @@ class DatabaseDialog(QDialog):
         elif column_type == "INTEGER" and column_name != "cout_marketing":
             input_field = QSpinBox()
             input_field.setMaximum(999999999)  # Set maximum value for the spin box
+            if column_name == "version":
+                input_field.setMinimum(1)
 
         # Check if the column type is REAL and the column name contains "date"
-        elif column_type == "REAL" and "date" in column_name.lower():
+        elif "date" in column_name.lower():
             input_field = QDateTimeEdit()
             input_field.setCalendarPopup(
                 True
@@ -152,13 +157,26 @@ class DatabaseDialog(QDialog):
         # Check if the column type is REAL
         elif column_type == "REAL" or column_name == "cout_marketing":
             input_field = QDoubleSpinBox()
+            input_field.setDecimals(1)  # Set number of decimal places
+            input_field.setLocale(QLocale(QLocale.English))  # Set locale to English
             input_field.setMaximum(
                 999999999.99
             )  # Set maximum value for the double spin box
 
         # Check if the column type is TEXT
         elif column_type == "TEXT":
-            input_field = QLineEdit()
+            if column_name == "photo":
+                input_field = PhotoFileInput()
+                # input_field = QPushButton("Choose File")
+                # input_field.clicked.connect(self._choose_file)
+                # self.file_path = QLineEdit()
+                # self.file_path.setReadOnly(True)
+                # self.form_layout.addRow("Selected File", self.file_path)
+            elif column_name == "description_etiquettes":
+                input_field = QTextEdit()
+                input_field.setPlaceholderText("Enter a description of the product")
+            else:
+                input_field = QLineEdit()
 
         elif column_type == "BOOLEAN":
             input_field = QComboBox()
@@ -178,6 +196,19 @@ class DatabaseDialog(QDialog):
             input_field = QLineEdit()
 
         return input_field
+
+    def _choose_file(self):
+        """Opens a file dialog to choose a file and sets the file path."""
+        options = QFileDialog.Options()
+        file_path, _ = QFileDialog.getOpenFileName(
+            self,
+            "Choose File",
+            "",
+            "All Files (*);;Image Files (*.png *.jpg *.jpeg *.bmp)",
+            options=options,
+        )
+        if file_path:
+            self.file_path.setText(file_path)
 
     def _is_foreign_key(self, column_name: str) -> bool:
         """Checks if the column is a foreign key.
@@ -222,6 +253,10 @@ class DatabaseDialog(QDialog):
                     if column_type != "BOOLEAN"
                     else self.inputs[column_name].currentIndex()
                 )
+            elif column_name == "photo":
+                data[column_name] = self.inputs[column_name].file_path
+            elif isinstance(self.inputs[column_name], QTextEdit):
+                data[column_name] = self.inputs[column_name].toPlainText()
             else:
                 data[column_name] = self.inputs[column_name].text()
 
