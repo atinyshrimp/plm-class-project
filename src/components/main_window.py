@@ -2,6 +2,7 @@ import sys
 import webbrowser
 
 from PyQt5 import QtGui
+from PyQt5.QtGui import QKeySequence
 from PyQt5.QtWidgets import (
     QAction,
     QDesktopWidget,
@@ -27,7 +28,7 @@ from utils.styling import apply_stylesheet
 
 
 class PLMApp(QWidget):
-    def __init__(self, version, db_manager):
+    def __init__(self, version: str, db_manager: SQLiteManager):
         super().__init__()
         self.version = version  # Store the version
         self.db_manager = db_manager
@@ -64,12 +65,14 @@ class PLMApp(QWidget):
 
         # Initialize and add tab widgets
         self.product_tabs = ProductTabs(self.db_manager)
+        self.people_tabs = PeopleTabs(self.db_manager)
+        self.process_tabs = ProcessTabs(self.db_manager)
         self.data_tabs = DataTabs(self.db_manager)
         self.database_tabs = DatabaseTabs(self.db_manager)
 
         self.tab_widget_stack.addWidget(self.product_tabs)
-        self.tab_widget_stack.addWidget(PeopleTabs(self.db_manager))
-        self.tab_widget_stack.addWidget(ProcessTabs(self.db_manager))
+        self.tab_widget_stack.addWidget(self.people_tabs)
+        self.tab_widget_stack.addWidget(self.process_tabs)
         self.tab_widget_stack.addWidget(self.data_tabs)
         self.tab_widget_stack.addWidget(self.database_tabs)
         self.tab_widget_stack.setCurrentIndex(0)  # Default to the first tab set
@@ -95,14 +98,15 @@ class PLMApp(QWidget):
         # File Menu
         file_menu = menubar.addMenu("File")
         file_menu.addAction("Log Out", self.__log_out)
-        file_menu.addAction("Exit", self.close_application)
+        file_menu.addAction("Exit", self.__close_application)
 
         if self.db_manager.is_admin:
             # Database Menu
             database_menu = menubar.addMenu("Database")
-            database_menu.addAction(
-                "View Database", lambda: self.tab_widget_stack.setCurrentIndex(4)
-            )
+            view_database_action = QAction("View Database", self)
+            view_database_action.triggered.connect(self.__go_to_database_tab)
+            view_database_action.setShortcut("Ctrl+5")  # Shortcut key
+            database_menu.addAction(view_database_action)
 
             add_row_menu = database_menu.addMenu("Add New Row")
             table_names = self.db_manager.get_all_tables()
@@ -130,6 +134,16 @@ class PLMApp(QWidget):
                     ),
                 )
 
+        # Navigation Menu
+        navigation_menu = menubar.addMenu("Navigation")
+
+        tab_names = ["Products", "People", "Process", "Data"]
+        for index, tab_name in enumerate(tab_names):
+            action = QAction(f"Go to {tab_name}", self)
+            action.triggered.connect(lambda _, index=index: self.__go_to_tab(index))
+            action.setShortcut(QKeySequence(f"Ctrl+{index + 1}"))  # Shortcut key
+            navigation_menu.addAction(action)
+
         # View Menu
         view_menu = menubar.addMenu("View")
         refresh_action = QAction("Refresh", self)
@@ -137,10 +151,18 @@ class PLMApp(QWidget):
         refresh_action.setShortcut("F5")  # Shortcut key
         view_menu.addAction(refresh_action)
 
+        toggle_navbar_action = QAction("Show/Hide Navbar", self)
+        toggle_navbar_action.triggered.connect(self.__toggle_navbar)
+        toggle_navbar_action.setShortcut("Ctrl+H")  # Shortcut key
+        view_menu.addAction(toggle_navbar_action)
+
         # Help Menu
         help_menu = menubar.addMenu("Help")
-        help_menu.addAction("About", self.show_about)
-        help_menu.addAction("Help", self.show_help_documentation)
+        help_menu.addAction("User Guide", self.__show_user_guide)
+        help_menu.addAction("Keyboard Shortcuts", self.__show_keyboard_shortcuts)
+        help_menu.addSeparator()
+        help_menu.addAction("About", self.__show_about)
+        help_menu.addAction("Help", self.__show_help_documentation)
         help_menu.addSeparator()
         help_menu.addAction(
             "Visit GitHub Repository",
@@ -157,7 +179,7 @@ class PLMApp(QWidget):
         """
         self.tab_widget_stack.setCurrentIndex(index)
 
-    def switch_to_product_tab(self, product_id):
+    def switch_to_product_tab(self, product_id: str):
         """Switch to the Product Sheets tab and focus on the given product."""
         self.tab_widget_stack.setCurrentWidget(self.product_tabs)
         self.navbar.setCurrentRow(0)
@@ -165,7 +187,7 @@ class PLMApp(QWidget):
             self.product_tabs.tab_widget.setCurrentIndex(0)
             self.product_tabs.focus_on_product_sheet(product_id)
 
-    def switch_to_cost_tab(self, product_id):
+    def switch_to_cost_tab(self, product_id: str):
         """Switch to the Cost Details tab and focus on the given product."""
         self.tab_widget_stack.setCurrentWidget(self.product_tabs)
         self.navbar.setCurrentRow(0)
@@ -173,14 +195,14 @@ class PLMApp(QWidget):
             self.product_tabs.tab_widget.setCurrentIndex(1)
             self.product_tabs.cost_details_tab.search_field.setText(product_id)
 
-    def switch_to_batch_tab(self, product_id):
+    def switch_to_batch_tab(self, product_id: str):
         """Switch to the Batch History tab and focus on the given product."""
         self.tab_widget_stack.setCurrentWidget(self.data_tabs)
         self.navbar.setCurrentRow(3)
         if hasattr(self.data_tabs.batch_history_tab, "filter_by_product"):
             self.data_tabs.batch_history_tab.filter_by_product(product_id)
 
-    def navigate_to_batch_history(self, lot_id):
+    def navigate_to_batch_history(self, lot_id: str):
         """Navigate to Batch History tab for the selected lot."""
         parent_widget = self.parentWidget()
         if hasattr(parent_widget, "switch_to_batch_tab"):
@@ -211,8 +233,13 @@ class PLMApp(QWidget):
                 # Exit the application if login fails or the user closes the window
                 sys.exit()
 
-    def close_application(self):
+    def __close_application(self):
         self.close()
+
+    def __go_to_database_tab(self):
+        """Navigate to the Database tab."""
+        self.navbar.setCurrentRow(4)
+        self.tab_widget_stack.setCurrentIndex(4)
 
     def refresh_tables(self):
         for i in range(self.tab_widget_stack.count()):
@@ -220,10 +247,41 @@ class PLMApp(QWidget):
             if hasattr(widget, "refresh"):
                 widget.refresh()
 
-    def show_about(self):
+    def __toggle_navbar(self):
+        self.navbar.setVisible(not self.navbar.isVisible())
+
+    def __go_to_tab(self, index: int):
+        """Navigate to the selected tab."""
+        tab_widgets = [
+            self.product_tabs,
+            self.people_tabs,
+            self.process_tabs,
+            self.data_tabs,
+        ]
+        self.navbar.setCurrentRow(index)
+        self.tab_widget_stack.setCurrentWidget(tab_widgets[index])
+
+    def __show_user_guide(self):
+        """Open detailed documentation for the application."""
+        webbrowser.open(
+            "https://github.com/atinyshrimp/plm-class-project/wiki/User-Guide"  # todo: update this link
+        )
+
+    def __show_keyboard_shortcuts(self):
+        """Show a list of shortcuts for efficient usage."""
+        shortcuts_message = f"""
+        Keyboard Shortcuts:
+        - Esc: Close Edit Mode
+        - F5: Refresh Tables
+        - Ctrl + H: Show/Hide Navbar
+        - Ctrl + 1-{"5" if self.db_manager.is_admin else "4"}: Navigate to Products, People, Process, Data{", Database" if self.db_manager.is_admin else ""} tabs
+        """
+        QMessageBox.information(self, "Keyboard Shortcuts", shortcuts_message)
+
+    def __show_about(self):
         about_message = f"PLM Tool v{self.version}\nDeveloped by MGO S.A. Group for managing product lifecycle."
         QMessageBox.about(self, "About", about_message)
 
-    def show_help_documentation(self):
+    def __show_help_documentation(self):
         help_message = "For help, visit our documentation or contact support."
         QMessageBox.information(self, "Help", help_message)
