@@ -2,6 +2,27 @@
 
 All notable changes to this project will be documented in this file.
 
+## [1.5.0] - 2025-01-12
+
+### 🚀 Features
+
+- Add menu functionalities and shortcuts
+- Add refresh functionality to various tabs
+- Enhance adding  product data input
+
+### 🐛 Bug Fixes
+
+- *(database)* Update to reflect edits
+
+### 🚜 Refactor
+
+- *(main)* Remove unused menu actions
+- Respect python file naming convention
+
+### ⚙️ Miscellaneous Tasks
+
+- Update CHANGELOG.md for version 1.4.0
+
 ## [1.4.0] - 2025-01-11
 
 ### 🚀 Features
