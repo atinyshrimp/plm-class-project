@@ -2,6 +2,22 @@
 
 All notable changes to this project will be documented in this file.
 
+## [1.5.2] - 2025-01-13
+
+### 🐛 Bug Fixes
+
+- *(cost)* Round total cost calculations
+- Increase page size
+- Populate dropdowns from database
+
+### 📚 Documentation
+
+- *(readme)* Update README.md with functionalities
+
+### ⚙️ Miscellaneous Tasks
+
+- Update CHANGELOG.md for version 1.5.1
+
 ## [1.5.1] - 2025-01-12
 
 ### 🐛 Bug Fixes
@@ -132,19 +148,11 @@ All notable changes to this project will be documented in this file.
 ### 🚀 Features
 
 - *(ui)* Style products' stock and location tab
-
-### ⚙️ Miscellaneous Tasks
-
-- Update CHANGELOG.md
-
-## [0.5.0] - 2024-12-11
-
-### 🚀 Features
-
 - *(ui)* Style the cost details tab in "Product"
 
 ### ⚙️ Miscellaneous Tasks
 
+- Update CHANGELOG.md
 - Add git-cliff for changelog generation
 
 ## [0.4.0] - 2024-12-11
