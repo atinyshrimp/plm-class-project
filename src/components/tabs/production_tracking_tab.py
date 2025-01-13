@@ -26,7 +26,7 @@ from utils.table import CustomTable
 class ProductionTrackingTab(QWidget):
     def __init__(self, db_manager):
         super().__init__()
-        self.page_size = 10
+        self.page_size = 20
         self.current_page = 1
         self.total_pages = 1
         self.db_manager = db_manager
@@ -93,9 +93,7 @@ class ProductionTrackingTab(QWidget):
         )
 
         self.factory_dropdown.addItem("All")
-        self.factory_dropdown.addItem("Usine A")
-        self.factory_dropdown.addItem("Usine B")
-        self.factory_dropdown.addItem("Usine C")
+        self.__populate_factory_dropdown()
 
         # Button to apply filters
         self.filter_button = QPushButton("Apply Filter")
@@ -170,6 +168,12 @@ class ProductionTrackingTab(QWidget):
             QDate.fromString(most_recent_date, "yyyy-MM-dd").addDays(1)
         )
 
+    def __populate_factory_dropdown(self):
+        """Populate the factory dropdown with factory locations."""
+        factories = self.db_manager.fetch_query("fetch_locations")
+        for factory in factories:
+            self.factory_dropdown.addItem(factory[0])
+
     def update_production_table(self):
         """Update the production table for the current page."""
         start = (self.current_page - 1) * self.page_size
@@ -200,7 +204,7 @@ class ProductionTrackingTab(QWidget):
             for row in self.production_data
             if start_date <= row[3] <= end_date  # Date Range Filter
             and (not product_id or product_id in row[1].lower())  # Product ID Filter
-            and (factory == "All" or row[4] == factory)  # Factory Location Filter
+            and (factory == "All" or factory in row[4])  # Factory Location Filter
         ]
 
         self.total_pages = (

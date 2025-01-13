@@ -101,9 +101,7 @@ class StockLocationTab(QWidget):
         """
         )
         self.location_dropdown.addItem("All")
-        self.location_dropdown.addItem("Paris")
-        self.location_dropdown.addItem("Lyon")
-        self.location_dropdown.addItem("Marseille")
+        self.__populate_locations()
 
         # Button to apply filters
         self.filter_button = QPushButton("Apply Filter")
@@ -184,6 +182,13 @@ class StockLocationTab(QWidget):
             QDate.fromString(oldest_arrival_date, "yyyy-MM-dd").addDays(-1)
         )
 
+    def __populate_locations(self):
+        """Populate the location dropdown with locations from the database."""
+        locations = self.db_manager.fetch_query("fetch_locations")
+        print(locations)
+        for location in locations:
+            self.location_dropdown.addItem(location[0])
+
     def update_stock_table(self):
         """Update the stock table for the current page."""
         start = (self.current_page - 1) * self.page_size
@@ -226,7 +231,7 @@ class StockLocationTab(QWidget):
             for row in self.stock_data
             if row[3] > expiration_date  # Expiration Date Filter
             and row[4] > arrival_date  # Arrival Date Filter
-            and (location == "All" or row[6] == location)  # Location Filter
+            and (location == "All" or location in row[6])  # Location Filter
         ]
 
         self.total_pages = (

@@ -52,6 +52,14 @@ SQL_QUERIES = {
         JOIN 
             Usines_entrepots ON Usines_entrepots.id = Stock.id_entrepot
     """,
+    "fetch_locations": """
+        SELECT 
+            DISTINCT TRIM(SUBSTR(localisation, INSTR(localisation, ',') + 1)) AS country
+        FROM 
+            Usines_entrepots
+        ORDER BY 
+            country;
+    """,
     "fetch_production_tracking": """
         SELECT 
             printf('L%04d', L.id) AS Id_lot,
