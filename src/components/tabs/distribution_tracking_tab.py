@@ -126,7 +126,7 @@ class DistributionTrackingTab(QWidget):
         """
         )
         self.warehouse_dropdown.addItem("All Warehouses")
-        self.warehouse_dropdown.addItems(["Warehouse A", "Warehouse B", "Warehouse C"])
+        self.__populate_warehouse_dropdown()
 
         # Arrange the filter layout
         filter_layout = QHBoxLayout()
@@ -218,6 +218,13 @@ class DistributionTrackingTab(QWidget):
             :
         ]  # Start with unfiltered data
 
+    def __populate_warehouse_dropdown(self):
+        """Populate the location dropdown with locations from the database."""
+        locations = self.db_manager.fetch_query("fetch_locations")
+        print(locations)
+        for location in locations:
+            self.warehouse_dropdown.addItem(location[0])
+
     def filter_by_date_and_warehouse(self):
         """Filter distributions by date range and warehouse."""
         start_date = self.start_date_field.date().toPyDate()
@@ -228,7 +235,7 @@ class DistributionTrackingTab(QWidget):
             row
             for row in self.distribution_data
             if start_date <= datetime.strptime(row[0], "%Y-%m-%d").date() <= end_date
-            and (selected_warehouse == "All Warehouses" or row[4] == selected_warehouse)
+            and (selected_warehouse == "All Warehouses" or selected_warehouse in row[4])
         ]
         self.total_pages = (
             len(self.filtered_distribution_data) + self.page_size - 1
