@@ -26,7 +26,7 @@ from dialogs.database_dialog import open_dialog
 class DistributionTrackingTab(QWidget):
     def __init__(self, db_manager):
         super().__init__()
-        self.page_size = 10  # Number of rows per page
+        self.page_size = 20  # Number of rows per page
         self.current_page = 1
         self.total_pages = 1
         self.distribution_data = []  # Full dataset

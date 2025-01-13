@@ -27,7 +27,7 @@ from utils.table import CustomTable
 class SupplierAvailabilityTab(QWidget):
     def __init__(self, db_manager):
         super().__init__()
-        self.page_size = 10
+        self.page_size = 20
         self.current_page = 1
         self.total_pages = 1
         self.db_manager = db_manager
