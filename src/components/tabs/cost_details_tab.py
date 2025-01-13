@@ -145,10 +145,10 @@ class ProductCostDetailsTab(QWidget):
 
     def update_cost_summary(self):
         """Update the cost summary based on the filtered data."""
-        total_production = sum(row[1] for row in self.filtered_cost_data)
-        total_raw_materials = sum(row[2] for row in self.filtered_cost_data)
-        total_marketing = sum(row[3] for row in self.filtered_cost_data)
-        total_costs = sum(row[5] for row in self.filtered_cost_data)
+        total_production = round(float(sum(row[1] for row in self.filtered_cost_data)), 2)
+        total_raw_materials = round(float(sum(row[2] for row in self.filtered_cost_data)), 2)
+        total_marketing = round(float(sum(row[3] for row in self.filtered_cost_data)), 2)
+        total_costs = round(float(sum(row[5] for row in self.filtered_cost_data)), 2)
 
         self.summary_label.setText(
             f"Total Costs - Production: €{total_production}, Raw Materials: €{total_raw_materials}, "
