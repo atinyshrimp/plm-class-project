@@ -1,90 +1,176 @@
-# plm-class-project
+# Hive: PLM Class Project
 
-A comprehensive Product Lifecycle Management (PLM) tool developed as a semester-long project for our PLM course.
+[![Python Version](https://img.shields.io/badge/Python-3.8+-3776AB?style=for-the-badge&logo=python&logoColor=white)](https://www.python.org/)
+[![Qt Framework](https://img.shields.io/badge/Qt-PyQt5+-41CD52?style=for-the-badge&logo=qt&logoColor=white)](https://www.qt.io/)
+[![License](https://img.shields.io/badge/License-MIT-28A745?style=for-the-badge)](LICENSE)
+[![Status](https://img.shields.io/badge/Status-Active-00A651?style=for-the-badge)](README.md)
+[![Database](https://img.shields.io/badge/Database-SQLite-003B57?style=for-the-badge&logo=sqlite&logoColor=white)](https://www.sqlite.org/)
 
-## Installation
+> **Streamline Your Product Lifecycle. From Supply to Sales.**
+
+A comprehensive Product Lifecycle Management (PLM) platform designed to optimize operational efficiency, reduce costs, and enhance decision-making across your entire product lifecycle. Built with enterprise-grade features and user-centric design, this platform transforms how organizations manage products, suppliers, inventory, and production processes.
+
+## 🎯 Business Value
+
+- **Operational Efficiency**: Centralize all product and supply chain data in one secure platform
+- **Cost Optimization**: Real-time cost tracking, margin analysis, and production insights
+- **Risk Mitigation**: Supplier monitoring, batch tracking, and supply chain visibility
+- **Data-Driven Decisions**: Advanced analytics and reporting capabilities for strategic planning
+- **Role-Based Access**: Secure multi-user environment with admin and viewer permissions
+
+## 🚀 Key Features
+
+### Product Management Suite
+
+- **Comprehensive Product Sheets**: Track ID, name, quantity, containers, versions, production dates, descriptions, and ingredients
+- **Cost Intelligence**: Monitor production costs, raw material expenses, selling prices, marketing costs, and calculate margins
+- **Stock & Inventory**: Real-time stock level monitoring, expiration tracking, warehouse location management, and CSV export capabilities
+
+### Supply Chain Optimization
+
+- **Supplier Intelligence**: Track supplier activities, monitor availability, and manage detailed supplier profiles
+- **Demand Planning**: Filter deliveries by date range, supplier name, and ingredient requirements
+- **Production Analytics**: Visualize production trends, filter by date range and factory location
+
+### Advanced Analytics
+
+- **Batch History Management**: Complete lot tracking with filtering and export capabilities
+- **Supplier Analytics**: Graphical visualization of supplier performance and trends
+- **Stock Trend Analysis**: Monitor inventory patterns and make informed stocking decisions
+
+### Enterprise Features
+
+- **Secure Authentication**: Role-based login system with admin and viewer access levels
+- **Data Export**: CSV export functionality across all modules for reporting and analysis
+- **Pagination & Search**: Handle large datasets efficiently with intuitive navigation
+- **Contextual Actions**: Right-click context menus for streamlined workflows
+
+## 📋 Installation
 
 1. Clone the repository:
-    ```bash
-    git clone https://github.com/atinyshrimp/plm-class-project.git
-    ```
-2. Navigate to the project directory:
-    ```bash
-    cd plm-class-project
-    ```
-3. Install the dependencies:
-    ```bash
-    pip install -r requirements.txt
-    ```
-4. Run the project:
-    ```bash
-    python src/main.py
-    ```
 
-## Usage
+   ```bash
+   git clone https://github.com/atinyshrimp/plm-class-project.git
+   cd plm-class-project
+   ```
 
-### Main Window
+2. Install dependencies:
 
--   The main window provides access to various tabs for managing different aspects of the product lifecycle.
+   ```bash
+   pip install -r requirements.txt
+   ```
 
-### Navigation Bar
+3. Launch the application:
+   ```bash
+   python src/main.py
+   ```
 
--   Use the navigation bar to switch between different sections such as Products, People, Processes, and more.
+## 🎮 Getting Started
 
-### Data Tabs
+### Dashboard Navigation
 
--   Each section contains data tabs for viewing and managing related information.
--   For example, the Products section includes tabs for product details, stock, and location.
+The main window provides intuitive access to key business areas:
 
-### Adding & Editing Data
+- **Products**: Manage product portfolios, costs, and inventory
+- **People**: Maintain supplier and organizational contacts
+- **Processes**: Track production workflows and timelines
+- **Data**: Access historical batch records and compliance data
 
--   Use the provided forms to add or edit data in each section.
--   Ensure all required fields are filled before submitting the form.
+### Core Workflows
 
-### Styling
+#### Adding & Managing Data
 
--   The application uses a custom stylesheet for a consistent look and feel.
--   You can modify the stylesheet in `palette_style.qss` and apply changes using the `apply_stylesheet` function in `styling.py`.
+- Use intuitive forms to input or modify data across all modules
+- Required fields are clearly marked to ensure data quality
+- Real-time validation provides immediate feedback
+
+#### Exporting Reports
+
+All major sections support CSV export for:
+
+- Integration with business intelligence tools
+- Compliance documentation
+- Strategic reporting and analysis
+
+#### Monitoring & Analytics
+
+- Filter data by multiple criteria (date range, product, supplier, location)
+- Visualize trends with built-in graphical analytics
+- Export insights for stakeholder presentations
+
+## 🏗️ Technical Architecture
+
+### Technology Stack
+
+- **Frontend**: PyQt5 (Native desktop UI)
+- **Backend**: Python 3.8+
+- **Database**: SQLite with optimized queries
+- **Styling**: Custom QSS stylesheets for consistent branding
+
+### Project Structure
+
+```
+src/
+├── main.py                 # Application entry point
+├── globals.py              # Global configurations
+├── components/             # UI components & tabs
+├── database/               # Database layer & queries
+├── dialogs/                # User dialogs & windows
+├── utils/                  # Utility functions
+└── widgets/                # Reusable widget components
+```
 
 ### Database
 
--   The application connects to a database to store and retrieve data.
--   Database queries are managed in `sql_queries.py`.
+- Relational schema for integrity and performance
+- Comprehensive query library in `sql_queries.py`
+- Automated population scripts for test data
 
-### Shortcuts
+## 🔐 User Management
 
--   The application includes various shortcuts for quick access to common actions.
--   Refer to the menu for a list of available shortcuts.
+### Authentication Levels
 
-## Functionalities
+- **Admin**: Full access to all features and settings
+- **Viewer**: Read-only access to data and reports
 
-### Product Management
+### Security Features
 
--   **Product Sheets**: View and manage detailed information about each product, including ID, name, quantity, container, version, production date, description, and ingredients.
--   **Cost Details**: Track and manage production costs, raw materials costs, selling prices, marketing costs, total costs, and margins.
--   **Stock & Location**: Monitor stock levels, expiration dates, arrival dates, warehouse locations, and export data to CSV.
+- Role-based access control (RBAC)
+- Secure login mechanism
+- Audit trail for compliance requirements
 
-### People Management
+## 📊 Business Use Cases
 
--   **Supplier Tracking**: Track supplier activities, view supplier details, and manage supplier data.
+### Scenario 1: Manufacturing Company
 
-### Process Management
+Use PLM to manage multi-product portfolios with complex supply chains, track production costs in real-time, and optimize inventory across multiple warehouses.
 
--   **Production Tracking**: Track production processes, filter data by date range, product ID, and factory location, and export data to CSV.
--   **Supplier Availability**: Monitor supplier availability, filter data by delivery dates, supplier names, and ingredients, and check for upcoming deliveries.
+### Scenario 2: Supply Chain Optimization
 
-### Data Management
+Monitor supplier performance, track ingredient deliveries, identify supply chain bottlenecks, and reduce procurement costs through data-driven insights.
 
--   **Batch History**: View and manage batch history, filter data by lot ID, product ID, or status, and export batch history to CSV.
+### Scenario 3: Compliance & Traceability
 
-### Additional Features
+Maintain comprehensive batch history for regulatory compliance, track product versions and ingredients, and generate audit-ready reports.
 
--   **Login System**: Secure login system with different user roles (admin, viewer).
--   **Context Menus**: Right-click context menus for quick actions on data tables.
--   **Pagination**: Pagination controls for navigating through large datasets.
--   **Export to CSV**: Export data from various tabs to CSV files for external use.
--   **Graphical Analytics**: Visualize supplier analytics and stock trends using graphs.
+### Scenario 4: Cost Management
 
-## Changelog
+Break down production costs by component, analyze margins across product lines, and identify cost reduction opportunities through detailed analytics.
 
-For a detailed list of changes, refer to the `CHANGELOG.md` file.
+## 🛠️ Customization & Styling
+
+The application supports extensive customization:
+
+- Modify the stylesheet in `assets/styles/palette_style.qss` for brand alignment
+- Apply custom styles using the `apply_stylesheet()` function in `utils/styling.py`
+- Extend components with additional business logic as needed
+
+## 📜 License & Attribution
+
+This project is licensed under the MIT License, allowing both commercial and personal use with attribution.
+
+Developed as a semester project for advanced Product Lifecycle Management coursework.
+
+## 📝 Changelog
+
+For detailed information about updates, improvements, and bug fixes, see [CHANGELOG.md](CHANGELOG.md).
