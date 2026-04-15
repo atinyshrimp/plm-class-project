@@ -2,8 +2,6 @@
 
 [![Python Version](https://img.shields.io/badge/Python-3.8+-3776AB?style=for-the-badge&logo=python&logoColor=white)](https://www.python.org/)
 [![Qt Framework](https://img.shields.io/badge/Qt-PyQt5+-41CD52?style=for-the-badge&logo=qt&logoColor=white)](https://www.qt.io/)
-[![License](https://img.shields.io/badge/License-MIT-28A745?style=for-the-badge)](LICENSE)
-[![Status](https://img.shields.io/badge/Status-Active-00A651?style=for-the-badge)](README.md)
 [![Database](https://img.shields.io/badge/Database-SQLite-003B57?style=for-the-badge&logo=sqlite&logoColor=white)](https://www.sqlite.org/)
 
 > **Streamline Your Product Lifecycle. From Supply to Sales.**
@@ -165,9 +163,7 @@ The application supports extensive customization:
 - Apply custom styles using the `apply_stylesheet()` function in `utils/styling.py`
 - Extend components with additional business logic as needed
 
-## 📜 License & Attribution
-
-This project is licensed under the MIT License, allowing both commercial and personal use with attribution.
+## 📜 Attribution
 
 Developed as a semester project for advanced Product Lifecycle Management coursework.
 
